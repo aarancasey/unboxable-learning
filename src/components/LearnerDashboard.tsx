@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import ModuleViewer from './ModuleViewer';
 import SurveyForm from './SurveyForm';
@@ -17,11 +16,34 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
   const [selectedModule, setSelectedModule] = useState<any>(null);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [currentLearner, setCurrentLearner] = useState(learnerData);
+  const [availableModules, setAvailableModules] = useState<any[]>([]);
 
   useEffect(() => {
     // Check if learner needs to change password on first login
     if (learnerData && learnerData.requiresPasswordChange) {
       setShowPasswordModal(true);
+    }
+
+    // Load available courses and their modules
+    const savedCourses = JSON.parse(localStorage.getItem('courses') || '[]');
+    console.log('Loading courses for learner:', savedCourses);
+    
+    if (savedCourses.length > 0) {
+      // Combine all modules from all active courses
+      const allModules = savedCourses.reduce((modules: any[], course: any) => {
+        if (course.status === 'active' && course.moduleList) {
+          const courseModules = course.moduleList.map((module: any) => ({
+            ...module,
+            courseId: course.id,
+            courseName: course.title,
+            unlocked: true, // For now, unlock all modules
+            status: 'available'
+          }));
+          return [...modules, ...courseModules];
+        }
+        return modules;
+      }, []);
+      setAvailableModules(allModules);
     }
   }, [learnerData]);
 
@@ -30,14 +52,14 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
     name: "Demo Learner",
     progress: 0,
     completedModules: 0,
-    totalModules: 4,
+    totalModules: availableModules.length,
     nextSurvey: "Customer Service Assessment",
-    modules: []
+    modules: availableModules
   };
 
   const displayData = currentLearner || defaultLearnerData;
-  // Ensure modules is always an array
-  const modules = displayData.modules || [];
+  // Use the loaded modules from courses
+  const modules = availableModules.length > 0 ? availableModules : displayData.modules || [];
 
   const handlePasswordChanged = (newPassword: string) => {
     if (currentLearner) {
@@ -102,7 +124,7 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
         <ProgressOverview
           progress={displayData.progress}
           completedModules={displayData.completedModules}
-          totalModules={displayData.totalModules}
+          totalModules={modules.length}
           nextSurvey={displayData.nextSurvey}
           onStartSurvey={() => setActiveView('survey')}
         />

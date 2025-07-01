@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { CourseCreationForm } from './CourseCreationForm';
 import { CourseHeader } from './course/CourseHeader';
@@ -11,13 +10,14 @@ const CourseManagement = () => {
   const [courses, setCourses] = useState<any[]>([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
 
-  // Load courses based on survey data
+  // Load courses from localStorage on component mount
   useEffect(() => {
+    const savedCourses = JSON.parse(localStorage.getItem('courses') || '[]');
     const savedSurveys = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
     
-    // Create a course based on survey data if surveys exist
-    if (savedSurveys.length > 0) {
-      const newCourse = {
+    // If no saved courses but surveys exist, create the default course
+    if (savedCourses.length === 0 && savedSurveys.length > 0) {
+      const defaultCourse = {
         id: 1,
         title: "Module 2: Advanced Customer Service Skills",
         description: "Building on Module 1 foundations, develop advanced customer service techniques and conflict resolution skills",
@@ -35,15 +35,19 @@ const CourseManagement = () => {
           { id: 4, title: "Service Excellence & Team Collaboration", type: "document", duration: "20 min", status: "active" },
         ]
       };
-      setCourses([newCourse]);
+      const coursesToSet = [defaultCourse];
+      setCourses(coursesToSet);
+      localStorage.setItem('courses', JSON.stringify(coursesToSet));
     } else {
-      setCourses([]);
+      setCourses(savedCourses);
     }
   }, []);
 
   const handleSaveCourse = (courseData: any) => {
-    setCourses(prev => [...prev, courseData]);
-    console.log('Course saved:', courseData);
+    const newCourses = [...courses, courseData];
+    setCourses(newCourses);
+    localStorage.setItem('courses', JSON.stringify(newCourses));
+    console.log('Course saved and persisted:', courseData);
   };
 
   if (selectedCourse) {

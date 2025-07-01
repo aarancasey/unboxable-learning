@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -29,18 +28,11 @@ export const CourseScheduleDialog = ({ open, onClose, selectedDate, onSchedule }
   const [availableCourses, setAvailableCourses] = useState<any[]>([]);
 
   useEffect(() => {
-    // Load available courses from CourseManagement
-    const savedSurveys = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
-    if (savedSurveys.length > 0) {
-      setAvailableCourses([
-        {
-          id: '1',
-          title: 'Module 2: Advanced Customer Service Skills',
-          maxEnrollment: 17
-        }
-      ]);
-    }
-  }, []);
+    // Load available courses from localStorage
+    const savedCourses = JSON.parse(localStorage.getItem('courses') || '[]');
+    console.log('Loading courses for calendar:', savedCourses);
+    setAvailableCourses(savedCourses.filter((course: any) => course.status === 'active'));
+  }, [open]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,7 +66,7 @@ export const CourseScheduleDialog = ({ open, onClose, selectedDate, onSchedule }
   };
 
   const handleCourseSelect = (courseId: string) => {
-    const course = availableCourses.find(c => c.id === courseId);
+    const course = availableCourses.find(c => c.id.toString() === courseId);
     if (course) {
       setCourseId(courseId);
       setCourseName(course.title);
@@ -105,7 +97,7 @@ export const CourseScheduleDialog = ({ open, onClose, selectedDate, onSchedule }
               </SelectTrigger>
               <SelectContent>
                 {availableCourses.map(course => (
-                  <SelectItem key={course.id} value={course.id}>
+                  <SelectItem key={course.id} value={course.id.toString()}>
                     {course.title}
                   </SelectItem>
                 ))}
