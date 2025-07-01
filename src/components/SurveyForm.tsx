@@ -58,12 +58,41 @@ const SurveyForm = ({ onBack, onSubmit }: SurveyFormProps) => {
       {
         title: "Instructions",
         type: "instructions",
-        content: `This pre-assessment in advance of your LEADForward program, is designed to help you reflect on how you lead today, how you're feeling in your leadership role, and where you want to go next. It combines:
+        content: `Leadership Sentiment, Purpose, Adaptive & Agility Self-Assessment (adapted from Joiner and Josephs)
+
+This self-assessment is designed to help you explore your current leadership sentiment and intent, adaptability and agility.
+
+It will give insight into how you currently lead and respond to dynamic conditions, change, make decisions, empower others and lead in complexity.
+
+Why Combine Sentiment, Intent and Leadership Agility?
+
+Most leadership assessments focus only on what leaders do - behaviours, styles, or competencies. But leadership isn't just behavioural. It's also deeply emotional, situational, and purpose driven.
+
+By combining how leaders feel (sentiment), how they lead (adaptive agility), and why they lead (intent and purpose), we'll unlock a far more complete picture of your leadership.
+
+We'll ask questions about your current capabilities, motivation, mindset, and direction - the internal drivers that influence how you show up, adapt, and grow over time as a leader.
+
+This three-part survey creates a richer starting point for personal development, coaching, and programme impact.
+
+It allows you to move from self-awareness to purposeful action - aligned with who you are and the kind of leader you want to become.
+
+This pre-assessment in advance of your LEADForward program, is designed to help you reflect on how you lead today, how you're feeling in your leadership role, and where you want to go next. It combines:
 
 • How you feel and experience leadership (Sentiment)
 • What drives you and where you're headed (Purpose)  
 • How you show up and adapt in complexity (Agility)
 
+Together, these insights provide a richer, more complete picture of your leadership - one that's both practical and personal and can be used to help shape your leadership journey.
+
+How This Helps:
+
+• At the start of the programme, this provides you an understanding of your leadership that will help both within LEADForward as well as within your coaching sessions.
+
+• This self-assessment survey will be repeated at the end of the LEADForward program and will help show shifts in your mindset, thinking, perspectives and capabilities.
+
+• This self-assessment is to give you a point in time perspective, there are no right wrong answers and is purely to give you a sense of where you are currently at.
+
+Instructions:
 Before you complete the full self-assessment, take the opportunity to complete this in a quiet and calm space so that you can fully reflect.
 
 Please answer these questions honestly. There are no right or wrong answers. Your responses will help you build insights and understanding as well as track shifts in mindset and perspective over time.

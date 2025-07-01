@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,10 +14,12 @@ import {
   PlayCircle,
   FileText
 } from 'lucide-react';
+import { CourseCreationForm } from './CourseCreationForm';
 
 const CourseManagement = () => {
   const [selectedCourse, setSelectedCourse] = useState<any>(null);
   const [courses, setCourses] = useState<any[]>([]);
+  const [showCreateForm, setShowCreateForm] = useState(false);
 
   // Load courses based on survey data
   useEffect(() => {
@@ -38,7 +39,7 @@ const CourseManagement = () => {
         createdDate: new Date().toISOString().split('T')[0],
         estimatedDuration: "4 weeks",
         moduleList: [
-          { id: 1, title: "Survey to Complete", type: "survey", duration: "15 min", status: "active" },
+          { id: 1, title: "Leadership Sentiment, Adaptive and Agile Self-Assessment", type: "survey", duration: "45 min", status: "active" },
           { id: 2, title: "Advanced Communication Techniques", type: "video", duration: "25 min", status: "active" },
           { id: 3, title: "Handling Difficult Customers", type: "interactive", duration: "30 min", status: "active" },
           { id: 4, title: "Service Excellence & Team Collaboration", type: "document", duration: "20 min", status: "active" },
@@ -49,6 +50,11 @@ const CourseManagement = () => {
       setCourses([]);
     }
   }, []);
+
+  const handleSaveCourse = (courseData: any) => {
+    setCourses(prev => [...prev, courseData]);
+    console.log('Course saved:', courseData);
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -201,96 +207,114 @@ const CourseManagement = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Course Management</h2>
-          <p className="text-gray-600">Create and manage learning courses and modules</p>
+    <>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">Course Management</h2>
+            <p className="text-gray-600">Create and manage learning courses and modules</p>
+          </div>
+          
+          <Button 
+            className="bg-purple-600 hover:bg-purple-700"
+            onClick={() => setShowCreateForm(true)}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Create Course
+          </Button>
         </div>
-        
-        <Button className="bg-purple-600 hover:bg-purple-700">
-          <Plus className="h-4 w-4 mr-2" />
-          Create Course
-        </Button>
+
+        {/* Courses Grid or Empty State */}
+        {courses.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {courses.map((course) => (
+              <Card 
+                key={course.id} 
+                className="hover:shadow-lg transition-shadow cursor-pointer"
+                onClick={() => setSelectedCourse(course)}
+              >
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <CardTitle className="text-lg mb-2">{course.title}</CardTitle>
+                      <p className="text-sm text-gray-600 line-clamp-2">{course.description}</p>
+                    </div>
+                    {getStatusBadge(course.status)}
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {/* Course Stats */}
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="flex items-center space-x-2">
+                        <BookOpen className="h-4 w-4 text-gray-500" />
+                        <span>{course.modules} modules</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Users className="h-4 w-4 text-gray-500" />
+                        <span>{course.enrolledUsers}/{course.maxEnrollment} enrolled</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Clock className="h-4 w-4 text-gray-500" />
+                        <span>{course.estimatedDuration}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Calendar className="h-4 w-4 text-gray-500" />
+                        <span>Created {course.createdDate}</span>
+                      </div>
+                    </div>
+
+                    {/* Completion Rate */}
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span className="text-gray-600">Completion Rate</span>
+                        <span className="font-medium">{course.completionRate}%</span>
+                      </div>
+                      <Progress value={course.completionRate} />
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex space-x-2 pt-2">
+                      <Button variant="outline" size="sm" className="flex-1">
+                        <Eye className="h-4 w-4 mr-1" />
+                        View
+                      </Button>
+                      <Button variant="outline" size="sm" className="flex-1">
+                        <Settings className="h-4 w-4 mr-1" />
+                        Edit
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <Card>
+            <CardContent className="text-center py-12">
+              <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No courses available</h3>
+              <p className="text-gray-600 mb-6">Create your first course to get started with the learning management system.</p>
+              <Button 
+                className="bg-purple-600 hover:bg-purple-700"
+                onClick={() => setShowCreateForm(true)}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Create Your First Course
+              </Button>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
-      {/* Courses Grid or Empty State */}
-      {courses.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {courses.map((course) => (
-            <Card 
-              key={course.id} 
-              className="hover:shadow-lg transition-shadow cursor-pointer"
-              onClick={() => setSelectedCourse(course)}
-            >
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-lg mb-2">{course.title}</CardTitle>
-                    <p className="text-sm text-gray-600 line-clamp-2">{course.description}</p>
-                  </div>
-                  {getStatusBadge(course.status)}
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {/* Course Stats */}
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div className="flex items-center space-x-2">
-                      <BookOpen className="h-4 w-4 text-gray-500" />
-                      <span>{course.modules} modules</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Users className="h-4 w-4 text-gray-500" />
-                      <span>{course.enrolledUsers}/{course.maxEnrollment} enrolled</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Clock className="h-4 w-4 text-gray-500" />
-                      <span>{course.estimatedDuration}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Calendar className="h-4 w-4 text-gray-500" />
-                      <span>Created {course.createdDate}</span>
-                    </div>
-                  </div>
-
-                  {/* Completion Rate */}
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span className="text-gray-600">Completion Rate</span>
-                      <span className="font-medium">{course.completionRate}%</span>
-                    </div>
-                    <Progress value={course.completionRate} />
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex space-x-2 pt-2">
-                    <Button variant="outline" size="sm" className="flex-1">
-                      <Eye className="h-4 w-4 mr-1" />
-                      View
-                    </Button>
-                    <Button variant="outline" size="sm" className="flex-1">
-                      <Settings className="h-4 w-4 mr-1" />
-                      Edit
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : (
-        <Card>
-          <CardContent className="text-center py-12">
-            <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No courses available</h3>
-            <p className="text-gray-600 mb-6">Courses will be automatically created based on survey submissions.</p>
-            <p className="text-sm text-gray-500">Complete Module 1 surveys to unlock Module 2 content.</p>
-          </CardContent>
-        </Card>
-      )}
-    </div>
+      {/* Course Creation Form */}
+      <CourseCreationForm
+        open={showCreateForm}
+        onOpenChange={setShowCreateForm}
+        onSave={handleSaveCourse}
+      />
+    </>
   );
 };
 
