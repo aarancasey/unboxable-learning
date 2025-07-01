@@ -9,9 +9,10 @@ import PasswordChangeModal from './PasswordChangeModal';
 interface LearnerDashboardProps {
   onLogout: () => void;
   learnerData?: any;
+  onStartSurvey?: () => void;
 }
 
-const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
+const LearnerDashboard = ({ onLogout, learnerData, onStartSurvey }: LearnerDashboardProps) => {
   const [activeView, setActiveView] = useState<'dashboard' | 'module' | 'survey'>('dashboard');
   const [selectedModule, setSelectedModule] = useState<any>(null);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -88,6 +89,14 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
     setActiveView('module');
   };
 
+  const handleSurveyStart = () => {
+    if (onStartSurvey) {
+      onStartSurvey();
+    } else {
+      setActiveView('survey');
+    }
+  };
+
   if (activeView === 'module' && selectedModule) {
     return (
       <ModuleViewer 
@@ -126,7 +135,7 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
           completedModules={displayData.completedModules}
           totalModules={modules.length}
           nextSurvey={displayData.nextSurvey}
-          onStartSurvey={() => setActiveView('survey')}
+          onStartSurvey={handleSurveyStart}
         />
 
         <ModulesSection
