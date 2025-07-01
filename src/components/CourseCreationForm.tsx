@@ -1,13 +1,10 @@
 
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, Upload, FileText, Video, Settings, Trash2 } from 'lucide-react';
 import { ModuleForm } from './ModuleForm';
+import { CourseBasicForm } from './course-creation/CourseBasicForm';
+import { ModulesListCard } from './course-creation/ModulesListCard';
+import { CourseFormActions } from './course-creation/CourseFormActions';
 
 interface Module {
   id: string;
@@ -119,21 +116,6 @@ export const CourseCreationForm = ({ open, onOpenChange, onSave }: CourseCreatio
     }]);
   };
 
-  const getModuleIcon = (type: string) => {
-    switch (type) {
-      case 'video':
-        return <Video className="h-4 w-4 text-blue-600" />;
-      case 'interactive':
-        return <Settings className="h-4 w-4 text-green-600" />;
-      case 'document':
-        return <FileText className="h-4 w-4 text-purple-600" />;
-      case 'survey':
-        return <FileText className="h-4 w-4 text-orange-600" />;
-      default:
-        return <FileText className="h-4 w-4 text-gray-600" />;
-    }
-  };
-
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -143,127 +125,35 @@ export const CourseCreationForm = ({ open, onOpenChange, onSave }: CourseCreatio
           </DialogHeader>
           
           <div className="space-y-6">
-            {/* Basic Course Information */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Course Details</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="courseName">Course Name</Label>
-                  <Input
-                    id="courseName"
-                    value={courseName}
-                    onChange={(e) => setCourseName(e.target.value)}
-                    placeholder="Enter course name"
-                  />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="duration">Duration</Label>
-                    <Input
-                      id="duration"
-                      value={duration}
-                      onChange={(e) => setDuration(e.target.value)}
-                      placeholder="e.g., 4 weeks"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="maxLearners">Maximum Learners</Label>
-                    <Input
-                      id="maxLearners"
-                      type="number"
-                      value={maxLearners}
-                      onChange={(e) => setMaxLearners(parseInt(e.target.value))}
-                    />
-                  </div>
-                </div>
-                
-                <div>
-                  <Label htmlFor="enrolledLearners">Currently Enrolled</Label>
-                  <Input
-                    id="enrolledLearners"
-                    type="number"
-                    value={enrolledLearners}
-                    onChange={(e) => setEnrolledLearners(parseInt(e.target.value))}
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="courseOverview">Course Overview</Label>
-                  <Textarea
-                    id="courseOverview"
-                    value={courseOverview}
-                    onChange={(e) => setCourseOverview(e.target.value)}
-                    placeholder="Describe the course content and objectives..."
-                    className="min-h-[100px]"
-                  />
-                </div>
-              </CardContent>
-            </Card>
+            <CourseBasicForm
+              courseName={courseName}
+              setCourseName={setCourseName}
+              courseOverview={courseOverview}
+              setCourseOverview={setCourseOverview}
+              duration={duration}
+              setDuration={setDuration}
+              maxLearners={maxLearners}
+              setMaxLearners={setMaxLearners}
+              enrolledLearners={enrolledLearners}
+              setEnrolledLearners={setEnrolledLearners}
+            />
 
-            {/* Modules Section */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>Course Modules ({modules.length})</CardTitle>
-                  <Button onClick={handleAddModule} size="sm">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Module
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {modules.map((module, index) => (
-                    <div key={module.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-sm font-medium">
-                          {index + 1}
-                        </div>
-                        {getModuleIcon(module.type)}
-                        <div>
-                          <h4 className="font-medium">{module.title}</h4>
-                          <p className="text-sm text-gray-500">{module.duration} • {module.type}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Button variant="ghost" size="sm" onClick={() => handleEditModule(module)}>
-                          <Settings className="h-4 w-4" />
-                        </Button>
-                        {modules.length > 1 && (
-                          <Button variant="ghost" size="sm" onClick={() => handleDeleteModule(module.id)}>
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                
-                <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                  <p className="text-sm text-blue-800">
-                    <strong>Note:</strong> Modules are sequential. The survey must be completed before learners can access other materials.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <ModulesListCard
+              modules={modules}
+              onAddModule={handleAddModule}
+              onEditModule={handleEditModule}
+              onDeleteModule={handleDeleteModule}
+            />
 
-            {/* Action Buttons */}
-            <div className="flex justify-end space-x-3">
-              <Button variant="outline" onClick={() => onOpenChange(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleSaveCourse} disabled={!courseName.trim()}>
-                Create Course
-              </Button>
-            </div>
+            <CourseFormActions
+              onCancel={() => onOpenChange(false)}
+              onSave={handleSaveCourse}
+              isValid={!!courseName.trim()}
+            />
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* Module Form Dialog */}
       <ModuleForm
         open={showModuleForm}
         onOpenChange={setShowModuleForm}
