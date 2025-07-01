@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import LearnerDashboard from '@/components/LearnerDashboard';
 import AdminDashboard from '@/components/AdminDashboard';
@@ -10,20 +9,33 @@ import { GraduationCap, Users } from 'lucide-react';
 const Index = () => {
   const [userRole, setUserRole] = useState<'learner' | 'admin' | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [learnerData, setLearnerData] = useState<any>(null);
 
   const handleRoleSelect = (role: 'learner' | 'admin') => {
     setUserRole(role);
+    // Don't set authenticated yet - wait for login
+  };
+
+  const handleLogin = (userData?: any) => {
     setIsAuthenticated(true);
+    if (userData) {
+      setLearnerData(userData);
+    }
   };
 
   const handleLogout = () => {
     setUserRole(null);
     setIsAuthenticated(false);
+    setLearnerData(null);
   };
 
   if (!isAuthenticated) {
     return userRole ? (
-      <LoginPage role={userRole} onLogin={() => setIsAuthenticated(true)} onBack={() => setUserRole(null)} />
+      <LoginPage 
+        role={userRole} 
+        onLogin={handleLogin} 
+        onBack={() => setUserRole(null)} 
+      />
     ) : (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
         <div className="max-w-md w-full space-y-8">
@@ -69,7 +81,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {userRole === 'learner' ? (
-        <LearnerDashboard onLogout={handleLogout} />
+        <LearnerDashboard onLogout={handleLogout} learnerData={learnerData} />
       ) : (
         <AdminDashboard onLogout={handleLogout} />
       )}

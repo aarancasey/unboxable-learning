@@ -5,20 +5,81 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft, GraduationCap, Users } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface LoginPageProps {
   role: 'learner' | 'admin';
-  onLogin: () => void;
+  onLogin: (userData?: any) => void;
   onBack: () => void;
 }
 
 const LoginPage = ({ role, onLogin, onBack }: LoginPageProps) => {
   const [credentials, setCredentials] = useState({ email: '', password: '' });
+  const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock authentication - in real app, this would validate against authService
-    onLogin();
+    
+    if (role === 'admin') {
+      // Mock admin authentication
+      onLogin();
+      return;
+    }
+
+    // Learner authentication
+    if (!credentials.email) {
+      toast({
+        title: "Email Required",
+        description: "Please enter your email address",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Get learners from localStorage
+    const storedLearners = localStorage.getItem('learners');
+    const learners = storedLearners ? JSON.parse(storedLearners) : [];
+    
+    // Find learner by email
+    const learner = learners.find((l: any) => l.email.toLowerCase() === credentials.email.toLowerCase());
+    
+    if (!learner) {
+      toast({
+        title: "Learner Not Found",
+        description: "No learner found with this email address",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check if learner requires password change (first time login)
+    if (learner.requiresPasswordChange) {
+      // For first-time login, just email is enough
+      onLogin(learner);
+      return;
+    }
+
+    // For returning users, check password
+    if (!credentials.password) {
+      toast({
+        title: "Password Required",
+        description: "Please enter your password",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (credentials.password !== learner.password) {
+      toast({
+        title: "Invalid Password",
+        description: "The password you entered is incorrect",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Successful login
+    onLogin(learner);
   };
 
   const isLearner = role === 'learner';
@@ -74,24 +135,40 @@ const LoginPage = ({ role, onLogin, onBack }: LoginPageProps) => {
                 />
               </div>
               
-              <div>
-                <Label htmlFor="password" className="text-unboxable-navy">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter your password"
-                  value={credentials.password}
-                  onChange={(e) => setCredentials(prev => ({ ...prev, password: e.target.value }))}
-                  className="border-slate-300 focus:border-unboxable-navy focus:ring-unboxable-navy"
-                  required
-                />
-              </div>
+              {/* Only show password field for admin or returning learners */}
+              {!isLearner && (
+                <div>
+                  <Label htmlFor="password" className="text-unboxable-navy">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Enter your password"
+                    value={credentials.password}
+                    onChange={(e) => setCredentials(prev => ({ ...prev, password: e.target.value }))}
+                    className="border-slate-300 focus:border-unboxable-navy focus:ring-unboxable-navy"
+                    required
+                  />
+                </div>
+              )}
 
-              {isLearner && (
-                <div className="text-sm text-slate-600 bg-slate-50 p-3 rounded-lg border">
-                  <strong className="text-unboxable-navy">Demo credentials:</strong><br />
-                  Email: learner@demo.com<br />
-                  Password: demo123
+              {/* Show password field for learners who don't require password change */}
+              {isLearner && credentials.email && (() => {
+                const storedLearners = localStorage.getItem('learners');
+                const learners = storedLearners ? JSON.parse(storedLearners) : [];
+                const learner = learners.find((l: any) => l.email.toLowerCase() === credentials.email.toLowerCase());
+                return learner && !learner.requiresPasswordChange;
+              })() && (
+                <div>
+                  <Label htmlFor="password" className="text-unboxable-navy">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Enter your password"
+                    value={credentials.password}
+                    onChange={(e) => setCredentials(prev => ({ ...prev, password: e.target.value }))}
+                    className="border-slate-300 focus:border-unboxable-navy focus:ring-unboxable-navy"
+                    required
+                  />
                 </div>
               )}
 

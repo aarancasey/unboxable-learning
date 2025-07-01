@@ -1,27 +1,62 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ModuleViewer from './ModuleViewer';
 import SurveyForm from './SurveyForm';
 import LearnerHeader from './LearnerHeader';
 import ProgressOverview from './ProgressOverview';
 import ModulesSection from './ModulesSection';
+import PasswordChangeModal from './PasswordChangeModal';
 
 interface LearnerDashboardProps {
   onLogout: () => void;
+  learnerData?: any;
 }
 
-const LearnerDashboard = ({ onLogout }: LearnerDashboardProps) => {
+const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
   const [activeView, setActiveView] = useState<'dashboard' | 'module' | 'survey'>('dashboard');
   const [selectedModule, setSelectedModule] = useState<any>(null);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [currentLearnier, setCurrentLearner] = useState(learnerData);
 
-  // Empty data structure - no mock data
-  const learnerData = {
-    name: "",
+  useEffect(() => {
+    // Check if learner needs to change password on first login
+    if (learnerData && learnerData.requiresPasswordChange) {
+      setShowPasswordModal(true);
+    }
+  }, [learnerData]);
+
+  // Default empty data structure if no learner data provided
+  const defaultLearnerData = {
+    name: "Demo Learner",
     progress: 0,
     completedModules: 0,
-    totalModules: 0,
-    nextSurvey: "",
+    totalModules: 4,
+    nextSurvey: "Customer Service Assessment",
     modules: []
+  };
+
+  const displayData = currentLearnier || defaultLearnerData;
+
+  const handlePasswordChanged = (newPassword: string) => {
+    if (currentLearnier) {
+      // Update learner data
+      const updatedLearner = {
+        ...currentLearnier,
+        password: newPassword,
+        requiresPasswordChange: false
+      };
+      
+      // Update in localStorage
+      const storedLearners = localStorage.getItem('learners');
+      const learners = storedLearners ? JSON.parse(storedLearners) : [];
+      const updatedLearners = learners.map((l: any) => 
+        l.id === currentLearnier.id ? updatedLearner : l
+      );
+      localStorage.setItem('learners', JSON.stringify(updatedLearners));
+      
+      setCurrentLearner(updatedLearner);
+    }
+    setShowPasswordModal(false);
   };
 
   const handleModuleClick = (module: any) => {
@@ -57,24 +92,31 @@ const LearnerDashboard = ({ onLogout }: LearnerDashboardProps) => {
   return (
     <div className="min-h-screen bg-gray-50">
       <LearnerHeader 
-        learnerName={learnerData.name}
+        learnerName={displayData.name}
         onLogout={onLogout}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <ProgressOverview
-          progress={learnerData.progress}
-          completedModules={learnerData.completedModules}
-          totalModules={learnerData.totalModules}
-          nextSurvey={learnerData.nextSurvey}
+          progress={displayData.progress}
+          completedModules={displayData.completedModules}
+          totalModules={displayData.totalModules}
+          nextSurvey={displayData.nextSurvey}
           onStartSurvey={() => setActiveView('survey')}
         />
 
         <ModulesSection
-          modules={learnerData.modules}
+          modules={displayData.modules}
           onModuleClick={handleModuleClick}
         />
       </div>
+
+      {/* Password Change Modal */}
+      <PasswordChangeModal
+        isOpen={showPasswordModal}
+        onPasswordChanged={handlePasswordChanged}
+        learnerName={displayData.name}
+      />
     </div>
   );
 };
