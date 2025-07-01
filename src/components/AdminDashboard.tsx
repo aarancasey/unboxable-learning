@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -27,10 +26,9 @@ interface AdminDashboardProps {
 
 const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
   const [activeTab, setActiveTab] = useState('overview');
-
-  const mockAdminData = {
+  const [adminData, setAdminData] = useState({
     totalLearners: 0,
-    activeCourses: 8,
+    activeCourses: 0,
     pendingSurveys: 0,
     completionRate: 0,
     recentActivity: [],
@@ -39,7 +37,18 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
       { id: 2, task: "Update Module 4 Content", priority: "medium", due: "Tomorrow" },
       { id: 3, task: "Send Weekly Progress Report", priority: "low", due: "Friday" },
     ]
-  };
+  });
+
+  // Update admin data based on survey submissions
+  useEffect(() => {
+    const savedSurveys = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
+    
+    setAdminData(prev => ({
+      ...prev,
+      activeCourses: savedSurveys.length > 0 ? 1 : 0,
+      pendingSurveys: savedSurveys.filter(survey => survey.status === 'pending').length
+    }));
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -89,7 +98,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-unboxable-navy">{mockAdminData.totalLearners}</div>
+                  <div className="text-2xl font-bold text-unboxable-navy">{adminData.totalLearners}</div>
                   <p className="text-xs text-gray-600 mt-1">Start by adding learners</p>
                 </CardContent>
               </Card>
@@ -102,8 +111,10 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-unboxable-navy">{mockAdminData.activeCourses}</div>
-                  <p className="text-xs text-gray-600 mt-1">Across 3 departments</p>
+                  <div className="text-2xl font-bold text-unboxable-navy">{adminData.activeCourses}</div>
+                  <p className="text-xs text-gray-600 mt-1">
+                    {adminData.activeCourses === 0 ? 'Complete surveys to unlock courses' : 'Module 2 available'}
+                  </p>
                 </CardContent>
               </Card>
 
@@ -115,8 +126,10 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-unboxable-orange">{mockAdminData.pendingSurveys}</div>
-                  <p className="text-xs text-gray-600 mt-1">No surveys pending</p>
+                  <div className="text-2xl font-bold text-unboxable-orange">{adminData.pendingSurveys}</div>
+                  <p className="text-xs text-gray-600 mt-1">
+                    {adminData.pendingSurveys === 0 ? 'No surveys pending' : 'Awaiting review'}
+                  </p>
                 </CardContent>
               </Card>
 
@@ -128,7 +141,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-green-600">{mockAdminData.completionRate}%</div>
+                  <div className="text-2xl font-bold text-green-600">{adminData.completionRate}%</div>
                   <p className="text-xs text-gray-600 mt-1">Add learners to track progress</p>
                 </CardContent>
               </Card>
@@ -162,7 +175,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {mockAdminData.upcomingTasks.map((task) => (
+                    {adminData.upcomingTasks.map((task) => (
                       <div key={task.id} className="flex items-center justify-between">
                         <div className="flex-1">
                           <p className="text-sm font-medium text-unboxable-navy">{task.task}</p>

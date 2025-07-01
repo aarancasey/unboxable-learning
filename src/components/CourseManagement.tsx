@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,57 +18,38 @@ import {
 
 const CourseManagement = () => {
   const [selectedCourse, setSelectedCourse] = useState<any>(null);
+  const [courses, setCourses] = useState<any[]>([]);
 
-  const mockCourses = [
-    {
-      id: 1,
-      title: "New Employee Onboarding",
-      description: "Comprehensive onboarding program for new hires",
-      modules: 8,
-      enrolledUsers: 15,
-      completionRate: 78,
-      status: "active",
-      createdDate: "2024-01-01",
-      estimatedDuration: "3 weeks",
-      moduleList: [
-        { id: 1, title: "Welcome & Company Overview", type: "video", duration: "15 min", status: "active" },
-        { id: 2, title: "Company Culture & Values", type: "interactive", duration: "20 min", status: "active" },
-        { id: 3, title: "HR Policies & Procedures", type: "document", duration: "30 min", status: "active" },
-        { id: 4, title: "Team Introductions", type: "video", duration: "25 min", status: "scheduled" },
-      ]
-    },
-    {
-      id: 2,
-      title: "Leadership Development",
-      description: "Advanced leadership skills for managers and senior staff",
-      modules: 12,
-      enrolledUsers: 8,
-      completionRate: 65,
-      status: "active",
-      createdDate: "2024-01-05",
-      estimatedDuration: "6 weeks",
-      moduleList: [
-        { id: 1, title: "Leadership Fundamentals", type: "video", duration: "45 min", status: "active" },
-        { id: 2, title: "Communication Strategies", type: "interactive", duration: "30 min", status: "active" },
-        { id: 3, title: "Team Building Exercises", type: "interactive", duration: "60 min", status: "draft" },
-      ]
-    },
-    {
-      id: 3,
-      title: "Sales Training Bootcamp",
-      description: "Intensive sales methodology and customer relationship training",
-      modules: 6,
-      enrolledUsers: 22,
-      completionRate: 92,
-      status: "completed",
-      createdDate: "2023-12-15",
-      estimatedDuration: "4 weeks",
-      moduleList: [
-        { id: 1, title: "Sales Fundamentals", type: "video", duration: "40 min", status: "active" },
-        { id: 2, title: "Customer Discovery", type: "interactive", duration: "35 min", status: "active" },
-      ]
+  // Load courses based on survey data
+  useEffect(() => {
+    const savedSurveys = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
+    
+    // Create a course based on survey data if surveys exist
+    if (savedSurveys.length > 0) {
+      const newCourse = {
+        id: 1,
+        title: "Module 2: Advanced Customer Service Skills",
+        description: "Building on Module 1 foundations, develop advanced customer service techniques and conflict resolution skills",
+        modules: 6,
+        enrolledUsers: savedSurveys.length,
+        completionRate: 0,
+        status: "active",
+        createdDate: new Date().toISOString().split('T')[0],
+        estimatedDuration: "3 weeks",
+        moduleList: [
+          { id: 1, title: "Advanced Communication Techniques", type: "video", duration: "25 min", status: "active" },
+          { id: 2, title: "Handling Difficult Customers", type: "interactive", duration: "30 min", status: "active" },
+          { id: 3, title: "Conflict Resolution Strategies", type: "document", duration: "20 min", status: "active" },
+          { id: 4, title: "Building Customer Loyalty", type: "video", duration: "22 min", status: "scheduled" },
+          { id: 5, title: "Service Recovery Techniques", type: "interactive", duration: "35 min", status: "draft" },
+          { id: 6, title: "Team Collaboration in Service", type: "video", duration: "28 min", status: "draft" },
+        ]
+      };
+      setCourses([newCourse]);
+    } else {
+      setCourses([]);
     }
-  ];
+  }, []);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -233,70 +214,81 @@ const CourseManagement = () => {
         </Button>
       </div>
 
-      {/* Courses Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {mockCourses.map((course) => (
-          <Card 
-            key={course.id} 
-            className="hover:shadow-lg transition-shadow cursor-pointer"
-            onClick={() => setSelectedCourse(course)}
-          >
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <CardTitle className="text-lg mb-2">{course.title}</CardTitle>
-                  <p className="text-sm text-gray-600 line-clamp-2">{course.description}</p>
+      {/* Courses Grid or Empty State */}
+      {courses.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {courses.map((course) => (
+            <Card 
+              key={course.id} 
+              className="hover:shadow-lg transition-shadow cursor-pointer"
+              onClick={() => setSelectedCourse(course)}
+            >
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <CardTitle className="text-lg mb-2">{course.title}</CardTitle>
+                    <p className="text-sm text-gray-600 line-clamp-2">{course.description}</p>
+                  </div>
+                  {getStatusBadge(course.status)}
                 </div>
-                {getStatusBadge(course.status)}
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {/* Course Stats */}
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="flex items-center space-x-2">
-                    <BookOpen className="h-4 w-4 text-gray-500" />
-                    <span>{course.modules} modules</span>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {/* Course Stats */}
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="flex items-center space-x-2">
+                      <BookOpen className="h-4 w-4 text-gray-500" />
+                      <span>{course.modules} modules</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Users className="h-4 w-4 text-gray-500" />
+                      <span>{course.enrolledUsers} enrolled</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Clock className="h-4 w-4 text-gray-500" />
+                      <span>{course.estimatedDuration}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Calendar className="h-4 w-4 text-gray-500" />
+                      <span>Created {course.createdDate}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Users className="h-4 w-4 text-gray-500" />
-                    <span>{course.enrolledUsers} enrolled</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Clock className="h-4 w-4 text-gray-500" />
-                    <span>{course.estimatedDuration}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Calendar className="h-4 w-4 text-gray-500" />
-                    <span>Created {course.createdDate}</span>
-                  </div>
-                </div>
 
-                {/* Completion Rate */}
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-600">Completion Rate</span>
-                    <span className="font-medium">{course.completionRate}%</span>
+                  {/* Completion Rate */}
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-gray-600">Completion Rate</span>
+                      <span className="font-medium">{course.completionRate}%</span>
+                    </div>
+                    <Progress value={course.completionRate} />
                   </div>
-                  <Progress value={course.completionRate} />
-                </div>
 
-                {/* Actions */}
-                <div className="flex space-x-2 pt-2">
-                  <Button variant="outline" size="sm" className="flex-1">
-                    <Eye className="h-4 w-4 mr-1" />
-                    View
-                  </Button>
-                  <Button variant="outline" size="sm" className="flex-1">
-                    <Settings className="h-4 w-4 mr-1" />
-                    Edit
-                  </Button>
+                  {/* Actions */}
+                  <div className="flex space-x-2 pt-2">
+                    <Button variant="outline" size="sm" className="flex-1">
+                      <Eye className="h-4 w-4 mr-1" />
+                      View
+                    </Button>
+                    <Button variant="outline" size="sm" className="flex-1">
+                      <Settings className="h-4 w-4 mr-1" />
+                      Edit
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <Card>
+          <CardContent className="text-center py-12">
+            <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No courses available</h3>
+            <p className="text-gray-600 mb-6">Courses will be automatically created based on survey submissions.</p>
+            <p className="text-sm text-gray-500">Complete Module 1 surveys to unlock Module 2 content.</p>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
