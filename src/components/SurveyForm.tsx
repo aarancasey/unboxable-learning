@@ -409,8 +409,68 @@ Your facilitator and coach will have oversight into your responses as this will 
     if (isInstructionsSection || currentQuestion === totalQuestions - 1) {
       // Move to next section
       if (currentSection === totalSections - 1) {
-        // Survey complete
+        // Survey complete - save to localStorage
         console.log('Survey submitted:', answers);
+        
+        // Create survey submission object
+        const surveySubmission = {
+          id: Date.now(), // Simple ID generation
+          title: survey.title,
+          learner: "Current User", // In real app, this would come from auth
+          department: "Department", // In real app, this would come from user profile
+          submittedDate: new Date().toISOString().split('T')[0],
+          status: "pending",
+          responses: Object.entries(answers).map(([key, value]) => {
+            // Find the question for this answer
+            let question = "";
+            for (const section of survey.sections) {
+              if (section.questions) {
+                const q = section.questions.find(q => 
+                  q.id === key || key.startsWith(q.id + '_')
+                );
+                if (q) {
+                  if (key.includes('_') && q.type === 'scale-grid') {
+                    // Handle scale-grid questions
+                    const promptIndex = parseInt(key.split('_')[1]);
+                    const scaleGridQ = q as ScaleGridQuestion;
+                    question = `${q.question} - ${scaleGridQ.prompts[promptIndex]}`;
+                  } else {
+                    question = q.question;
+                  }
+                  break;
+                }
+              }
+            }
+            
+            return {
+              question,
+              answer: Array.isArray(value) ? value.join(', ') : value.toString()
+            };
+          }).filter(response => response.question), // Only include responses with questions
+          aiSummary: {
+            strengths: [
+              "Demonstrates self-awareness in leadership assessment",
+              "Shows commitment to professional development",
+              "Engages thoughtfully with reflection questions"
+            ],
+            challenges: [
+              "Areas for development identified through self-assessment",
+              "Opportunities for growth in leadership agility"
+            ],
+            recommendations: [
+              "Continue with LEADForward program modules",
+              "Focus on areas rated lower in self-assessment",
+              "Schedule follow-up coaching sessions"
+            ],
+            overallAssessment: "Completed comprehensive leadership self-assessment showing engagement with personal development. Ready to progress through structured learning modules."
+          }
+        };
+
+        // Save to localStorage
+        const existingSurveys = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
+        existingSurveys.push(surveySubmission);
+        localStorage.setItem('surveySubmissions', JSON.stringify(existingSurveys));
+
         onSubmit();
       } else {
         setCurrentSection(currentSection + 1);

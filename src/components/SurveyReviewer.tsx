@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -21,6 +20,13 @@ import {
 const SurveyReviewer = () => {
   const [selectedSurvey, setSelectedSurvey] = useState<any>(null);
   const [filter, setFilter] = useState('all');
+  const [storedSurveys, setStoredSurveys] = useState<any[]>([]);
+
+  // Load surveys from localStorage on component mount
+  useEffect(() => {
+    const savedSurveys = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
+    setStoredSurveys(savedSurveys);
+  }, []);
 
   const mockSurveys = [
     {
@@ -168,7 +174,9 @@ const SurveyReviewer = () => {
     }
   };
 
-  const filteredSurveys = filter === 'all' ? mockSurveys : mockSurveys.filter(survey => survey.status === filter);
+  // Combine mock surveys with stored surveys
+  const allSurveys = [...mockSurveys, ...storedSurveys];
+  const filteredSurveys = filter === 'all' ? allSurveys : allSurveys.filter(survey => survey.status === filter);
 
   if (selectedSurvey) {
     return (
