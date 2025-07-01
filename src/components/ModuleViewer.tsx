@@ -1,9 +1,9 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { ArrowLeft, PlayCircle, CheckCircle, FileText, Clock } from 'lucide-react';
+import SurveyForm from './SurveyForm';
 
 interface ModuleViewerProps {
   module: any;
@@ -14,6 +14,16 @@ interface ModuleViewerProps {
 const ModuleViewer = ({ module, onBack, onComplete }: ModuleViewerProps) => {
   const [currentSection, setCurrentSection] = useState(0);
   const [progress, setProgress] = useState(0);
+
+  // If this is a survey module, show the survey form instead
+  if (module.type === 'survey') {
+    return (
+      <SurveyForm 
+        onBack={onBack}
+        onSubmit={onComplete}
+      />
+    );
+  }
 
   const mockModuleContent = {
     sections: [

@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Award, FileText } from 'lucide-react';
+import { BookOpen, Clock, Award, ArrowRight } from 'lucide-react';
 
 interface ProgressOverviewProps {
   progress: number;
@@ -20,62 +20,58 @@ const ProgressOverview = ({
   onStartSurvey 
 }: ProgressOverviewProps) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-gray-600">Overall Progress</CardTitle>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Overall Progress</CardTitle>
+          <BookOpen className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-2xl font-bold text-unboxable-navy">{progress}%</span>
-            <Award className="h-6 w-6 text-unboxable-orange" />
-          </div>
-          <Progress value={progress} className="mb-2" />
-          <p className="text-sm text-gray-600">
-            {completedModules} of {totalModules} modules completed
+          <div className="text-2xl font-bold">{Math.round(progress)}%</div>
+          <Progress value={progress} className="mt-2" />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Modules Completed</CardTitle>
+          <Award className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{completedModules}</div>
+          <p className="text-xs text-muted-foreground">
+            of {totalModules} modules
           </p>
         </CardContent>
       </Card>
 
       <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-gray-600">Next Survey Due</CardTitle>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Time Investment</CardTitle>
+          <Clock className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between mb-2">
-            <FileText className="h-6 w-6 text-unboxable-orange" />
-          </div>
-          <p className="text-sm font-medium text-unboxable-navy mb-1">{nextSurvey || 'No surveys available'}</p>
-          <Button 
-            size="sm" 
-            className="w-full bg-unboxable-orange hover:bg-unboxable-orange/90 text-white"
-            onClick={onStartSurvey}
-            disabled={!nextSurvey}
-          >
-            Start Survey
-          </Button>
+          <div className="text-2xl font-bold">2.5h</div>
+          <p className="text-xs text-muted-foreground">
+            total learning time
+          </p>
         </CardContent>
       </Card>
 
       <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-gray-600">Quick Stats</CardTitle>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Next Assessment</CardTitle>
+          <ArrowRight className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Completed</span>
-              <span className="font-medium text-green-600">{completedModules}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">In Progress</span>
-              <span className="font-medium text-unboxable-orange">0</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Upcoming</span>
-              <span className="font-medium text-gray-600">0</span>
-            </div>
-          </div>
+          <div className="text-sm font-medium mb-2">{nextSurvey}</div>
+          <Button 
+            size="sm" 
+            className="w-full bg-orange-600 hover:bg-orange-700 text-white"
+            onClick={onStartSurvey}
+          >
+            Start Assessment
+          </Button>
         </CardContent>
       </Card>
     </div>
