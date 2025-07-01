@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -174,8 +175,26 @@ const SurveyReviewer = () => {
     }
   };
 
-  // Combine mock surveys with stored surveys
-  const allSurveys = [...mockSurveys, ...storedSurveys];
+  // Combine mock surveys with stored surveys and sort by priority
+  const allSurveys = [...mockSurveys, ...storedSurveys].sort((a, b) => {
+    // Priority order: pending first, then reviewed, then approved
+    const statusPriority: { [key: string]: number } = {
+      'pending': 1,
+      'reviewed': 2,
+      'approved': 3
+    };
+    
+    const priorityA = statusPriority[a.status] || 4;
+    const priorityB = statusPriority[b.status] || 4;
+    
+    if (priorityA !== priorityB) {
+      return priorityA - priorityB;
+    }
+    
+    // If same status, sort by submitted date (newest first)
+    return new Date(b.submittedDate).getTime() - new Date(a.submittedDate).getTime();
+  });
+  
   const filteredSurveys = filter === 'all' ? allSurveys : allSurveys.filter(survey => survey.status === filter);
 
   if (selectedSurvey) {
