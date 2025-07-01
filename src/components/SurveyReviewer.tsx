@@ -1,4 +1,5 @@
 
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -29,126 +30,6 @@ const SurveyReviewer = () => {
     setStoredSurveys(savedSurveys);
   }, []);
 
-  const mockSurveys = [
-    {
-      id: 1,
-      title: "Communication Skills Assessment",
-      learner: "Sarah Johnson",
-      department: "Marketing",
-      submittedDate: "2024-01-20",
-      status: "pending",
-      responses: [
-        {
-          question: "How comfortable are you with public speaking?",
-          answer: "Somewhat comfortable - I can do it when needed"
-        },
-        {
-          question: "Which communication style do you prefer in team meetings?",
-          answer: "Collaborative and discussion-focused"
-        },
-        {
-          question: "Describe a recent situation where you had to communicate complex information to a colleague.",
-          answer: "Last week, I had to explain our new marketing automation workflow to a colleague from sales. I broke it down into step-by-step visuals and walked through each stage, making sure to relate it to their existing processes. I also provided a written summary they could reference later."
-        },
-        {
-          question: "What's your biggest challenge in workplace communication?",
-          answer: "Speaking up in meetings"
-        },
-        {
-          question: "What communication skills would you most like to improve?",
-          answer: "I'd like to improve my confidence in presenting to leadership and my ability to give constructive feedback to team members. I sometimes struggle with finding the right balance between being direct and being diplomatic."
-        }
-      ],
-      aiSummary: {
-        strengths: [
-          "Shows collaborative communication style preference",
-          "Demonstrates good written communication skills",
-          "Uses visual aids effectively to explain complex concepts"
-        ],
-        challenges: [
-          "Lacks confidence in speaking up during meetings",
-          "Needs development in presentation skills for leadership",
-          "Struggles with giving constructive feedback"
-        ],
-        recommendations: [
-          "Enroll in the 'Executive Presentation Skills' module",
-          "Practice feedback delivery through role-playing exercises",
-          "Join the peer mentoring program for confidence building"
-        ],
-        overallAssessment: "Sarah demonstrates strong foundational communication skills with a collaborative approach. Her main development areas focus on confidence-building in formal settings and feedback delivery. She would benefit from structured practice opportunities and mentorship."
-      }
-    },
-    {
-      id: 2,
-      title: "Leadership Style Assessment",
-      learner: "Mike Chen",
-      department: "Engineering",
-      submittedDate: "2024-01-19",
-      status: "reviewed",
-      responses: [
-        {
-          question: "How do you typically approach team conflicts?",
-          answer: "I try to understand all perspectives first, then facilitate a discussion to find common ground"
-        },
-        {
-          question: "What motivates you most as a leader?",
-          answer: "Seeing team members grow and achieve their goals"
-        }
-      ],
-      aiSummary: {
-        strengths: [
-          "Shows empathetic leadership approach",
-          "Focuses on team development and growth",
-          "Demonstrates conflict resolution skills"
-        ],
-        challenges: [
-          "May need to be more decisive in certain situations",
-          "Could benefit from strategic planning skills"
-        ],
-        recommendations: [
-          "Complete the 'Strategic Leadership' advanced module",
-          "Practice decision-making frameworks",
-          "Consider executive coaching sessions"
-        ],
-        overallAssessment: "Mike shows natural leadership instincts with a people-first approach. To advance to senior leadership roles, he should focus on strategic thinking and decisive action when needed."
-      }
-    },
-    {
-      id: 3,
-      title: "Onboarding Experience Survey",
-      learner: "Emily Davis",
-      department: "Sales",
-      submittedDate: "2024-01-18",
-      status: "approved",
-      responses: [
-        {
-          question: "How would you rate your onboarding experience?",
-          answer: "Very positive - felt welcomed and well-informed"
-        },
-        {
-          question: "What was most helpful during your first week?",
-          answer: "The buddy system and having someone to ask questions to"
-        }
-      ],
-      aiSummary: {
-        strengths: [
-          "Positive onboarding experience indicates good program effectiveness",
-          "Values peer support and mentorship",
-          "Shows engagement with company culture"
-        ],
-        challenges: [
-          "No significant challenges identified in onboarding"
-        ],
-        recommendations: [
-          "Continue with standard learning path",
-          "Consider for peer mentor role in future",
-          "Monitor progress through first 90 days"
-        ],
-        overallAssessment: "Emily had an excellent onboarding experience and shows strong potential for contributing to team culture. She could be a valuable peer mentor for future new hires."
-      }
-    }
-  ];
-
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
@@ -175,8 +56,8 @@ const SurveyReviewer = () => {
     }
   };
 
-  // Combine mock surveys with stored surveys and sort by priority
-  const allSurveys = [...mockSurveys, ...storedSurveys].sort((a, b) => {
+  // Sort surveys by priority
+  const allSurveys = [...storedSurveys].sort((a, b) => {
     // Priority order: pending first, then reviewed, then approved
     const statusPriority: { [key: string]: number } = {
       'pending': 1,
@@ -440,3 +321,4 @@ const SurveyReviewer = () => {
 };
 
 export default SurveyReviewer;
+
