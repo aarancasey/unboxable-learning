@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,9 +20,18 @@ const LoginPage = ({ role, onLogin, onBack }: LoginPageProps) => {
     e.preventDefault();
     
     if (role === 'admin') {
-      // Mock admin authentication
-      onLogin();
-      return;
+      // Check admin credentials
+      if (credentials.email === 'fiona@unboxable.co.nz' && credentials.password === 'Netball1974#') {
+        onLogin();
+        return;
+      } else {
+        toast({
+          title: "Invalid Credentials",
+          description: "Please check your email and password",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     // Learner authentication
@@ -175,8 +183,8 @@ const LoginPage = ({ role, onLogin, onBack }: LoginPageProps) => {
               {!isLearner && (
                 <div className="text-sm text-slate-600 bg-slate-50 p-3 rounded-lg border">
                   <strong className="text-unboxable-navy">Demo credentials:</strong><br />
-                  Email: admin@demo.com<br />
-                  Password: admin123
+                  Email: fiona@unboxable.co.nz<br />
+                  Password: Netball1974#
                 </div>
               )}
               
