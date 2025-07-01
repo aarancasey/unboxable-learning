@@ -30,19 +30,18 @@ const CourseManagement = () => {
         id: 1,
         title: "Module 2: Advanced Customer Service Skills",
         description: "Building on Module 1 foundations, develop advanced customer service techniques and conflict resolution skills",
-        modules: 6,
-        enrolledUsers: savedSurveys.length,
+        modules: 4,
+        maxEnrollment: 17,
+        enrolledUsers: Math.min(savedSurveys.length, 17),
         completionRate: 0,
         status: "active",
         createdDate: new Date().toISOString().split('T')[0],
-        estimatedDuration: "3 weeks",
+        estimatedDuration: "4 weeks",
         moduleList: [
-          { id: 1, title: "Advanced Communication Techniques", type: "video", duration: "25 min", status: "active" },
-          { id: 2, title: "Handling Difficult Customers", type: "interactive", duration: "30 min", status: "active" },
-          { id: 3, title: "Conflict Resolution Strategies", type: "document", duration: "20 min", status: "active" },
-          { id: 4, title: "Building Customer Loyalty", type: "video", duration: "22 min", status: "scheduled" },
-          { id: 5, title: "Service Recovery Techniques", type: "interactive", duration: "35 min", status: "draft" },
-          { id: 6, title: "Team Collaboration in Service", type: "video", duration: "28 min", status: "draft" },
+          { id: 1, title: "Survey to Complete", type: "survey", duration: "15 min", status: "active" },
+          { id: 2, title: "Advanced Communication Techniques", type: "video", duration: "25 min", status: "active" },
+          { id: 3, title: "Handling Difficult Customers", type: "interactive", duration: "30 min", status: "active" },
+          { id: 4, title: "Service Excellence & Team Collaboration", type: "document", duration: "20 min", status: "active" },
         ]
       };
       setCourses([newCourse]);
@@ -74,6 +73,8 @@ const CourseManagement = () => {
         return <Settings className="h-4 w-4 text-green-600" />;
       case 'document':
         return <FileText className="h-4 w-4 text-purple-600" />;
+      case 'survey':
+        return <FileText className="h-4 w-4 text-orange-600" />;
       default:
         return <BookOpen className="h-4 w-4 text-gray-600" />;
     }
@@ -122,7 +123,7 @@ const CourseManagement = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Enrolled Users</p>
-                  <p className="text-2xl font-bold text-gray-900">{selectedCourse.enrolledUsers}</p>
+                  <p className="text-2xl font-bold text-gray-900">{selectedCourse.enrolledUsers}/{selectedCourse.maxEnrollment}</p>
                 </div>
                 <Users className="h-8 w-8 text-green-600" />
               </div>
@@ -242,7 +243,7 @@ const CourseManagement = () => {
                     </div>
                     <div className="flex items-center space-x-2">
                       <Users className="h-4 w-4 text-gray-500" />
-                      <span>{course.enrolledUsers} enrolled</span>
+                      <span>{course.enrolledUsers}/{course.maxEnrollment} enrolled</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Clock className="h-4 w-4 text-gray-500" />
