@@ -25,56 +25,14 @@ const LearnerDashboard = ({ onLogout }: LearnerDashboardProps) => {
   const [activeView, setActiveView] = useState<'dashboard' | 'module' | 'survey'>('dashboard');
   const [selectedModule, setSelectedModule] = useState<any>(null);
 
-  const mockLearnerData = {
-    name: "Sarah Johnson",
-    progress: 65,
-    completedModules: 3,
-    totalModules: 8,
-    nextSurvey: "Communication Skills Assessment",
-    modules: [
-      {
-        id: 1,
-        title: "Welcome & Onboarding",
-        status: "completed",
-        duration: "15 min",
-        type: "video",
-        unlocked: true
-      },
-      {
-        id: 2,
-        title: "Company Culture & Values",
-        status: "completed",
-        duration: "20 min",
-        type: "interactive",
-        unlocked: true
-      },
-      {
-        id: 3,
-        title: "Communication Fundamentals",
-        status: "in-progress",
-        duration: "30 min",
-        type: "video",
-        unlocked: true
-      },
-      {
-        id: 4,
-        title: "Team Collaboration",
-        status: "locked",
-        duration: "25 min",
-        type: "interactive",
-        unlocked: false,
-        unlockDate: "2024-01-15"
-      },
-      {
-        id: 5,
-        title: "Leadership Principles",
-        status: "locked",
-        duration: "40 min",
-        type: "video",
-        unlocked: false,
-        unlockDate: "2024-01-22"
-      }
-    ]
+  // Empty data structure - no mock data
+  const learnerData = {
+    name: "",
+    progress: 0,
+    completedModules: 0,
+    totalModules: 0,
+    nextSurvey: "",
+    modules: []
   };
 
   const handleModuleClick = (module: any) => {
@@ -148,8 +106,8 @@ const LearnerDashboard = ({ onLogout }: LearnerDashboardProps) => {
             </div>
             
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">Welcome, {mockLearnerData.name}</span>
-              <Button variant="ghost" size="sm" onClick={onLogout} className="hover:bg-slate-100">
+              <span className="text-sm text-gray-600">Welcome, {learnerData.name || 'Learner'}</span>
+              <Button variant="ghost" size="sm" onClick={onLogout} className="hover:bg-slate-100 text-unboxable-navy hover:text-unboxable-navy">
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
               </Button>
@@ -167,12 +125,12 @@ const LearnerDashboard = ({ onLogout }: LearnerDashboardProps) => {
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-2xl font-bold text-unboxable-navy">{mockLearnerData.progress}%</span>
+                <span className="text-2xl font-bold text-unboxable-navy">{learnerData.progress}%</span>
                 <Award className="h-6 w-6 text-unboxable-orange" />
               </div>
-              <Progress value={mockLearnerData.progress} className="mb-2" />
+              <Progress value={learnerData.progress} className="mb-2" />
               <p className="text-sm text-gray-600">
-                {mockLearnerData.completedModules} of {mockLearnerData.totalModules} modules completed
+                {learnerData.completedModules} of {learnerData.totalModules} modules completed
               </p>
             </CardContent>
           </Card>
@@ -185,11 +143,12 @@ const LearnerDashboard = ({ onLogout }: LearnerDashboardProps) => {
               <div className="flex items-center justify-between mb-2">
                 <FileText className="h-6 w-6 text-unboxable-orange" />
               </div>
-              <p className="text-sm font-medium text-unboxable-navy mb-1">{mockLearnerData.nextSurvey}</p>
+              <p className="text-sm font-medium text-unboxable-navy mb-1">{learnerData.nextSurvey || 'No surveys available'}</p>
               <Button 
                 size="sm" 
                 className="w-full bg-unboxable-orange hover:bg-unboxable-orange/90 text-white"
                 onClick={() => setActiveView('survey')}
+                disabled={!learnerData.nextSurvey}
               >
                 Start Survey
               </Button>
@@ -204,15 +163,15 @@ const LearnerDashboard = ({ onLogout }: LearnerDashboardProps) => {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Completed</span>
-                  <span className="font-medium text-green-600">{mockLearnerData.completedModules}</span>
+                  <span className="font-medium text-green-600">{learnerData.completedModules}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">In Progress</span>
-                  <span className="font-medium text-blue-600">1</span>
+                  <span className="font-medium text-unboxable-orange">0</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Upcoming</span>
-                  <span className="font-medium text-gray-600">4</span>
+                  <span className="font-medium text-gray-600">0</span>
                 </div>
               </div>
             </CardContent>
@@ -228,38 +187,46 @@ const LearnerDashboard = ({ onLogout }: LearnerDashboardProps) => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {mockLearnerData.modules.map((module) => (
-                <Card
-                  key={module.id}
-                  className={`transition-all hover:shadow-md ${
-                    module.unlocked ? 'cursor-pointer hover:border-unboxable-navy/30' : 'opacity-60'
-                  }`}
-                  onClick={() => handleModuleClick(module)}
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      {getStatusIcon(module.status)}
-                      {getStatusBadge(module.status)}
-                    </div>
-                    
-                    <h3 className="font-medium text-unboxable-navy mb-2">{module.title}</h3>
-                    
-                    <div className="flex items-center justify-between text-sm text-gray-600">
-                      <span>{module.duration}</span>
-                      <span className="capitalize">{module.type}</span>
-                    </div>
-                    
-                    {!module.unlocked && module.unlockDate && (
-                      <div className="mt-2 flex items-center text-xs text-gray-500">
-                        <Calendar className="h-3 w-3 mr-1" />
-                        Unlocks {module.unlockDate}
+            {learnerData.modules.length === 0 ? (
+              <div className="text-center py-12">
+                <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-unboxable-navy mb-2">No Modules Available</h3>
+                <p className="text-gray-600">Check back later for new learning content.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {learnerData.modules.map((module) => (
+                  <Card
+                    key={module.id}
+                    className={`transition-all hover:shadow-md ${
+                      module.unlocked ? 'cursor-pointer hover:border-unboxable-navy/30' : 'opacity-60'
+                    }`}
+                    onClick={() => handleModuleClick(module)}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between mb-3">
+                        {getStatusIcon(module.status)}
+                        {getStatusBadge(module.status)}
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                      
+                      <h3 className="font-medium text-unboxable-navy mb-2">{module.title}</h3>
+                      
+                      <div className="flex items-center justify-between text-sm text-gray-600">
+                        <span>{module.duration}</span>
+                        <span className="capitalize">{module.type}</span>
+                      </div>
+                      
+                      {!module.unlocked && module.unlockDate && (
+                        <div className="mt-2 flex items-center text-xs text-gray-500">
+                          <Calendar className="h-3 w-3 mr-1" />
+                          Unlocks {module.unlockDate}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
