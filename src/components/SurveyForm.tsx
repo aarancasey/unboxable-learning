@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,6 +12,39 @@ interface SurveyFormProps {
   onBack: () => void;
   onSubmit: () => void;
 }
+
+interface BaseQuestion {
+  id: string;
+  type: string;
+  question: string;
+}
+
+interface RadioQuestion extends BaseQuestion {
+  type: 'radio';
+  options: string[];
+}
+
+interface CheckboxQuestion extends BaseQuestion {
+  type: 'checkbox';
+  options: string[];
+  maxSelections?: number;
+}
+
+interface ScaleQuestion extends BaseQuestion {
+  type: 'scale';
+  scaleLabels: string[];
+}
+
+interface ScaleGridQuestion extends BaseQuestion {
+  type: 'scale-grid';
+  prompts: string[];
+}
+
+interface TextQuestion extends BaseQuestion {
+  type: 'text';
+}
+
+type Question = RadioQuestion | CheckboxQuestion | ScaleQuestion | ScaleGridQuestion | TextQuestion;
 
 const SurveyForm = ({ onBack, onSubmit }: SurveyFormProps) => {
   const [currentSection, setCurrentSection] = useState(0);
@@ -93,7 +125,7 @@ Your facilitator and coach will have oversight into your responses as this will 
             type: "text",
             question: "What feels most exciting or energising?"
           }
-        ]
+        ] as Question[]
       },
       {
         title: "Leadership Intent & Purpose",
@@ -145,7 +177,7 @@ Your facilitator and coach will have oversight into your responses as this will 
               "I feel deeply purposeful and driven"
             ]
           }
-        ]
+        ] as Question[]
       },
       {
         title: "Adaptive & Agile Leadership - Navigating Change & Uncertainty",
@@ -167,7 +199,7 @@ Your facilitator and coach will have oversight into your responses as this will 
               "I stay focused on outcomes even when the path forward is unclear"
             ]
           }
-        ]
+        ] as Question[]
       },
       {
         title: "Adaptive & Agile Leadership - Systems Thinking & Strategic Agility",
@@ -189,7 +221,7 @@ Your facilitator and coach will have oversight into your responses as this will 
               "I help others connect their work to the bigger picture"
             ]
           }
-        ]
+        ] as Question[]
       },
       {
         title: "Adaptive & Agile Leadership - Learning Agility & Growth Mindset",
@@ -211,7 +243,7 @@ Your facilitator and coach will have oversight into your responses as this will 
               "I role-model continuous learning for my team or peers"
             ]
           }
-        ]
+        ] as Question[]
       },
       {
         title: "Adaptive & Agile Leadership - Empowering Others & Building Collective Agility",
@@ -233,7 +265,7 @@ Your facilitator and coach will have oversight into your responses as this will 
               "I intentionally build diversity of thought into how we work"
             ]
           }
-        ]
+        ] as Question[]
       },
       {
         title: "Adaptive & Agile Leadership - Action Orientation & Agility in Delivery",
@@ -255,7 +287,7 @@ Your facilitator and coach will have oversight into your responses as this will 
               "I help others stay focused on impact rather than getting stuck in process"
             ]
           }
-        ]
+        ] as Question[]
       },
       {
         title: "Adaptive & Agile Leadership - Decision-Making Agility",
@@ -277,7 +309,7 @@ Your facilitator and coach will have oversight into your responses as this will 
               "I learn from past decisions to improve future thinking"
             ]
           }
-        ]
+        ] as Question[]
       },
       {
         title: "Self-Reflection Questions",
@@ -304,7 +336,7 @@ Your facilitator and coach will have oversight into your responses as this will 
             type: "text",
             question: "What's one insight from this assessment that you want to explore more deeply?"
           }
-        ]
+        ] as Question[]
       }
     ]
   };
@@ -359,7 +391,7 @@ Your facilitator and coach will have oversight into your responses as this will 
     if (!currentQ) return false;
 
     if (currentQ.type === 'scale-grid') {
-      const prompts = currentQ.prompts || [];
+      const prompts = (currentQ as ScaleGridQuestion).prompts || [];
       return prompts.every((_, index) => {
         const key = `${currentQ.id}_${index}`;
         return answers[key] && answers[key] !== '';
@@ -424,12 +456,13 @@ Your facilitator and coach will have oversight into your responses as this will 
 
     switch (currentQ.type) {
       case 'radio':
+        const radioQ = currentQ as RadioQuestion;
         return (
           <RadioGroup
             value={answers[currentQ.id] as string || ''}
             onValueChange={(value) => handleAnswerChange(value)}
           >
-            {currentQ.options?.map((option, index) => (
+            {radioQ.options?.map((option, index) => (
               <div key={index} className="flex items-center space-x-2">
                 <RadioGroupItem value={option} id={`option-${index}`} />
                 <Label htmlFor={`option-${index}`} className="flex-1 cursor-pointer">
@@ -441,8 +474,9 @@ Your facilitator and coach will have oversight into your responses as this will 
         );
 
       case 'checkbox':
+        const checkboxQ = currentQ as CheckboxQuestion;
         const selectedOptions = (answers[currentQ.id] as string[]) || [];
-        const maxSelections = currentQ.maxSelections;
+        const maxSelections = checkboxQ.maxSelections;
         
         return (
           <div className="space-y-3">
@@ -451,7 +485,7 @@ Your facilitator and coach will have oversight into your responses as this will 
                 Select up to {maxSelections} options
               </p>
             )}
-            {currentQ.options?.map((option, index) => (
+            {checkboxQ.options?.map((option, index) => (
               <div key={index} className="flex items-center space-x-2">
                 <Checkbox
                   id={`checkbox-${index}`}
@@ -478,12 +512,13 @@ Your facilitator and coach will have oversight into your responses as this will 
         );
 
       case 'scale':
+        const scaleQ = currentQ as ScaleQuestion;
         return (
           <RadioGroup
             value={answers[currentQ.id] as string || ''}
             onValueChange={(value) => handleAnswerChange(value)}
           >
-            {currentQ.scaleLabels?.map((label, index) => (
+            {scaleQ.scaleLabels?.map((label, index) => (
               <div key={index} className="flex items-center space-x-2">
                 <RadioGroupItem value={(index + 1).toString()} id={`scale-${index}`} />
                 <Label htmlFor={`scale-${index}`} className="flex-1 cursor-pointer">
@@ -496,6 +531,7 @@ Your facilitator and coach will have oversight into your responses as this will 
         );
 
       case 'scale-grid':
+        const scaleGridQ = currentQ as ScaleGridQuestion;
         return (
           <div className="space-y-4">
             <div className="grid grid-cols-7 gap-2 text-xs text-gray-600 mb-4">
@@ -507,7 +543,7 @@ Your facilitator and coach will have oversight into your responses as this will 
               <div className="text-center">5</div>
               <div className="text-center">6<br/>Always</div>
             </div>
-            {currentQ.prompts?.map((prompt, promptIndex) => (
+            {scaleGridQ.prompts?.map((prompt, promptIndex) => (
               <div key={promptIndex} className="grid grid-cols-7 gap-2 items-center py-2 border-b border-gray-100">
                 <div className="text-sm pr-4">{prompt}</div>
                 {[1, 2, 3, 4, 5, 6].map((value) => (
