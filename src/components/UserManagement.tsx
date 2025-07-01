@@ -17,11 +17,13 @@ import {
   UserCheck
 } from 'lucide-react';
 import AddLearnerForm from './AddLearnerForm';
+import SendInvitesModal from './SendInvitesModal';
 import { useToast } from '@/hooks/use-toast';
 
 const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddLearnerOpen, setIsAddLearnerOpen] = useState(false);
+  const [isSendInvitesOpen, setIsSendInvitesOpen] = useState(false);
   const [learners, setLearners] = useState<any[]>([]);
   const { toast } = useToast();
 
@@ -51,6 +53,17 @@ const UserManagement = () => {
     });
   };
 
+  const handleInvitesSent = (learnerIds: number[]) => {
+    const updatedLearners = learners.map(learner => 
+      learnerIds.includes(learner.id) 
+        ? { ...learner, status: 'invited' }
+        : learner
+    );
+    
+    setLearners(updatedLearners);
+    localStorage.setItem('learners', JSON.stringify(updatedLearners));
+  };
+
   // Load learners from localStorage on component mount
   useState(() => {
     const savedLearners = JSON.parse(localStorage.getItem('learners') || '[]');
@@ -63,8 +76,10 @@ const UserManagement = () => {
         return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Active</Badge>;
       case 'pending':
         return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">Pending</Badge>;
+      case 'invited':
+        return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">Invited</Badge>;
       case 'completed':
-        return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">Completed</Badge>;
+        return <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-100">Completed</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -76,8 +91,10 @@ const UserManagement = () => {
         return <CheckCircle className="h-4 w-4 text-green-500" />;
       case 'pending':
         return <Clock className="h-4 w-4 text-yellow-500" />;
+      case 'invited':
+        return <Mail className="h-4 w-4 text-blue-500" />;
       case 'completed':
-        return <CheckCircle className="h-4 w-4 text-blue-500" />;
+        return <CheckCircle className="h-4 w-4 text-purple-500" />;
       default:
         return <AlertCircle className="h-4 w-4 text-gray-500" />;
     }
@@ -106,7 +123,10 @@ const UserManagement = () => {
             <UserPlus className="h-4 w-4 mr-2" />
             Add Learner
           </Button>
-          <Button variant="outline">
+          <Button 
+            variant="outline"
+            onClick={() => setIsSendInvitesOpen(true)}
+          >
             <Mail className="h-4 w-4 mr-2" />
             Send Invites
           </Button>
@@ -204,6 +224,13 @@ const UserManagement = () => {
         isOpen={isAddLearnerOpen}
         onClose={() => setIsAddLearnerOpen(false)}
         onAddLearner={handleAddLearner}
+      />
+
+      <SendInvitesModal
+        isOpen={isSendInvitesOpen}
+        onClose={() => setIsSendInvitesOpen(false)}
+        learners={learners}
+        onInvitesSent={handleInvitesSent}
       />
     </div>
   );
