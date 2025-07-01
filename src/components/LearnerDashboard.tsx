@@ -89,7 +89,7 @@ const LearnerDashboard = ({ onLogout }: LearnerDashboardProps) => {
       case 'completed':
         return <CheckCircle className="h-5 w-5 text-green-500" />;
       case 'in-progress':
-        return <PlayCircle className="h-5 w-5 text-blue-500" />;
+        return <PlayCircle className="h-5 w-5 text-unboxable-orange" />;
       default:
         return <Clock className="h-5 w-5 text-gray-400" />;
     }
@@ -100,7 +100,7 @@ const LearnerDashboard = ({ onLogout }: LearnerDashboardProps) => {
       case 'completed':
         return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Completed</Badge>;
       case 'in-progress':
-        return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">In Progress</Badge>;
+        return <Badge className="bg-orange-100 text-unboxable-orange hover:bg-orange-100">In Progress</Badge>;
       default:
         return <Badge variant="secondary">Locked</Badge>;
     }
@@ -138,13 +138,18 @@ const LearnerDashboard = ({ onLogout }: LearnerDashboardProps) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4">
-              <BookOpen className="h-8 w-8 text-blue-600" />
-              <h1 className="text-xl font-semibold text-gray-900">Learning Portal</h1>
+              <img 
+                src="/lovable-uploads/d0544c04-760a-4cf9-824c-612e5ef4aeaa.png" 
+                alt="Unboxable" 
+                className="h-8"
+              />
+              <div className="h-8 w-px bg-gray-300"></div>
+              <h1 className="text-xl font-semibold text-unboxable-navy">Learning Portal</h1>
             </div>
             
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-600">Welcome, {mockLearnerData.name}</span>
-              <Button variant="ghost" size="sm" onClick={onLogout}>
+              <Button variant="ghost" size="sm" onClick={onLogout} className="hover:bg-slate-100">
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
               </Button>
@@ -162,8 +167,8 @@ const LearnerDashboard = ({ onLogout }: LearnerDashboardProps) => {
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-2xl font-bold text-gray-900">{mockLearnerData.progress}%</span>
-                <Award className="h-6 w-6 text-blue-600" />
+                <span className="text-2xl font-bold text-unboxable-navy">{mockLearnerData.progress}%</span>
+                <Award className="h-6 w-6 text-unboxable-orange" />
               </div>
               <Progress value={mockLearnerData.progress} className="mb-2" />
               <p className="text-sm text-gray-600">
@@ -178,12 +183,12 @@ const LearnerDashboard = ({ onLogout }: LearnerDashboardProps) => {
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between mb-2">
-                <FileText className="h-6 w-6 text-orange-600" />
+                <FileText className="h-6 w-6 text-unboxable-orange" />
               </div>
-              <p className="text-sm font-medium text-gray-900 mb-1">{mockLearnerData.nextSurvey}</p>
+              <p className="text-sm font-medium text-unboxable-navy mb-1">{mockLearnerData.nextSurvey}</p>
               <Button 
                 size="sm" 
-                className="w-full bg-orange-600 hover:bg-orange-700"
+                className="w-full bg-unboxable-orange hover:bg-unboxable-orange/90 text-white"
                 onClick={() => setActiveView('survey')}
               >
                 Start Survey
@@ -218,8 +223,8 @@ const LearnerDashboard = ({ onLogout }: LearnerDashboardProps) => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <BookOpen className="h-6 w-6 text-blue-600" />
-              <span>Learning Modules</span>
+              <BookOpen className="h-6 w-6 text-unboxable-navy" />
+              <span className="text-unboxable-navy">Learning Modules</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -228,7 +233,7 @@ const LearnerDashboard = ({ onLogout }: LearnerDashboardProps) => {
                 <Card
                   key={module.id}
                   className={`transition-all hover:shadow-md ${
-                    module.unlocked ? 'cursor-pointer hover:border-blue-300' : 'opacity-60'
+                    module.unlocked ? 'cursor-pointer hover:border-unboxable-navy/30' : 'opacity-60'
                   }`}
                   onClick={() => handleModuleClick(module)}
                 >
@@ -238,7 +243,7 @@ const LearnerDashboard = ({ onLogout }: LearnerDashboardProps) => {
                       {getStatusBadge(module.status)}
                     </div>
                     
-                    <h3 className="font-medium text-gray-900 mb-2">{module.title}</h3>
+                    <h3 className="font-medium text-unboxable-navy mb-2">{module.title}</h3>
                     
                     <div className="flex items-center justify-between text-sm text-gray-600">
                       <span>{module.duration}</span>

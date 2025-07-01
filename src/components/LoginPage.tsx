@@ -24,68 +24,80 @@ const LoginPage = ({ role, onLogin, onBack }: LoginPageProps) => {
   const isLearner = role === 'learner';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
-        <Card className="shadow-xl">
+        <Card className="shadow-xl border-0">
           <CardHeader className="text-center space-y-4">
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={onBack}
-              className="self-start"
+              className="self-start hover:bg-slate-100"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back
             </Button>
             
+            {/* Unboxable Logo */}
+            <div className="mx-auto mb-4">
+              <img 
+                src="/lovable-uploads/d0544c04-760a-4cf9-824c-612e5ef4aeaa.png" 
+                alt="Unboxable" 
+                className="h-16 mx-auto mb-2"
+              />
+              <p className="text-sm text-unboxable-navy font-medium">RETHINKING BUSINESS</p>
+            </div>
+            
             {isLearner ? (
-              <GraduationCap className="mx-auto h-16 w-16 text-blue-600" />
+              <GraduationCap className="mx-auto h-12 w-12 text-unboxable-navy" />
             ) : (
-              <Users className="mx-auto h-16 w-16 text-purple-600" />
+              <Users className="mx-auto h-12 w-12 text-unboxable-orange" />
             )}
             
-            <CardTitle className="text-2xl">
-              {isLearner ? 'Learner Login' : 'Admin Login'}
+            <CardTitle className="text-2xl text-unboxable-navy">
+              {isLearner ? 'Learner Portal' : 'Admin Portal'}
             </CardTitle>
           </CardHeader>
           
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-unboxable-navy">Email</Label>
                 <Input
                   id="email"
                   type="email"
                   placeholder="Enter your email"
                   value={credentials.email}
                   onChange={(e) => setCredentials(prev => ({ ...prev, email: e.target.value }))}
+                  className="border-slate-300 focus:border-unboxable-navy focus:ring-unboxable-navy"
                   required
                 />
               </div>
               
               <div>
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="text-unboxable-navy">Password</Label>
                 <Input
                   id="password"
                   type="password"
                   placeholder="Enter your password"
                   value={credentials.password}
                   onChange={(e) => setCredentials(prev => ({ ...prev, password: e.target.value }))}
+                  className="border-slate-300 focus:border-unboxable-navy focus:ring-unboxable-navy"
                   required
                 />
               </div>
 
               {isLearner && (
-                <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
-                  <strong>Demo credentials:</strong><br />
+                <div className="text-sm text-slate-600 bg-slate-50 p-3 rounded-lg border">
+                  <strong className="text-unboxable-navy">Demo credentials:</strong><br />
                   Email: learner@demo.com<br />
                   Password: demo123
                 </div>
               )}
 
               {!isLearner && (
-                <div className="text-sm text-gray-600 bg-purple-50 p-3 rounded-lg">
-                  <strong>Demo credentials:</strong><br />
+                <div className="text-sm text-slate-600 bg-slate-50 p-3 rounded-lg border">
+                  <strong className="text-unboxable-navy">Demo credentials:</strong><br />
                   Email: admin@demo.com<br />
                   Password: admin123
                 </div>
@@ -93,9 +105,9 @@ const LoginPage = ({ role, onLogin, onBack }: LoginPageProps) => {
               
               <Button 
                 type="submit" 
-                className={`w-full ${isLearner 
-                  ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800' 
-                  : 'bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800'
+                className={`w-full text-white ${isLearner 
+                  ? 'bg-unboxable-navy hover:bg-unboxable-navy/90' 
+                  : 'bg-unboxable-orange hover:bg-unboxable-orange/90'
                 }`}
               >
                 Sign In

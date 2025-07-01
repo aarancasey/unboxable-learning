@@ -52,13 +52,18 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4">
-              <Settings className="h-8 w-8 text-purple-600" />
-              <h1 className="text-xl font-semibold text-gray-900">Admin Portal</h1>
+              <img 
+                src="/lovable-uploads/d0544c04-760a-4cf9-824c-612e5ef4aeaa.png" 
+                alt="Unboxable" 
+                className="h-8"
+              />
+              <div className="h-8 w-px bg-gray-300"></div>
+              <h1 className="text-xl font-semibold text-unboxable-navy">Admin Portal</h1>
             </div>
             
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-600">Administrator</span>
-              <Button variant="ghost" size="sm" onClick={onLogout}>
+              <Button variant="ghost" size="sm" onClick={onLogout} className="hover:bg-slate-100">
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
               </Button>
@@ -83,12 +88,12 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-gray-600 flex items-center">
-                    <Users className="h-4 w-4 mr-2" />
+                    <Users className="h-4 w-4 mr-2 text-unboxable-navy" />
                     Total Learners
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-gray-900">{mockAdminData.totalLearners}</div>
+                  <div className="text-2xl font-bold text-unboxable-navy">{mockAdminData.totalLearners}</div>
                   <p className="text-xs text-green-600 flex items-center mt-1">
                     <TrendingUp className="h-3 w-3 mr-1" />
                     +12% from last month
@@ -99,12 +104,12 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-gray-600 flex items-center">
-                    <BookOpen className="h-4 w-4 mr-2" />
+                    <BookOpen className="h-4 w-4 mr-2 text-unboxable-navy" />
                     Active Courses
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-gray-900">{mockAdminData.activeCourses}</div>
+                  <div className="text-2xl font-bold text-unboxable-navy">{mockAdminData.activeCourses}</div>
                   <p className="text-xs text-gray-600 mt-1">Across 3 departments</p>
                 </CardContent>
               </Card>
@@ -112,12 +117,12 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-gray-600 flex items-center">
-                    <FileText className="h-4 w-4 mr-2" />
+                    <FileText className="h-4 w-4 mr-2 text-unboxable-orange" />
                     Pending Surveys
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-orange-600">{mockAdminData.pendingSurveys}</div>
+                  <div className="text-2xl font-bold text-unboxable-orange">{mockAdminData.pendingSurveys}</div>
                   <p className="text-xs text-gray-600 mt-1">Awaiting review</p>
                 </CardContent>
               </Card>
@@ -125,7 +130,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-gray-600 flex items-center">
-                    <CheckCircle className="h-4 w-4 mr-2" />
+                    <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
                     Completion Rate
                   </CardTitle>
                 </CardHeader>
@@ -144,17 +149,17 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
-                    <Clock className="h-5 w-5 text-blue-600" />
-                    <span>Recent Activity</span>
+                    <Clock className="h-5 w-5 text-unboxable-orange" />
+                    <span className="text-unboxable-navy">Recent Activity</span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     {mockAdminData.recentActivity.map((activity) => (
                       <div key={activity.id} className="flex items-start space-x-3">
-                        <div className="w-2 h-2 bg-blue-600 rounded-full mt-2"></div>
+                        <div className="w-2 h-2 bg-unboxable-orange rounded-full mt-2"></div>
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-900">{activity.user}</p>
+                          <p className="text-sm font-medium text-unboxable-navy">{activity.user}</p>
                           <p className="text-sm text-gray-600">{activity.action}</p>
                           <p className="text-xs text-gray-500">{activity.time}</p>
                         </div>
@@ -168,8 +173,8 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
-                    <Calendar className="h-5 w-5 text-purple-600" />
-                    <span>Upcoming Tasks</span>
+                    <Calendar className="h-5 w-5 text-unboxable-orange" />
+                    <span className="text-unboxable-navy">Upcoming Tasks</span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -177,7 +182,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                     {mockAdminData.upcomingTasks.map((task) => (
                       <div key={task.id} className="flex items-center justify-between">
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-900">{task.task}</p>
+                          <p className="text-sm font-medium text-unboxable-navy">{task.task}</p>
                           <p className="text-xs text-gray-500">Due: {task.due}</p>
                         </div>
                         <Badge 
