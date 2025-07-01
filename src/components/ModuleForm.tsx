@@ -110,7 +110,7 @@ export const ModuleForm = ({ open, onOpenChange, module, onSave }: ModuleFormPro
             onCancel={() => onOpenChange(false)}
             onSave={handleSave}
             isEditMode={!!module}
-            isValid={isValid}
+            isValid={!!isValid}
           />
         </div>
       </DialogContent>
