@@ -2,7 +2,6 @@ import { useState } from 'react';
 import LearnerDashboard from '@/components/LearnerDashboard';
 import AdminDashboard from '@/components/AdminDashboard';
 import LoginPage from '@/components/LoginPage';
-import SurveyForm from '@/components/SurveyForm';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { GraduationCap, Users } from 'lucide-react';
@@ -11,7 +10,6 @@ const Index = () => {
   const [userRole, setUserRole] = useState<'learner' | 'admin' | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [learnerData, setLearnerData] = useState<any>(null);
-  const [showSurvey, setShowSurvey] = useState(false);
 
   const handleRoleSelect = (role: 'learner' | 'admin') => {
     setUserRole(role);
@@ -23,25 +21,12 @@ const Index = () => {
     if (userData) {
       setLearnerData(userData);
     }
-    // For learners, show survey directly after login
-    if (userRole === 'learner') {
-      setShowSurvey(true);
-    }
   };
 
   const handleLogout = () => {
     setUserRole(null);
     setIsAuthenticated(false);
     setLearnerData(null);
-    setShowSurvey(false);
-  };
-
-  const handleSurveyComplete = () => {
-    setShowSurvey(false);
-  };
-
-  const handleBackToDashboard = () => {
-    setShowSurvey(false);
   };
 
   if (!isAuthenticated) {
@@ -93,24 +78,10 @@ const Index = () => {
     );
   }
 
-  // Show survey directly for learners
-  if (userRole === 'learner' && showSurvey) {
-    return (
-      <SurveyForm 
-        onBack={handleBackToDashboard}
-        onSubmit={handleSurveyComplete}
-      />
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
       {userRole === 'learner' ? (
-        <LearnerDashboard 
-          onLogout={handleLogout} 
-          learnerData={learnerData}
-          onStartSurvey={() => setShowSurvey(true)}
-        />
+        <LearnerDashboard onLogout={handleLogout} learnerData={learnerData} />
       ) : (
         <AdminDashboard onLogout={handleLogout} />
       )}
