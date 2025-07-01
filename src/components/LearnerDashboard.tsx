@@ -16,7 +16,7 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
   const [activeView, setActiveView] = useState<'dashboard' | 'module' | 'survey'>('dashboard');
   const [selectedModule, setSelectedModule] = useState<any>(null);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [currentLearnier, setCurrentLearner] = useState(learnerData);
+  const [currentLearner, setCurrentLearner] = useState(learnerData);
 
   useEffect(() => {
     // Check if learner needs to change password on first login
@@ -35,13 +35,15 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
     modules: []
   };
 
-  const displayData = currentLearnier || defaultLearnerData;
+  const displayData = currentLearner || defaultLearnerData;
+  // Ensure modules is always an array
+  const modules = displayData.modules || [];
 
   const handlePasswordChanged = (newPassword: string) => {
-    if (currentLearnier) {
+    if (currentLearner) {
       // Update learner data
       const updatedLearner = {
-        ...currentLearnier,
+        ...currentLearner,
         password: newPassword,
         requiresPasswordChange: false
       };
@@ -50,7 +52,7 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
       const storedLearners = localStorage.getItem('learners');
       const learners = storedLearners ? JSON.parse(storedLearners) : [];
       const updatedLearners = learners.map((l: any) => 
-        l.id === currentLearnier.id ? updatedLearner : l
+        l.id === currentLearner.id ? updatedLearner : l
       );
       localStorage.setItem('learners', JSON.stringify(updatedLearners));
       
@@ -106,7 +108,7 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
         />
 
         <ModulesSection
-          modules={displayData.modules}
+          modules={modules}
           onModuleClick={handleModuleClick}
         />
       </div>
