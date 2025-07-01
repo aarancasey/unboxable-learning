@@ -13,14 +13,17 @@ import {
   MoreHorizontal,
   CheckCircle,
   Clock,
-  AlertCircle
+  AlertCircle,
+  UserCheck
 } from 'lucide-react';
 import AddLearnerForm from './AddLearnerForm';
+import { useToast } from '@/hooks/use-toast';
 
 const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddLearnerOpen, setIsAddLearnerOpen] = useState(false);
   const [learners, setLearners] = useState<any[]>([]);
+  const { toast } = useToast();
 
   const handleAddLearner = (newLearner: any) => {
     setLearners(prev => [...prev, newLearner]);
@@ -29,6 +32,23 @@ const UserManagement = () => {
     const existingLearners = JSON.parse(localStorage.getItem('learners') || '[]');
     const updatedLearners = [...existingLearners, newLearner];
     localStorage.setItem('learners', JSON.stringify(updatedLearners));
+  };
+
+  const handleActivateLearner = (learnerId: number) => {
+    const updatedLearners = learners.map(learner => 
+      learner.id === learnerId 
+        ? { ...learner, status: 'active' }
+        : learner
+    );
+    
+    setLearners(updatedLearners);
+    localStorage.setItem('learners', JSON.stringify(updatedLearners));
+    
+    const activatedLearner = updatedLearners.find(l => l.id === learnerId);
+    toast({
+      title: "Learner Activated",
+      description: `${activatedLearner?.name} has been successfully activated and can now access the learning portal.`,
+    });
   };
 
   // Load learners from localStorage on component mount
@@ -158,6 +178,16 @@ const UserManagement = () => {
                     <div className="flex items-center space-x-3">
                       {getStatusIcon(learner.status)}
                       {getStatusBadge(learner.status)}
+                      {learner.status === 'pending' && (
+                        <Button 
+                          size="sm" 
+                          className="bg-green-600 hover:bg-green-700 text-white"
+                          onClick={() => handleActivateLearner(learner.id)}
+                        >
+                          <UserCheck className="h-4 w-4 mr-1" />
+                          Activate
+                        </Button>
+                      )}
                       <Button variant="ghost" size="sm">
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
