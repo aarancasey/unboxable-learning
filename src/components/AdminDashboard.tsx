@@ -29,15 +29,11 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
   const [activeTab, setActiveTab] = useState('overview');
 
   const mockAdminData = {
-    totalLearners: 45,
+    totalLearners: 0,
     activeCourses: 8,
-    pendingSurveys: 12,
-    completionRate: 78,
-    recentActivity: [
-      { id: 1, user: "Sarah Johnson", action: "Completed Communication Module", time: "2 hours ago" },
-      { id: 2, user: "Mike Chen", action: "Submitted Leadership Survey", time: "3 hours ago" },
-      { id: 3, user: "Emily Davis", action: "Started Onboarding Course", time: "5 hours ago" },
-    ],
+    pendingSurveys: 0,
+    completionRate: 0,
+    recentActivity: [],
     upcomingTasks: [
       { id: 1, task: "Review Q4 Survey Responses", priority: "high", due: "Today" },
       { id: 2, task: "Update Module 4 Content", priority: "medium", due: "Tomorrow" },
@@ -94,10 +90,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-unboxable-navy">{mockAdminData.totalLearners}</div>
-                  <p className="text-xs text-green-600 flex items-center mt-1">
-                    <TrendingUp className="h-3 w-3 mr-1" />
-                    +12% from last month
-                  </p>
+                  <p className="text-xs text-gray-600 mt-1">Start by adding learners</p>
                 </CardContent>
               </Card>
 
@@ -123,7 +116,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-unboxable-orange">{mockAdminData.pendingSurveys}</div>
-                  <p className="text-xs text-gray-600 mt-1">Awaiting review</p>
+                  <p className="text-xs text-gray-600 mt-1">No surveys pending</p>
                 </CardContent>
               </Card>
 
@@ -136,10 +129,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-green-600">{mockAdminData.completionRate}%</div>
-                  <p className="text-xs text-green-600 flex items-center mt-1">
-                    <TrendingUp className="h-3 w-3 mr-1" />
-                    +5% from last week
-                  </p>
+                  <p className="text-xs text-gray-600 mt-1">Add learners to track progress</p>
                 </CardContent>
               </Card>
             </div>
@@ -154,17 +144,10 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    {mockAdminData.recentActivity.map((activity) => (
-                      <div key={activity.id} className="flex items-start space-x-3">
-                        <div className="w-2 h-2 bg-unboxable-orange rounded-full mt-2"></div>
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-unboxable-navy">{activity.user}</p>
-                          <p className="text-sm text-gray-600">{activity.action}</p>
-                          <p className="text-xs text-gray-500">{activity.time}</p>
-                        </div>
-                      </div>
-                    ))}
+                  <div className="text-center py-8">
+                    <Clock className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                    <p className="text-gray-600">No recent activity</p>
+                    <p className="text-sm text-gray-500">Activity will appear here once learners start engaging with content</p>
                   </div>
                 </CardContent>
               </Card>
