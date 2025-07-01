@@ -47,7 +47,7 @@ export const ModulesListCard = ({
   return (
     <Card>
       <CardHeader>
-        <divClassName="flex items-center justify-between">
+        <div className="flex items-center justify-between">
           <CardTitle>Course Modules ({modules.length})</CardTitle>
           <Button onClick={onAddModule} size="sm">
             <Plus className="h-4 w-4 mr-2" />
