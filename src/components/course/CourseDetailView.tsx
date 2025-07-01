@@ -24,6 +24,12 @@ interface CourseDetailViewProps {
 }
 
 export const CourseDetailView = ({ course, onBack }: CourseDetailViewProps) => {
+  const handleModuleUpdate = (moduleId: number, updatedModule: any) => {
+    console.log('Module updated:', moduleId, updatedModule);
+    // Here you would typically update the course data in your state management
+    // For now, we'll just log it since we don't have a full update mechanism
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -57,7 +63,10 @@ export const CourseDetailView = ({ course, onBack }: CourseDetailViewProps) => {
       />
 
       {/* Modules List */}
-      <CourseModulesList modules={course.moduleList} />
+      <CourseModulesList 
+        modules={course.moduleList} 
+        onModuleUpdate={handleModuleUpdate}
+      />
     </div>
   );
 };
