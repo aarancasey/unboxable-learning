@@ -15,12 +15,27 @@ import {
   Clock,
   AlertCircle
 } from 'lucide-react';
+import AddLearnerForm from './AddLearnerForm';
 
 const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [isAddLearnerOpen, setIsAddLearnerOpen] = useState(false);
+  const [learners, setLearners] = useState<any[]>([]);
 
-  // Empty data structure - no mock data
-  const mockUsers: any[] = [];
+  const handleAddLearner = (newLearner: any) => {
+    setLearners(prev => [...prev, newLearner]);
+    
+    // Save to localStorage for persistence
+    const existingLearners = JSON.parse(localStorage.getItem('learners') || '[]');
+    const updatedLearners = [...existingLearners, newLearner];
+    localStorage.setItem('learners', JSON.stringify(updatedLearners));
+  };
+
+  // Load learners from localStorage on component mount
+  useState(() => {
+    const savedLearners = JSON.parse(localStorage.getItem('learners') || '[]');
+    setLearners(savedLearners);
+  });
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -48,7 +63,7 @@ const UserManagement = () => {
     }
   };
 
-  const filteredUsers = mockUsers.filter(user =>
+  const filteredUsers = learners.filter(user =>
     user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.department.toLowerCase().includes(searchTerm.toLowerCase())
@@ -64,7 +79,10 @@ const UserManagement = () => {
         </div>
         
         <div className="flex space-x-3">
-          <Button className="bg-unboxable-navy hover:bg-unboxable-navy/90">
+          <Button 
+            className="bg-unboxable-navy hover:bg-unboxable-navy/90"
+            onClick={() => setIsAddLearnerOpen(true)}
+          >
             <UserPlus className="h-4 w-4 mr-2" />
             Add Learner
           </Button>
@@ -97,24 +115,66 @@ const UserManagement = () => {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            <span>Learners (0)</span>
+            <span>Learners ({learners.length})</span>
             <div className="text-sm text-gray-600">
-              0 active users
+              {learners.filter(l => l.status === 'active').length} active users
             </div>
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="text-center py-12">
-            <UserPlus className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No learners yet</h3>
-            <p className="text-gray-600 mb-6">Get started by adding your first learner to the platform.</p>
-            <Button className="bg-unboxable-navy hover:bg-unboxable-navy/90">
-              <UserPlus className="h-4 w-4 mr-2" />
-              Add First Learner
-            </Button>
-          </div>
+          {learners.length === 0 ? (
+            <div className="text-center py-12">
+              <UserPlus className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No learners yet</h3>
+              <p className="text-gray-600 mb-6">Get started by adding your first learner to the platform.</p>
+              <Button 
+                className="bg-unboxable-navy hover:bg-unboxable-navy/90"
+                onClick={() => setIsAddLearnerOpen(true)}
+              >
+                <UserPlus className="h-4 w-4 mr-2" />
+                Add First Learner
+              </Button>
+            </div>
+          ) : (
+            <div className="divide-y divide-gray-200">
+              {filteredUsers.map((learner) => (
+                <div key={learner.id} className="p-6 hover:bg-gray-50">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <div className="flex-shrink-0">
+                        <div className="w-10 h-10 bg-unboxable-navy rounded-full flex items-center justify-center text-white font-medium">
+                          {learner.name.charAt(0).toUpperCase()}
+                        </div>
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-900">{learner.name}</h4>
+                        <p className="text-sm text-gray-500">{learner.email}</p>
+                        <div className="flex items-center space-x-4 mt-1">
+                          <span className="text-xs text-gray-500">{learner.mobile}</span>
+                          <span className="text-xs text-gray-500">{learner.department}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      {getStatusIcon(learner.status)}
+                      {getStatusBadge(learner.status)}
+                      <Button variant="ghost" size="sm">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
+
+      <AddLearnerForm
+        isOpen={isAddLearnerOpen}
+        onClose={() => setIsAddLearnerOpen(false)}
+        onAddLearner={handleAddLearner}
+      />
     </div>
   );
 };
