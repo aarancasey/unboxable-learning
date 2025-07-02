@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import UserManagementHeader from './UserManagementHeader';
 import UserSearchBar from './UserSearchBar';
@@ -64,10 +64,10 @@ const UserManagement = () => {
   };
 
   // Load learners from localStorage on component mount
-  useState(() => {
+  useEffect(() => {
     const savedLearners = JSON.parse(localStorage.getItem('learners') || '[]');
     setLearners(savedLearners);
-  });
+  }, []);
 
   const filteredUsers = learners.filter(user =>
     user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
