@@ -5,7 +5,7 @@ import LearnerHeader from './LearnerHeader';
 import ProgressOverview from './ProgressOverview';
 import ModulesSection from './ModulesSection';
 import PasswordChangeModal from './PasswordChangeModal';
-import ModuleUnlockTester from './ModuleUnlockTester';
+
 
 interface LearnerDashboardProps {
   onLogout: () => void;
@@ -152,8 +152,6 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
           onModuleClick={handleModuleClick}
         />
 
-        {/* Testing Component - Remove in production */}
-        <ModuleUnlockTester />
       </div>
 
       {/* Password Change Modal */}
