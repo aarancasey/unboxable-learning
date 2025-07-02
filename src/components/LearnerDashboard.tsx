@@ -5,6 +5,7 @@ import LearnerHeader from './LearnerHeader';
 import ProgressOverview from './ProgressOverview';
 import ModulesSection from './ModulesSection';
 import PasswordChangeModal from './PasswordChangeModal';
+import ModuleUnlockTester from './ModuleUnlockTester';
 
 interface LearnerDashboardProps {
   onLogout: () => void;
@@ -27,6 +28,7 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
     // Check if survey has been completed
     const surveySubmissions = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
     const hasSurveyCompleted = surveySubmissions.length > 0;
+    console.log('Survey completion status:', hasSurveyCompleted, 'Submissions:', surveySubmissions.length);
 
     // Load available courses and their modules
     const savedCourses = JSON.parse(localStorage.getItem('courses') || '[]');
@@ -42,6 +44,8 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
             const isFirstModule = index === 0;
             const isSurveyModule = module.type === 'survey';
             const shouldUnlock = isFirstModule || isSurveyModule || hasSurveyCompleted;
+            
+            console.log(`Module "${module.title}": type=${module.type}, index=${index}, shouldUnlock=${shouldUnlock}, hasSurveyCompleted=${hasSurveyCompleted}`);
             
             return {
               ...module,
@@ -147,6 +151,9 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
           modules={modules}
           onModuleClick={handleModuleClick}
         />
+
+        {/* Testing Component - Remove in production */}
+        <ModuleUnlockTester />
       </div>
 
       {/* Password Change Modal */}
