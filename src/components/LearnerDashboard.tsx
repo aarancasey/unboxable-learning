@@ -5,6 +5,7 @@ import LearnerHeader from './LearnerHeader';
 import ProgressOverview from './ProgressOverview';
 import ModulesSection from './ModulesSection';
 import PasswordChangeModal from './PasswordChangeModal';
+import { useAnalytics } from '@/hooks/useAnalytics';
 
 
 interface LearnerDashboardProps {
@@ -18,6 +19,7 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [currentLearner, setCurrentLearner] = useState(learnerData);
   const [availableModules, setAvailableModules] = useState<any[]>([]);
+  const { trackModuleStart, trackSurveySubmission } = useAnalytics();
 
   useEffect(() => {
     // Check if learner needs to change password on first login
@@ -103,6 +105,8 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
   const handleModuleClick = (module: any) => {
     setSelectedModule(module);
     setActiveView('module');
+    // Track module start
+    trackModuleStart(module.id || 'unknown', module.title || 'Unknown Module', module.courseId || 'unknown');
   };
 
   if (activeView === 'module' && selectedModule) {
@@ -124,6 +128,8 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
         onBack={() => setActiveView('dashboard')}
         onSubmit={() => {
           setActiveView('dashboard');
+          // Track survey submission
+          trackSurveySubmission('customer-service-assessment', 'pre-course');
           // Refresh modules after survey submission to unlock them
           window.location.reload();
         }}

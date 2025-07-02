@@ -5,11 +5,13 @@ import LoginPage from '@/components/LoginPage';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { GraduationCap, Users } from 'lucide-react';
+import { useAnalytics } from '@/hooks/useAnalytics';
 
 const Index = () => {
   const [userRole, setUserRole] = useState<'learner' | 'admin' | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [learnerData, setLearnerData] = useState<any>(null);
+  const { trackUserLogin, trackPageView } = useAnalytics();
 
   const handleRoleSelect = (role: 'learner' | 'admin') => {
     setUserRole(role);
@@ -21,6 +23,9 @@ const Index = () => {
     if (userData) {
       setLearnerData(userData);
     }
+    // Track user login
+    trackUserLogin(userRole || 'unknown');
+    trackPageView('/dashboard');
   };
 
   const handleLogout = () => {

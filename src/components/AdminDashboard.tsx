@@ -21,6 +21,7 @@ import UserManagement from './UserManagement';
 import CourseManagement from './CourseManagement';
 import SurveyReviewer from './SurveyReviewer';
 import { CalendarView } from './calendar/CalendarView';
+import AnalyticsDashboard from './analytics/AnalyticsDashboard';
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -214,19 +215,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
           </TabsContent>
 
           <TabsContent value="analytics">
-            <Card>
-              <CardHeader>
-                <CardTitle>Analytics Dashboard</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-12">
-                  <TrendingUp className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Advanced Analytics</h3>
-                  <p className="text-gray-600">Detailed analytics and reporting features coming soon.</p>
-                  <p className="text-sm text-gray-500 mt-2">This will include learner progress trends, completion rates, and performance metrics.</p>
-                </div>
-              </CardContent>
-            </Card>
+            <AnalyticsDashboard />
           </TabsContent>
         </Tabs>
       </div>
