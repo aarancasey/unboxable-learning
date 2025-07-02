@@ -7,13 +7,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar, ChevronLeft, ChevronRight, Plus, Settings, Mail } from 'lucide-react';
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addDays, subDays, addWeeks, subWeeks, addMonths, subMonths } from 'date-fns';
 import { CourseScheduleDialog } from './CourseScheduleDialog';
+import { MultiWeekCourseScheduleDialog } from './MultiWeekCourseScheduleDialog';
 import { EmailReminderDialog } from './EmailReminderDialog';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ScheduledCourse {
   id: string;
   courseId: string;
   courseName: string;
   date: Date;
+  endDate?: Date;
   time: string;
   duration: string;
   enrolledCount: number;
@@ -22,6 +25,9 @@ interface ScheduledCourse {
   location?: string;
   reminderSent: boolean;
   reminderDate?: Date;
+  isMultiWeek?: boolean;
+  moduleSchedules?: any[];
+  status?: string;
 }
 
 export const CalendarView = () => {
@@ -29,22 +35,71 @@ export const CalendarView = () => {
   const [view, setView] = useState<'week' | 'month'>('month');
   const [scheduledCourses, setScheduledCourses] = useState<ScheduledCourse[]>([]);
   const [showScheduleDialog, setShowScheduleDialog] = useState(false);
+  const [showMultiWeekDialog, setShowMultiWeekDialog] = useState(false);
   const [showReminderDialog, setShowReminderDialog] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedCourse, setSelectedCourse] = useState<ScheduledCourse | null>(null);
 
-  // Load scheduled courses from localStorage
+  // Load scheduled courses from Supabase and localStorage
   useEffect(() => {
-    const saved = localStorage.getItem('scheduledCourses');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      setScheduledCourses(parsed.map((course: any) => ({
+    loadScheduledCourses();
+  }, []);
+
+  const loadScheduledCourses = async () => {
+    try {
+      // Load from Supabase
+      const { data: courseSchedules, error } = await supabase
+        .from('course_schedules')
+        .select(`
+          *,
+          module_schedules (*)
+        `);
+
+      if (error) throw error;
+
+      const supabaseCourses = courseSchedules.map((schedule: any) => ({
+        id: schedule.id,
+        courseId: schedule.course_id,
+        courseName: schedule.course_name,
+        date: new Date(schedule.start_date),
+        endDate: new Date(schedule.end_date),
+        time: '09:00',
+        duration: `${schedule.duration_weeks} weeks`,
+        enrolledCount: schedule.enrolled_count,
+        maxEnrollment: schedule.max_enrollment,
+        instructor: schedule.instructor,
+        location: schedule.location,
+        reminderSent: false,
+        isMultiWeek: true,
+        moduleSchedules: schedule.module_schedules,
+        status: schedule.status
+      }));
+
+      // Also load legacy courses from localStorage
+      const saved = localStorage.getItem('scheduledCourses');
+      const legacyCourses = saved ? JSON.parse(saved).map((course: any) => ({
         ...course,
         date: new Date(course.date),
-        reminderDate: course.reminderDate ? new Date(course.reminderDate) : undefined
-      })));
+        reminderDate: course.reminderDate ? new Date(course.reminderDate) : undefined,
+        isMultiWeek: false
+      })) : [];
+
+      setScheduledCourses([...supabaseCourses, ...legacyCourses]);
+    } catch (error) {
+      console.error('Error loading scheduled courses:', error);
+      // Fallback to localStorage only
+      const saved = localStorage.getItem('scheduledCourses');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setScheduledCourses(parsed.map((course: any) => ({
+          ...course,
+          date: new Date(course.date),
+          reminderDate: course.reminderDate ? new Date(course.reminderDate) : undefined,
+          isMultiWeek: false
+        })));
+      }
     }
-  }, []);
+  };
 
   // Save scheduled courses to localStorage
   const saveScheduledCourses = (courses: ScheduledCourse[]) => {
@@ -92,11 +147,26 @@ export const CalendarView = () => {
     const newCourse: ScheduledCourse = {
       id: Date.now().toString(),
       ...courseData,
-      reminderSent: false
+      reminderSent: false,
+      isMultiWeek: false
     };
-    saveScheduledCourses([...scheduledCourses, newCourse]);
+    const updatedCourses = [...scheduledCourses, newCourse];
+    setScheduledCourses(updatedCourses);
+    localStorage.setItem('scheduledCourses', JSON.stringify(updatedCourses.filter(c => !c.isMultiWeek)));
     setShowScheduleDialog(false);
     setSelectedDate(null);
+  };
+
+  const handleScheduleMultiWeekCourse = (courseData: any) => {
+    const newCourse: ScheduledCourse = {
+      ...courseData,
+      isMultiWeek: true
+    };
+    setScheduledCourses([...scheduledCourses, newCourse]);
+    setShowMultiWeekDialog(false);
+    setSelectedDate(null);
+    // Refresh data from Supabase
+    loadScheduledCourses();
   };
 
   const handleUpdateReminder = (courseId: string, reminderData: any) => {
@@ -127,13 +197,22 @@ export const CalendarView = () => {
             </TabsList>
           </Tabs>
           
-          <Button 
-            className="bg-purple-600 hover:bg-purple-700"
-            onClick={() => setShowScheduleDialog(true)}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Schedule Course
-          </Button>
+          <div className="flex space-x-2">
+            <Button 
+              variant="outline"
+              onClick={() => setShowScheduleDialog(true)}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Single Session
+            </Button>
+            <Button 
+              className="bg-primary hover:bg-primary/90"
+              onClick={() => setShowMultiWeekDialog(true)}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Multi-Week Course
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -270,6 +349,16 @@ export const CalendarView = () => {
         }}
         selectedDate={selectedDate}
         onSchedule={handleScheduleCourse}
+      />
+
+      <MultiWeekCourseScheduleDialog
+        open={showMultiWeekDialog}
+        onClose={() => {
+          setShowMultiWeekDialog(false);
+          setSelectedDate(null);
+        }}
+        selectedDate={selectedDate}
+        onSchedule={handleScheduleMultiWeekCourse}
       />
 
       <EmailReminderDialog

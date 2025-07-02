@@ -249,6 +249,110 @@ export type Database = {
         }
         Relationships: []
       }
+      course_schedules: {
+        Row: {
+          course_id: string
+          course_name: string
+          created_at: string
+          description: string | null
+          duration_weeks: number
+          end_date: string
+          enrolled_count: number
+          id: string
+          instructor: string | null
+          location: string | null
+          max_enrollment: number
+          pre_course_survey_date: string | null
+          start_date: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          course_id: string
+          course_name: string
+          created_at?: string
+          description?: string | null
+          duration_weeks?: number
+          end_date: string
+          enrolled_count?: number
+          id?: string
+          instructor?: string | null
+          location?: string | null
+          max_enrollment: number
+          pre_course_survey_date?: string | null
+          start_date: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          course_id?: string
+          course_name?: string
+          created_at?: string
+          description?: string | null
+          duration_weeks?: number
+          end_date?: string
+          enrolled_count?: number
+          id?: string
+          instructor?: string | null
+          location?: string | null
+          max_enrollment?: number
+          pre_course_survey_date?: string | null
+          start_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      email_campaigns: {
+        Row: {
+          campaign_type: string
+          course_schedule_id: string
+          created_at: string
+          email_content: string
+          email_subject: string
+          id: string
+          recipient_email: string
+          scheduled_date: string
+          scheduled_time: string
+          sent_at: string | null
+          status: string
+        }
+        Insert: {
+          campaign_type: string
+          course_schedule_id: string
+          created_at?: string
+          email_content: string
+          email_subject: string
+          id?: string
+          recipient_email: string
+          scheduled_date: string
+          scheduled_time: string
+          sent_at?: string | null
+          status?: string
+        }
+        Update: {
+          campaign_type?: string
+          course_schedule_id?: string
+          created_at?: string
+          email_content?: string
+          email_subject?: string
+          id?: string
+          recipient_email?: string
+          scheduled_date?: string
+          scheduled_time?: string
+          sent_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_campaigns_course_schedule_id_fkey"
+            columns: ["course_schedule_id"]
+            isOneToOne: false
+            referencedRelation: "course_schedules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hero_content: {
         Row: {
           background_image_url: string | null
@@ -362,6 +466,56 @@ export type Database = {
         }
         Relationships: []
       }
+      module_schedules: {
+        Row: {
+          course_schedule_id: string
+          created_at: string
+          email_notification_date: string
+          id: string
+          is_unlocked: boolean
+          module_id: string
+          module_title: string
+          module_type: string
+          unlock_date: string
+          unlock_time: string
+          week_number: number
+        }
+        Insert: {
+          course_schedule_id: string
+          created_at?: string
+          email_notification_date: string
+          id?: string
+          is_unlocked?: boolean
+          module_id: string
+          module_title: string
+          module_type: string
+          unlock_date: string
+          unlock_time: string
+          week_number: number
+        }
+        Update: {
+          course_schedule_id?: string
+          created_at?: string
+          email_notification_date?: string
+          id?: string
+          is_unlocked?: boolean
+          module_id?: string
+          module_title?: string
+          module_type?: string
+          unlock_date?: string
+          unlock_time?: string
+          week_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "module_schedules_course_schedule_id_fkey"
+            columns: ["course_schedule_id"]
+            isOneToOne: false
+            referencedRelation: "course_schedules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pages: {
         Row: {
           content: Json
@@ -388,6 +542,50 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      participant_progress: {
+        Row: {
+          course_schedule_id: string
+          created_at: string
+          id: string
+          last_activity_at: string
+          modules_completed: Json
+          participant_email: string
+          participant_name: string | null
+          survey_completed: boolean
+          survey_completed_at: string | null
+        }
+        Insert: {
+          course_schedule_id: string
+          created_at?: string
+          id?: string
+          last_activity_at?: string
+          modules_completed?: Json
+          participant_email: string
+          participant_name?: string | null
+          survey_completed?: boolean
+          survey_completed_at?: string | null
+        }
+        Update: {
+          course_schedule_id?: string
+          created_at?: string
+          id?: string
+          last_activity_at?: string
+          modules_completed?: Json
+          participant_email?: string
+          participant_name?: string | null
+          survey_completed?: boolean
+          survey_completed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "participant_progress_course_schedule_id_fkey"
+            columns: ["course_schedule_id"]
+            isOneToOne: false
+            referencedRelation: "course_schedules"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       post_categories: {
         Row: {
