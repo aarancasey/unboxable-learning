@@ -251,6 +251,7 @@ export type Database = {
       }
       course_schedules: {
         Row: {
+          color: string | null
           course_id: string
           course_name: string
           created_at: string
@@ -268,6 +269,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          color?: string | null
           course_id: string
           course_name: string
           created_at?: string
@@ -285,6 +287,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          color?: string | null
           course_id?: string
           course_name?: string
           created_at?: string

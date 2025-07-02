@@ -28,6 +28,7 @@ interface ScheduledCourse {
   isMultiWeek?: boolean;
   moduleSchedules?: any[];
   status?: string;
+  color?: string;
 }
 
 export const CalendarView = () => {
@@ -72,7 +73,8 @@ export const CalendarView = () => {
         reminderSent: false,
         isMultiWeek: true,
         moduleSchedules: schedule.module_schedules,
-        status: schedule.status
+        status: schedule.status,
+        color: schedule.color || '#8B5CF6'
       }));
 
       // Also load legacy courses from localStorage
@@ -130,7 +132,36 @@ export const CalendarView = () => {
   };
 
   const getCoursesForDate = (date: Date) => {
-    return scheduledCourses.filter(course => isSameDay(course.date, date));
+    return scheduledCourses.filter(course => {
+      if (course.isMultiWeek && course.endDate) {
+        // For multi-week courses, check if date is within the course duration
+        return date >= course.date && date <= course.endDate;
+      }
+      // For single-day courses, check exact date match
+      return isSameDay(course.date, date);
+    });
+  };
+
+  const getEmailEventsForDate = (date: Date) => {
+    const emailEvents: any[] = [];
+    
+    scheduledCourses.forEach(course => {
+      if (course.moduleSchedules) {
+        course.moduleSchedules.forEach((module: any) => {
+          const emailDate = new Date(module.email_notification_date);
+          if (isSameDay(emailDate, date)) {
+            emailEvents.push({
+              type: 'email',
+              title: `Email: ${module.module_title}`,
+              courseName: course.courseName,
+              color: course.color || '#8B5CF6'
+            });
+          }
+        });
+      }
+    });
+    
+    return emailEvents;
   };
 
   const handleDateClick = (date: Date) => {
@@ -246,12 +277,13 @@ export const CalendarView = () => {
             {/* Calendar days */}
             {days.map(day => {
               const coursesForDay = getCoursesForDate(day);
+              const emailEventsForDay = getEmailEventsForDate(day);
               const isToday = isSameDay(day, new Date());
               
               return (
                 <div
                   key={day.toISOString()}
-                  className={`min-h-24 p-2 border rounded-lg cursor-pointer hover:bg-gray-50 ${
+                  className={`min-h-28 p-2 border rounded-lg cursor-pointer hover:bg-gray-50 ${
                     isToday ? 'bg-blue-50 border-blue-200' : 'border-gray-200'
                   }`}
                   onClick={() => handleDateClick(day)}
@@ -265,8 +297,13 @@ export const CalendarView = () => {
                   <div className="space-y-1">
                     {coursesForDay.map(course => (
                       <div
-                        key={course.id}
-                        className="text-xs p-1 bg-purple-100 text-purple-800 rounded cursor-pointer hover:bg-purple-200"
+                        key={`course-${course.id}`}
+                        className="text-xs p-1 rounded cursor-pointer"
+                        style={{
+                          backgroundColor: `${course.color}20`,
+                          borderLeft: `3px solid ${course.color}`,
+                          color: course.color
+                        }}
                         onClick={(e) => {
                           e.stopPropagation();
                           handleCourseClick(course);
@@ -274,10 +311,27 @@ export const CalendarView = () => {
                       >
                         <div className="font-medium truncate">{course.courseName}</div>
                         <div className="flex items-center justify-between">
-                          <span>{course.time}</span>
+                          <span>{course.isMultiWeek ? 'Multi-week' : course.time}</span>
                           {!course.reminderSent && (
                             <Mail className="h-3 w-3 text-orange-500" />
                           )}
+                        </div>
+                      </div>
+                    ))}
+                    
+                    {emailEventsForDay.map((emailEvent, index) => (
+                      <div
+                        key={`email-${index}`}
+                        className="text-xs p-1 rounded border-l-2"
+                        style={{
+                          backgroundColor: `${emailEvent.color}10`,
+                          borderLeftColor: emailEvent.color,
+                          color: emailEvent.color
+                        }}
+                      >
+                        <div className="font-medium truncate flex items-center">
+                          <Mail className="h-3 w-3 mr-1" />
+                          {emailEvent.title}
                         </div>
                       </div>
                     ))}

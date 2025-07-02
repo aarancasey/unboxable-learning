@@ -36,6 +36,9 @@ export const MultiWeekCourseScheduleDialog = ({
 }: MultiWeekCourseScheduleDialogProps) => {
   const [courseName, setCourseName] = useState('');
   const [courseId, setCourseId] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [courseColor, setCourseColor] = useState('#8B5CF6');
   const [maxEnrollment, setMaxEnrollment] = useState('');
   const [instructor, setInstructor] = useState('');
   const [location, setLocation] = useState('');
@@ -52,8 +55,12 @@ export const MultiWeekCourseScheduleDialog = ({
       const savedCourses = JSON.parse(localStorage.getItem('courses') || '[]');
       setAvailableCourses(savedCourses.filter((course: any) => course.status === 'active'));
       
-      // Set default pre-course email date (1 week before course start)
+      // Set default dates
       if (selectedDate) {
+        setStartDate(format(selectedDate, 'yyyy-MM-dd'));
+        const defaultEndDate = addWeeks(selectedDate, 4);
+        setEndDate(format(defaultEndDate, 'yyyy-MM-dd'));
+        
         const oneWeekBefore = addDays(selectedDate, -7);
         setPreCourseEmailDate(format(oneWeekBefore, 'yyyy-MM-dd'));
       }
@@ -68,9 +75,13 @@ export const MultiWeekCourseScheduleDialog = ({
       setMaxEnrollment(course.maxEnrollment.toString());
       
       // Generate module schedules based on course modules
+      const courseStartDate = startDate ? new Date(startDate) : selectedDate!;
+      const courseEndDate = endDate ? new Date(endDate) : addWeeks(courseStartDate, 4);
+      const totalWeeks = Math.ceil((courseEndDate.getTime() - courseStartDate.getTime()) / (7 * 24 * 60 * 60 * 1000));
+      
       const schedules: ModuleSchedule[] = course.moduleList.map((module: any, index: number) => {
-        const weekNumber = Math.floor(index / 1) + 1; // Distribute modules across 4 weeks
-        const unlockDate = addWeeks(selectedDate!, weekNumber - 1);
+        const weekNumber = Math.floor(index / Math.max(1, Math.floor(course.moduleList.length / totalWeeks))) + 1;
+        const unlockDate = addWeeks(courseStartDate, Math.min(weekNumber - 1, totalWeeks - 1));
         const emailNotificationDate = addDays(unlockDate, -7);
         
         return {
@@ -97,12 +108,14 @@ export const MultiWeekCourseScheduleDialog = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!selectedDate || !courseName || !maxEnrollment) {
+    if (!startDate || !endDate || !courseName || !maxEnrollment) {
       return;
     }
 
     try {
-      const endDate = addWeeks(selectedDate, 4);
+      const courseStartDate = new Date(startDate);
+      const courseEndDate = new Date(endDate);
+      const durationWeeks = Math.ceil((courseEndDate.getTime() - courseStartDate.getTime()) / (7 * 24 * 60 * 60 * 1000));
       
       // Create course schedule in Supabase
       const { data: courseSchedule, error: courseError } = await supabase
@@ -110,14 +123,15 @@ export const MultiWeekCourseScheduleDialog = ({
         .insert({
           course_id: courseId || courseName,
           course_name: courseName,
-          start_date: format(selectedDate, 'yyyy-MM-dd'),
-          end_date: format(endDate, 'yyyy-MM-dd'),
-          duration_weeks: 4,
+          start_date: startDate,
+          end_date: endDate,
+          duration_weeks: durationWeeks,
           max_enrollment: parseInt(maxEnrollment),
           instructor,
           location,
           description,
-          pre_course_survey_date: preCourseEmailDate
+          pre_course_survey_date: preCourseEmailDate,
+          color: courseColor
         })
         .select()
         .single();
@@ -194,15 +208,16 @@ export const MultiWeekCourseScheduleDialog = ({
         id: courseSchedule.id,
         courseId: courseId || courseName,
         courseName,
-        startDate: selectedDate,
-        endDate,
+        startDate: courseStartDate,
+        endDate: courseEndDate,
         maxEnrollment: parseInt(maxEnrollment),
         enrolledCount: emails.length,
         instructor,
         location,
         description,
         moduleSchedules,
-        status: 'scheduled'
+        status: 'scheduled',
+        color: courseColor
       });
 
       // Reset form
@@ -217,6 +232,9 @@ export const MultiWeekCourseScheduleDialog = ({
   const resetForm = () => {
     setCourseName('');
     setCourseId('');
+    setStartDate('');
+    setEndDate('');
+    setCourseColor('#8B5CF6');
     setMaxEnrollment('');
     setInstructor('');
     setLocation('');
@@ -314,6 +332,39 @@ export const MultiWeekCourseScheduleDialog = ({
                     onChange={(e) => setMaxEnrollment(e.target.value)}
                     placeholder="Maximum participants"
                     required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="startDate">Start Date</Label>
+                  <Input
+                    id="startDate"
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="endDate">End Date</Label>
+                  <Input
+                    id="endDate"
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="courseColor">Course Color</Label>
+                  <Input
+                    id="courseColor"
+                    type="color"
+                    value={courseColor}
+                    onChange={(e) => setCourseColor(e.target.value)}
+                    className="h-10 w-full"
                   />
                 </div>
               </div>
@@ -441,7 +492,7 @@ export const MultiWeekCourseScheduleDialog = ({
               Cancel
             </Button>
             <Button type="submit" className="bg-primary hover:bg-primary/90">
-              Schedule 4-Week Course
+              Schedule Multi-Week Course
             </Button>
           </div>
         </form>
