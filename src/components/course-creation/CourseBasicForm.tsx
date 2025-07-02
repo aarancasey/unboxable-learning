@@ -61,7 +61,7 @@ export const CourseBasicForm = ({
               id="maxLearners"
               type="number"
               value={maxLearners}
-              onChange={(e) => setMaxLearners(parseInt(e.target.value))}
+              onChange={(e) => setMaxLearners(parseInt(e.target.value) || 0)}
             />
           </div>
         </div>
@@ -72,7 +72,7 @@ export const CourseBasicForm = ({
             id="enrolledLearners"
             type="number"
             value={enrolledLearners}
-            onChange={(e) => setEnrolledLearners(parseInt(e.target.value))}
+            onChange={(e) => setEnrolledLearners(parseInt(e.target.value) || 0)}
           />
         </div>
         
