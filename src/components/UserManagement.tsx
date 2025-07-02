@@ -6,11 +6,13 @@ import UserSearchBar from './UserSearchBar';
 import UsersList from './UsersList';
 import AddLearnerForm from './AddLearnerForm';
 import SendInvitesModal from './SendInvitesModal';
+import BulkUploadModal from './BulkUploadModal';
 
 const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddLearnerOpen, setIsAddLearnerOpen] = useState(false);
   const [isSendInvitesOpen, setIsSendInvitesOpen] = useState(false);
+  const [isBulkUploadOpen, setIsBulkUploadOpen] = useState(false);
   const [learners, setLearners] = useState<any[]>([]);
   const { toast } = useToast();
 
@@ -51,6 +53,16 @@ const UserManagement = () => {
     localStorage.setItem('learners', JSON.stringify(updatedLearners));
   };
 
+  const handleBulkImport = (newLearners: any[]) => {
+    const updatedLearners = [...learners, ...newLearners];
+    setLearners(updatedLearners);
+    
+    // Save to localStorage for persistence
+    const existingLearners = JSON.parse(localStorage.getItem('learners') || '[]');
+    const allLearners = [...existingLearners, ...newLearners];
+    localStorage.setItem('learners', JSON.stringify(allLearners));
+  };
+
   // Load learners from localStorage on component mount
   useState(() => {
     const savedLearners = JSON.parse(localStorage.getItem('learners') || '[]');
@@ -63,11 +75,14 @@ const UserManagement = () => {
     user.department.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const existingEmails = learners.map(learner => learner.email.toLowerCase());
+
   return (
     <div className="space-y-6">
       <UserManagementHeader
         onAddLearner={() => setIsAddLearnerOpen(true)}
         onSendInvites={() => setIsSendInvitesOpen(true)}
+        onBulkUpload={() => setIsBulkUploadOpen(true)}
       />
 
       <UserSearchBar
@@ -93,6 +108,13 @@ const UserManagement = () => {
         onClose={() => setIsSendInvitesOpen(false)}
         learners={learners}
         onInvitesSent={handleInvitesSent}
+      />
+
+      <BulkUploadModal
+        isOpen={isBulkUploadOpen}
+        onClose={() => setIsBulkUploadOpen(false)}
+        onBulkImport={handleBulkImport}
+        existingEmails={existingEmails}
       />
     </div>
   );
