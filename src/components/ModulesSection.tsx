@@ -31,19 +31,25 @@ const ModulesSection = ({ modules, onModuleClick }: ModulesSectionProps) => {
         return <CheckCircle className="h-5 w-5 text-green-500" />;
       case 'in-progress':
         return <PlayCircle className="h-5 w-5 text-unboxable-orange" />;
-      default:
+      case 'locked':
         return <Clock className="h-5 w-5 text-gray-400" />;
+      default:
+        return <BookOpen className="h-5 w-5 text-blue-500" />;
     }
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string, unlocked: boolean) => {
+    if (!unlocked) {
+      return <Badge variant="secondary" className="bg-gray-200 text-gray-600">Locked</Badge>;
+    }
+    
     switch (status) {
       case 'completed':
         return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Completed</Badge>;
       case 'in-progress':
         return <Badge className="bg-orange-100 text-unboxable-orange hover:bg-orange-100">In Progress</Badge>;
       default:
-        return <Badge variant="secondary">Locked</Badge>;
+        return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">Available</Badge>;
     }
   };
 
@@ -73,28 +79,49 @@ const ModulesSection = ({ modules, onModuleClick }: ModulesSectionProps) => {
             {modules.map((module) => (
               <Card
                 key={module.id}
-                className={`transition-all hover:shadow-md ${
-                  module.unlocked ? 'cursor-pointer hover:border-unboxable-navy/30' : 'opacity-60'
+                className={`transition-all duration-300 ${
+                  module.unlocked 
+                    ? 'cursor-pointer hover:shadow-lg hover:border-unboxable-navy/30 hover:scale-105' 
+                    : 'opacity-50 cursor-not-allowed bg-gray-50'
                 }`}
                 onClick={() => handleModuleClick(module)}
               >
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between mb-3">
-                    {getStatusIcon(module.status)}
-                    {getStatusBadge(module.status)}
+                    <div className={`${!module.unlocked ? 'text-gray-400' : ''}`}>
+                      {getStatusIcon(module.unlocked ? module.status : 'locked')}
+                    </div>
+                    {getStatusBadge(module.status, module.unlocked)}
                   </div>
                   
-                  <h3 className="font-medium text-unboxable-navy mb-2">{module.title}</h3>
+                  <h3 className={`font-medium mb-2 ${
+                    module.unlocked ? 'text-unboxable-navy' : 'text-gray-400'
+                  }`}>
+                    {module.title}
+                  </h3>
                   
-                  <div className="flex items-center justify-between text-sm text-gray-600">
+                  <div className={`flex items-center justify-between text-sm ${
+                    module.unlocked ? 'text-gray-600' : 'text-gray-400'
+                  }`}>
                     <span>{module.duration}</span>
                     <span className="capitalize">{module.type}</span>
                   </div>
                   
-                  {!module.unlocked && module.unlockDate && (
-                    <div className="mt-2 flex items-center text-xs text-gray-500">
-                      <Calendar className="h-3 w-3 mr-1" />
-                      Unlocks {module.unlockDate}
+                  {!module.unlocked && (
+                    <div className="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded-md">
+                      <div className="flex items-center text-xs text-yellow-700">
+                        <Calendar className="h-3 w-3 mr-1" />
+                        {module.unlockDate || 'Complete previous modules to unlock'}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {module.unlocked && module.type === 'survey' && (
+                    <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded-md">
+                      <div className="flex items-center text-xs text-blue-700">
+                        <CheckCircle className="h-3 w-3 mr-1" />
+                        Required to unlock other modules
+                      </div>
                     </div>
                   )}
                 </CardContent>

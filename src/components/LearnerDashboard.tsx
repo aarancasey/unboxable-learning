@@ -24,6 +24,10 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
       setShowPasswordModal(true);
     }
 
+    // Check if survey has been completed
+    const surveySubmissions = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
+    const hasSurveyCompleted = surveySubmissions.length > 0;
+
     // Load available courses and their modules
     const savedCourses = JSON.parse(localStorage.getItem('courses') || '[]');
     console.log('Loading courses for learner:', savedCourses);
@@ -32,13 +36,22 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
       // Combine all modules from all active courses
       const allModules = savedCourses.reduce((modules: any[], course: any) => {
         if (course.status === 'active' && course.moduleList) {
-          const courseModules = course.moduleList.map((module: any) => ({
-            ...module,
-            courseId: course.id,
-            courseName: course.title,
-            unlocked: true, // For now, unlock all modules
-            status: 'available'
-          }));
+          const courseModules = course.moduleList.map((module: any, index: number) => {
+            // First module (survey) is always unlocked
+            // Other modules are unlocked only after survey completion
+            const isFirstModule = index === 0;
+            const isSurveyModule = module.type === 'survey';
+            const shouldUnlock = isFirstModule || isSurveyModule || hasSurveyCompleted;
+            
+            return {
+              ...module,
+              courseId: course.id,
+              courseName: course.title,
+              unlocked: shouldUnlock,
+              status: shouldUnlock ? (isSurveyModule && !hasSurveyCompleted ? 'available' : 'available') : 'locked',
+              unlockDate: !shouldUnlock ? 'Complete survey to unlock' : undefined
+            };
+          });
           return [...modules, ...courseModules];
         }
         return modules;
@@ -107,7 +120,8 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
         onBack={() => setActiveView('dashboard')}
         onSubmit={() => {
           setActiveView('dashboard');
-          // Handle survey submission
+          // Refresh modules after survey submission to unlock them
+          window.location.reload();
         }}
       />
     );
