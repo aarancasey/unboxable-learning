@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ModuleBasicFields } from './module/ModuleBasicFields';
 import { ModuleContentFields } from './module/ModuleContentFields';
-import { ModuleFileUpload } from './module/ModuleFileUpload';
+import { ModuleFileUploadSimple } from './module/ModuleFileUploadSimple';
 import { ModuleFormActions } from './module/ModuleFormActions';
 
 interface Module {
@@ -16,6 +16,7 @@ interface Module {
     files?: File[];
     videoUrl?: string;
     documentUrl?: string;
+    googleDocsLinks?: string[];
   };
 }
 
@@ -34,25 +35,30 @@ export const ModuleForm = ({ open, onOpenChange, module, onSave }: ModuleFormPro
   const [videoUrl, setVideoUrl] = useState('');
   const [documentUrl, setDocumentUrl] = useState('');
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [googleDocsLinks, setGoogleDocsLinks] = useState<string[]>([]);
 
   useEffect(() => {
-    if (module) {
-      setTitle(module.title);
-      setType(module.type);
-      setDuration(module.duration);
-      setDescription(module.description);
-      setVideoUrl(module.content?.videoUrl || '');
-      setDocumentUrl(module.content?.documentUrl || '');
-      setUploadedFiles(module.content?.files || []);
-    } else {
-      // Reset form for new module
-      setTitle('');
-      setType('document');
-      setDuration('');
-      setDescription('');
-      setVideoUrl('');
-      setDocumentUrl('');
-      setUploadedFiles([]);
+    if (open) {
+      if (module) {
+        setTitle(module.title);
+        setType(module.type);
+        setDuration(module.duration);
+        setDescription(module.description);
+        setVideoUrl(module.content?.videoUrl || '');
+        setDocumentUrl(module.content?.documentUrl || '');
+        setUploadedFiles(module.content?.files || []);
+        setGoogleDocsLinks(module.content?.googleDocsLinks || []);
+      } else {
+        // Reset form for new module
+        setTitle('');
+        setType('document');
+        setDuration('');
+        setDescription('');
+        setVideoUrl('');
+        setDocumentUrl('');
+        setUploadedFiles([]);
+        setGoogleDocsLinks([]);
+      }
     }
   }, [module, open]);
 
@@ -66,10 +72,12 @@ export const ModuleForm = ({ open, onOpenChange, module, onSave }: ModuleFormPro
         files: uploadedFiles,
         videoUrl: videoUrl || undefined,
         documentUrl: documentUrl || undefined,
+        googleDocsLinks: googleDocsLinks.length > 0 ? googleDocsLinks : undefined,
       }
     };
 
     onSave(moduleData);
+    onOpenChange(false);
   };
 
   const isValid = title.trim() && duration.trim();
@@ -101,9 +109,11 @@ export const ModuleForm = ({ open, onOpenChange, module, onSave }: ModuleFormPro
             setDocumentUrl={setDocumentUrl}
           />
 
-          <ModuleFileUpload
+          <ModuleFileUploadSimple
             uploadedFiles={uploadedFiles}
             setUploadedFiles={setUploadedFiles}
+            googleDocsLinks={googleDocsLinks}
+            setGoogleDocsLinks={setGoogleDocsLinks}
           />
 
           <ModuleFormActions
