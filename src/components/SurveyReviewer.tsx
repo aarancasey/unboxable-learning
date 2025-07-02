@@ -140,58 +140,113 @@ const SurveyReviewer = () => {
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Brain className="h-5 w-5 text-purple-600" />
-                  <span>AI Analysis Summary</span>
+                  <span>AI Leadership Assessment Summary</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div>
-                  <h4 className="font-medium text-green-700 mb-2 flex items-center">
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                    Strengths Identified
-                  </h4>
-                  <ul className="space-y-1">
-                    {selectedSurvey.aiSummary.strengths.map((strength: string, index: number) => (
-                      <li key={index} className="text-sm text-gray-700 flex items-start">
-                        <span className="w-2 h-2 bg-green-500 rounded-full mt-2 mr-2 flex-shrink-0"></span>
-                        {strength}
-                      </li>
-                    ))}
-                  </ul>
+                {/* Section 1: Leadership Sentiment Snapshot */}
+                <div className="border-b pb-4">
+                  <h4 className="font-semibold text-gray-900 mb-3">Section 1: Leadership Sentiment Snapshot</h4>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <h5 className="font-medium text-gray-800 mb-2">Current Leadership Style</h5>
+                      <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                        {selectedSurvey.aiSummary.currentLeadershipStyle || 'Managing, but close to overload'}
+                      </span>
+                    </div>
+                    
+                    <div>
+                      <h5 className="font-medium text-gray-800 mb-2">Confidence Rating</h5>
+                      <span className="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                        {selectedSurvey.aiSummary.confidenceRating || 'Developing Confidence (2.5–3.4)'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <h5 className="font-medium text-green-700 mb-2">Strongest Area</h5>
+                      <p className="text-sm text-gray-700">{selectedSurvey.aiSummary.strongestArea || 'Motivate and align your team'}</p>
+                    </div>
+                    
+                    <div>
+                      <h5 className="font-medium text-orange-700 mb-2">Area to Focus On</h5>
+                      <p className="text-sm text-gray-700">{selectedSurvey.aiSummary.focusArea || 'Lead through complexity and ambiguity'}</p>
+                    </div>
+                  </div>
                 </div>
 
-                <div>
-                  <h4 className="font-medium text-orange-700 mb-2 flex items-center">
-                    <AlertCircle className="h-4 w-4 mr-2" />
-                    Development Areas
-                  </h4>
-                  <ul className="space-y-1">
-                    {selectedSurvey.aiSummary.challenges.map((challenge: string, index: number) => (
-                      <li key={index} className="text-sm text-gray-700 flex items-start">
-                        <span className="w-2 h-2 bg-orange-500 rounded-full mt-2 mr-2 flex-shrink-0"></span>
-                        {challenge}
-                      </li>
-                    ))}
-                  </ul>
+                {/* Section 2: Leadership Intent & Purpose */}
+                <div className="border-b pb-4">
+                  <h4 className="font-semibold text-gray-900 mb-3">Section 2: Leadership Intent & Purpose</h4>
+                  
+                  <div className="mb-4">
+                    <h5 className="font-medium text-gray-800 mb-2">Leadership Aspirations</h5>
+                    <div className="flex flex-wrap gap-2">
+                      {(selectedSurvey.aiSummary.leadershipAspirations || ['Empowering and people-centred', 'Strategic and future-focused', 'Curious and adaptive']).map((aspiration: string, index: number) => (
+                        <span key={index} className="inline-block px-2 py-1 bg-purple-100 text-purple-800 rounded text-sm">
+                          {aspiration}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <h5 className="font-medium text-gray-800 mb-2">Connection to Purpose Rating</h5>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-2xl font-bold text-blue-600">{selectedSurvey.aiSummary.purposeRating || '4'}</span>
+                      <span className="text-sm text-gray-600">/ 6 - Connected and gaining clarity</span>
+                    </div>
+                  </div>
                 </div>
 
-                <div>
-                  <h4 className="font-medium text-blue-700 mb-2 flex items-center">
-                    <Brain className="h-4 w-4 mr-2" />
-                    Recommended Actions
-                  </h4>
-                  <ul className="space-y-1">
-                    {selectedSurvey.aiSummary.recommendations.map((rec: string, index: number) => (
-                      <li key={index} className="text-sm text-gray-700 flex items-start">
-                        <span className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-2 flex-shrink-0"></span>
-                        {rec}
-                      </li>
-                    ))}
-                  </ul>
+                {/* Section 3: Adaptive & Agile Leadership Snapshot */}
+                <div className="border-b pb-4">
+                  <h4 className="font-semibold text-gray-900 mb-3">Section 3: Adaptive & Agile Leadership Snapshot</h4>
+                  
+                  <div className="mb-4">
+                    <h5 className="font-medium text-gray-800 mb-2">Leadership Agility Level</h5>
+                    <span className="inline-block px-4 py-2 bg-indigo-100 text-indigo-800 rounded-lg font-medium">
+                      {selectedSurvey.aiSummary.agilityLevel || 'Achiever'}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <h5 className="font-medium text-green-700 mb-2">Notable Strengths (Top 3)</h5>
+                      <ul className="space-y-1">
+                        {(selectedSurvey.aiSummary.topStrengths || ['Action Orientation & Delivery', 'Decision-Making Agility', 'Empowering Others & Collaboration']).map((strength: string, index: number) => (
+                          <li key={index} className="text-sm text-gray-700 flex items-start">
+                            <span className="w-2 h-2 bg-green-500 rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                            {strength}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    
+                    <div>
+                      <h5 className="font-medium text-orange-700 mb-2">Development Areas (Bottom 3)</h5>
+                      <ul className="space-y-1">
+                        {(selectedSurvey.aiSummary.developmentAreas || ['Navigating Change & Uncertainty', 'Strategic Agility & Systems Thinking', 'Learning Agility & Growth Mindset']).map((area: string, index: number) => (
+                          <li key={index} className="text-sm text-gray-700 flex items-start">
+                            <span className="w-2 h-2 bg-orange-500 rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                            {area}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-gray-900 mb-2">Overall Assessment</h4>
-                  <p className="text-sm text-gray-700">{selectedSurvey.aiSummary.overallAssessment}</p>
+                {/* Section 4: General Summary */}
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-3">Section 4: General Summary</h4>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <p className="text-sm text-gray-700">
+                      {selectedSurvey.aiSummary.overallAssessment || 'This leader demonstrates strong operational capabilities with clear areas for strategic development. Focus on building confidence in navigating ambiguity while leveraging existing strengths in team motivation and decision-making.'}
+                    </p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
