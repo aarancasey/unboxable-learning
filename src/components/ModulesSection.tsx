@@ -1,4 +1,5 @@
 
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -8,6 +9,8 @@ import {
   PlayCircle, 
   Calendar
 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { format, isAfter, parseISO } from 'date-fns';
 
 interface Module {
   id: string;
@@ -25,14 +28,60 @@ interface ModulesSectionProps {
 }
 
 const ModulesSection = ({ modules, onModuleClick }: ModulesSectionProps) => {
-  const getStatusIcon = (status: string) => {
+  const [scheduledModules, setScheduledModules] = useState<any[]>([]);
+
+  useEffect(() => {
+    loadModuleSchedules();
+  }, []);
+
+  const loadModuleSchedules = async () => {
+    try {
+      const { data: moduleSchedules, error } = await supabase
+        .from('module_schedules')
+        .select(`
+          *,
+          course_schedules (course_name, start_date, status)
+        `)
+        .order('unlock_date', { ascending: true });
+
+      if (error) throw error;
+      setScheduledModules(moduleSchedules || []);
+    } catch (error) {
+      console.error('Error loading module schedules:', error);
+    }
+  };
+
+  const isModuleUnlocked = (module: Module) => {
+    // Check if module is unlocked in scheduled courses
+    const scheduledModule = scheduledModules.find(sm => sm.module_id === module.id);
+    if (scheduledModule) {
+      const now = new Date();
+      const unlockDateTime = new Date(`${scheduledModule.unlock_date}T${scheduledModule.unlock_time}`);
+      return isAfter(now, unlockDateTime) || scheduledModule.is_unlocked;
+    }
+    
+    // Fallback to existing unlock logic
+    return module.unlocked;
+  };
+
+  const getModuleUnlockDate = (module: Module) => {
+    const scheduledModule = scheduledModules.find(sm => sm.module_id === module.id);
+    if (scheduledModule) {
+      return format(parseISO(scheduledModule.unlock_date), 'MMM d, yyyy');
+    }
+    return module.unlockDate || 'Complete previous modules to unlock';
+  };
+
+  const getStatusIcon = (status: string, isUnlocked: boolean) => {
+    if (!isUnlocked) {
+      return <Clock className="h-5 w-5 text-gray-400" />;
+    }
+    
     switch (status) {
       case 'completed':
         return <CheckCircle className="h-5 w-5 text-green-500" />;
       case 'in-progress':
         return <PlayCircle className="h-5 w-5 text-unboxable-orange" />;
-      case 'locked':
-        return <Clock className="h-5 w-5 text-gray-400" />;
       default:
         return <BookOpen className="h-5 w-5 text-blue-500" />;
     }
@@ -54,8 +103,9 @@ const ModulesSection = ({ modules, onModuleClick }: ModulesSectionProps) => {
   };
 
   const handleModuleClick = (module: Module) => {
-    console.log('Module clicked:', module.title, 'unlocked:', module.unlocked);
-    if (module.unlocked) {
+    const isUnlocked = isModuleUnlocked(module);
+    console.log('Module clicked:', module.title, 'unlocked:', isUnlocked);
+    if (isUnlocked) {
       onModuleClick(module);
     } else {
       console.log('Module is locked, click ignored');
@@ -79,57 +129,62 @@ const ModulesSection = ({ modules, onModuleClick }: ModulesSectionProps) => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {modules.map((module) => (
-              <Card
-                key={module.id}
-                className={`transition-all duration-300 ${
-                  module.unlocked 
-                    ? 'cursor-pointer hover:shadow-lg hover:border-unboxable-navy/30 hover:scale-105' 
-                    : 'opacity-50 cursor-not-allowed bg-gray-50'
-                }`}
-                onClick={() => handleModuleClick(module)}
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className={`${!module.unlocked ? 'text-gray-400' : ''}`}>
-                      {getStatusIcon(module.unlocked ? module.status : 'locked')}
-                    </div>
-                    {getStatusBadge(module.status, module.unlocked)}
-                  </div>
-                  
-                  <h3 className={`font-medium mb-2 ${
-                    module.unlocked ? 'text-unboxable-navy' : 'text-gray-400'
-                  }`}>
-                    {module.title}
-                  </h3>
-                  
-                  <div className={`flex items-center justify-between text-sm ${
-                    module.unlocked ? 'text-gray-600' : 'text-gray-400'
-                  }`}>
-                    <span>{module.duration}</span>
-                    <span className="capitalize">{module.type}</span>
-                  </div>
-                  
-                  {!module.unlocked && (
-                    <div className="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded-md">
-                      <div className="flex items-center text-xs text-yellow-700">
-                        <Calendar className="h-3 w-3 mr-1" />
-                        {module.unlockDate || 'Complete previous modules to unlock'}
+            {modules.map((module) => {
+              const isUnlocked = isModuleUnlocked(module);
+              const unlockDate = getModuleUnlockDate(module);
+              
+              return (
+                <Card
+                  key={module.id}
+                  className={`transition-all duration-300 ${
+                    isUnlocked 
+                      ? 'cursor-pointer hover:shadow-lg hover:border-unboxable-navy/30 hover:scale-105' 
+                      : 'opacity-50 cursor-not-allowed bg-gray-50'
+                  }`}
+                  onClick={() => handleModuleClick(module)}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className={`${!isUnlocked ? 'text-gray-400' : ''}`}>
+                        {getStatusIcon(isUnlocked ? module.status : 'locked', isUnlocked)}
                       </div>
+                      {getStatusBadge(module.status, isUnlocked)}
                     </div>
-                  )}
-                  
-                  {module.unlocked && module.type === 'survey' && (
-                    <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded-md">
-                      <div className="flex items-center text-xs text-blue-700">
-                        <CheckCircle className="h-3 w-3 mr-1" />
-                        Required to unlock other modules
+                    
+                    <h3 className={`font-medium mb-2 ${
+                      isUnlocked ? 'text-unboxable-navy' : 'text-gray-400'
+                    }`}>
+                      {module.title}
+                    </h3>
+                    
+                    <div className={`flex items-center justify-between text-sm ${
+                      isUnlocked ? 'text-gray-600' : 'text-gray-400'
+                    }`}>
+                      <span>{module.duration}</span>
+                      <span className="capitalize">{module.type}</span>
+                    </div>
+                    
+                    {!isUnlocked && (
+                      <div className="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded-md">
+                        <div className="flex items-center text-xs text-yellow-700">
+                          <Calendar className="h-3 w-3 mr-1" />
+                          Unlocks: {unlockDate}
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
+                    )}
+                    
+                    {isUnlocked && module.type === 'survey' && (
+                      <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded-md">
+                        <div className="flex items-center text-xs text-blue-700">
+                          <CheckCircle className="h-3 w-3 mr-1" />
+                          Required to unlock other modules
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         )}
       </CardContent>
