@@ -22,6 +22,7 @@ import CourseManagement from './CourseManagement';
 import SurveyReviewer from './SurveyReviewer';
 import { CalendarView } from './calendar/CalendarView';
 import AnalyticsDashboard from './analytics/AnalyticsDashboard';
+import EmailTestModal from './EmailTestModal';
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -70,6 +71,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
             </div>
             
             <div className="flex items-center space-x-4">
+              <EmailTestModal />
               <span className="text-sm text-gray-600">Administrator</span>
               <Button variant="ghost" size="sm" onClick={onLogout} className="hover:bg-slate-100">
                 <LogOut className="h-4 w-4 mr-2" />
