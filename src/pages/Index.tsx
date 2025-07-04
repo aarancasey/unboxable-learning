@@ -54,7 +54,7 @@ const Index = () => {
       <div className="min-h-screen bg-unboxable-navy flex flex-col font-poppins">
         {/* Hero Section */}
         <div className="flex-1 flex items-center p-8">
-          <div className="max-w-6xl w-full">
+          <div className="max-w-[1200px] mx-auto w-full">
             <div className="max-w-2xl">
               {/* Logo */}
               <div className="mb-8">
@@ -98,7 +98,7 @@ const Index = () => {
 
         {/* Footer */}
         <footer className="bg-unboxable-navy/50 backdrop-blur-sm border-t border-white/10 p-6">
-          <div className="max-w-6xl mx-auto flex justify-between items-center">
+          <div className="max-w-[1200px] mx-auto flex justify-between items-center">
             <div className="text-white/60 text-sm">
               © 2024 Unboxable. All rights reserved.
             </div>
