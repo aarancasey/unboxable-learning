@@ -19,8 +19,6 @@ interface BulkUploadModalProps {
 interface ParsedUser {
   name: string;
   email: string;
-  mobile: string;
-  department: string;
   isValid: boolean;
   errors: string[];
   rowNumber: number;
@@ -39,7 +37,6 @@ const BulkUploadModal = ({ isOpen, onClose, onBulkImport, existingEmails }: Bulk
     // Required fields validation
     if (!user.name?.trim()) errors.push('Name is required');
     if (!user.email?.trim()) errors.push('Email is required');
-    if (!user.mobile?.trim()) errors.push('Mobile is required');
     
     // Email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -55,8 +52,6 @@ const BulkUploadModal = ({ isOpen, onClose, onBulkImport, existingEmails }: Bulk
     return {
       name: user.name?.trim() || '',
       email: user.email?.toLowerCase()?.trim() || '',
-      mobile: user.mobile?.trim() || '',
-      department: user.department?.trim() || '',
       isValid: errors.length === 0,
       errors,
       rowNumber
@@ -77,8 +72,6 @@ const BulkUploadModal = ({ isOpen, onClose, onBulkImport, existingEmails }: Bulk
       headers.forEach((header, index) => {
         if (header.includes('name')) user.name = values[index];
         else if (header.includes('email')) user.email = values[index];
-        else if (header.includes('mobile') || header.includes('phone')) user.mobile = values[index];
-        else if (header.includes('department')) user.department = values[index];
       });
       
       if (user.name || user.email) {
@@ -115,8 +108,6 @@ const BulkUploadModal = ({ isOpen, onClose, onBulkImport, existingEmails }: Bulk
             headers.forEach((header, index) => {
               if (header.includes('name')) user.name = row[index];
               else if (header.includes('email')) user.email = row[index];
-              else if (header.includes('mobile') || header.includes('phone')) user.mobile = row[index];
-              else if (header.includes('department')) user.department = row[index];
             });
             
             if (user.name || user.email) {
@@ -192,7 +183,7 @@ const BulkUploadModal = ({ isOpen, onClose, onBulkImport, existingEmails }: Bulk
   };
 
   const downloadTemplate = () => {
-    const csvContent = 'Name,Email,Mobile,Department\nJohn Doe,john.doe@example.com,+1234567890,Engineering\nJane Smith,jane.smith@example.com,+0987654321,Marketing';
+    const csvContent = 'Name,Email\nJohn Doe,john.doe@example.com\nJane Smith,jane.smith@example.com';
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -209,8 +200,8 @@ const BulkUploadModal = ({ isOpen, onClose, onBulkImport, existingEmails }: Bulk
       id: Date.now() + index,
       name: user.name,
       email: user.email,
-      mobile: user.mobile,
-      department: user.department || 'General',
+      mobile: '',
+      department: 'General',
       status: 'pending',
       enrolledDate: new Date().toISOString().split('T')[0],
       requiresPasswordChange: true,
@@ -326,8 +317,6 @@ const BulkUploadModal = ({ isOpen, onClose, onBulkImport, existingEmails }: Bulk
                       <TableHead>Row</TableHead>
                       <TableHead>Name</TableHead>
                       <TableHead>Email</TableHead>
-                      <TableHead>Mobile</TableHead>
-                      <TableHead>Department</TableHead>
                       <TableHead>Status</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -337,8 +326,6 @@ const BulkUploadModal = ({ isOpen, onClose, onBulkImport, existingEmails }: Bulk
                         <TableCell>{user.rowNumber}</TableCell>
                         <TableCell>{user.name}</TableCell>
                         <TableCell>{user.email}</TableCell>
-                        <TableCell>{user.mobile}</TableCell>
-                        <TableCell>{user.department}</TableCell>
                         <TableCell>
                           {user.isValid ? (
                             <Badge variant="default">
