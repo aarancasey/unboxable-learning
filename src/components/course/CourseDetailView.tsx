@@ -122,7 +122,7 @@ export const CourseDetailView = ({ course, onBack, onCourseUpdate }: CourseDetai
 
       {/* Modules List */}
       <CourseModulesList 
-        modules={currentCourse.moduleList} 
+        modules={currentCourse.moduleList.filter((module: any) => module.type !== 'survey')} 
         onModuleUpdate={handleModuleUpdate}
       />
 

@@ -21,7 +21,7 @@ const CourseManagement = () => {
         id: 1,
         title: "Module 2: Advanced Customer Service Skills",
         description: "Building on Module 1 foundations, develop advanced customer service techniques and conflict resolution skills",
-        modules: 4,
+        modules: 3,
         maxEnrollment: 17,
         enrolledUsers: Math.min(savedSurveys.length, 17),
         completionRate: 0,
@@ -29,7 +29,6 @@ const CourseManagement = () => {
         createdDate: new Date().toISOString().split('T')[0],
         estimatedDuration: "4 weeks",
         moduleList: [
-          { id: 1, title: "Leadership Sentiment, Adaptive and Agile Self-Assessment", type: "survey", duration: "45 min", status: "active" },
           { id: 2, title: "Advanced Communication Techniques", type: "video", duration: "25 min", status: "active" },
           { id: 3, title: "Handling Difficult Customers", type: "interactive", duration: "30 min", status: "active" },
           { id: 4, title: "Service Excellence & Team Collaboration", type: "document", duration: "20 min", status: "active" },
