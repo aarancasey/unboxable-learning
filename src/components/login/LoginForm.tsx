@@ -142,14 +142,6 @@ const LoginForm = ({ role, onLogin }: LoginFormProps) => {
         </div>
       )}
 
-      {!isLearner && (
-        <div className="text-sm text-slate-600 bg-slate-50 p-3 rounded-lg border">
-          <strong className="text-unboxable-navy">Demo credentials:</strong><br />
-          Email: fiona@unboxable.co.nz<br />
-          Password: Netball1974#
-        </div>
-      )}
-      
       <Button 
         type="submit" 
         className={`w-full text-white ${isLearner 
