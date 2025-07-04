@@ -151,6 +151,7 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
           totalModules={modules.length}
           nextSurvey={displayData.nextSurvey}
           onStartSurvey={() => setActiveView('survey')}
+          hasModules={modules.length > 0}
         />
 
         <ModulesSection

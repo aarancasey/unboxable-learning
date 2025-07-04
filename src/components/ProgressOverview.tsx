@@ -10,6 +10,7 @@ interface ProgressOverviewProps {
   totalModules: number;
   nextSurvey: string;
   onStartSurvey: () => void;
+  hasModules?: boolean;
 }
 
 const ProgressOverview = ({ 
@@ -17,7 +18,8 @@ const ProgressOverview = ({
   completedModules, 
   totalModules, 
   nextSurvey, 
-  onStartSurvey 
+  onStartSurvey,
+  hasModules = false
 }: ProgressOverviewProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -67,11 +69,18 @@ const ProgressOverview = ({
           <div className="text-sm font-medium mb-2">{nextSurvey}</div>
           <Button 
             size="sm" 
-            className="w-full bg-orange-600 hover:bg-orange-700 text-white"
+            className="w-full bg-orange-600 hover:bg-orange-700 text-white disabled:bg-gray-400 disabled:hover:bg-gray-400"
             onClick={onStartSurvey}
+            disabled={!hasModules}
+            title={!hasModules ? "Complete learning modules must be assigned before starting assessment" : ""}
           >
             Start Assessment
           </Button>
+          {!hasModules && (
+            <p className="text-xs text-gray-500 mt-1 text-center">
+              Learning modules must be assigned first
+            </p>
+          )}
         </CardContent>
       </Card>
     </div>
