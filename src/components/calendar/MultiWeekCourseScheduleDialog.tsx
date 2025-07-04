@@ -177,7 +177,7 @@ export const MultiWeekCourseScheduleDialog = ({
             scheduledDate: preCourseEmailDate,
             scheduledTime: '09:00',
             emailSubject: `${courseName} - Pre-Course Survey`,
-            emailContent: generatePreCourseSurveyEmail(courseName, selectedDate)
+            emailContent: generatePreCourseSurveyEmail(courseName, courseStartDate)
           }
         });
 
