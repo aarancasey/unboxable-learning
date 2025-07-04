@@ -53,39 +53,39 @@ const Index = () => {
     ) : (
       <div className="min-h-screen bg-unboxable-navy flex flex-col font-poppins">
         {/* Hero Section */}
-        <div className="flex-1 flex items-center p-8">
+        <div className="flex-1 flex items-center p-4 sm:p-6 lg:p-8">
           <div className="max-w-[1200px] mx-auto w-full">
-            <div className="max-w-2xl">
+            <div className="max-w-2xl mx-auto lg:mx-0">
               {/* Logo */}
-              <div className="mb-8">
+              <div className="mb-6 sm:mb-8 text-center lg:text-left">
                 <img 
                   src="/lovable-uploads/72877e4c-8de7-499d-86f0-77c477293eeb.png" 
                   alt="Unboxable" 
-                  className="h-12 w-auto"
+                  className="h-10 sm:h-12 w-auto mx-auto lg:mx-0"
                 />
               </div>
               
               {/* Heading and subheading */}
-              <div className="space-y-6 mb-12">
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
-                  Sparking the shift<br />
-                  Inspiring action<span className="text-unboxable-orange">.</span>
+              <div className="space-y-4 sm:space-y-6 mb-8 sm:mb-12 text-center lg:text-left">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
+                  Sparking the shift<br className="hidden sm:block" />
+                  <span className="sm:hidden"> </span>Inspiring action<span className="text-unboxable-orange">.</span>
                 </h1>
-                <p className="text-xl text-white/90 font-medium">
+                <p className="text-lg sm:text-xl text-white/90 font-medium">
                   Learning to help you move forward
                 </p>
               </div>
 
               {/* Learner Access - positioned under heading */}
-              <div className="max-w-sm">
+              <div className="max-w-sm mx-auto lg:mx-0">
                 <Card className="bg-white border-0 shadow-xl">
-                  <CardContent className="p-8 text-center">
-                    <GraduationCap className="mx-auto h-16 w-16 text-unboxable-navy mb-4" />
-                    <h3 className="text-2xl font-semibold mb-3 text-unboxable-navy">Learner Access</h3>
-                    <p className="text-gray-600 mb-6">Access your courses and complete surveys</p>
+                  <CardContent className="p-6 sm:p-8 text-center">
+                    <GraduationCap className="mx-auto h-12 sm:h-16 w-12 sm:w-16 text-unboxable-navy mb-3 sm:mb-4" />
+                    <h3 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-3 text-unboxable-navy">Learner Access</h3>
+                    <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">Access your courses and complete surveys</p>
                     <Button 
                       onClick={() => setShowLearnerLogin(true)}
-                      className="w-full bg-unboxable-navy text-white hover:bg-unboxable-navy/90 font-semibold py-3"
+                      className="w-full bg-unboxable-navy text-white hover:bg-unboxable-navy/90 font-semibold py-2.5 sm:py-3 text-sm sm:text-base"
                     >
                       Get Started
                     </Button>
@@ -97,9 +97,9 @@ const Index = () => {
         </div>
 
         {/* Footer */}
-        <footer className="bg-unboxable-navy/50 backdrop-blur-sm border-t border-white/10 p-6">
-          <div className="max-w-[1200px] mx-auto flex justify-between items-center">
-            <div className="text-white/60 text-sm">
+        <footer className="bg-unboxable-navy/50 backdrop-blur-sm border-t border-white/10 p-4 sm:p-6">
+          <div className="max-w-[1200px] mx-auto flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
+            <div className="text-white/60 text-xs sm:text-sm text-center sm:text-left">
               © 2024 Unboxable. All rights reserved.
             </div>
             

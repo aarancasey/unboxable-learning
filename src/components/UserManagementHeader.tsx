@@ -16,27 +16,35 @@ const UserManagementHeader = ({ onAddLearner, onSendInvites, onBulkUpload }: Use
         <p className="text-gray-600">Manage learners and track their progress</p>
       </div>
       
-      <div className="flex space-x-3">
+      <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
         <Button 
           variant="outline"
           onClick={onBulkUpload}
+          className="w-full sm:w-auto text-sm"
+          size="sm"
         >
-          <Upload className="h-4 w-4 mr-2" />
-          Bulk Upload
+          <Upload className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+          <span className="hidden sm:inline">Bulk Upload</span>
+          <span className="sm:hidden">Upload</span>
         </Button>
         <Button 
-          className="bg-unboxable-navy hover:bg-unboxable-navy/90"
+          className="bg-unboxable-navy hover:bg-unboxable-navy/90 w-full sm:w-auto text-sm"
           onClick={onAddLearner}
+          size="sm"
         >
-          <UserPlus className="h-4 w-4 mr-2" />
-          Add Learner
+          <UserPlus className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+          <span className="hidden sm:inline">Add Learner</span>
+          <span className="sm:hidden">Add</span>
         </Button>
         <Button 
           variant="outline"
           onClick={onSendInvites}
+          className="w-full sm:w-auto text-sm"
+          size="sm"
         >
-          <Mail className="h-4 w-4 mr-2" />
-          Send Invites
+          <Mail className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+          <span className="hidden sm:inline">Send Invites</span>
+          <span className="sm:hidden">Invites</span>
         </Button>
       </div>
     </div>

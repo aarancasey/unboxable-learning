@@ -68,44 +68,46 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
+          <div className="flex justify-between items-center h-14 sm:h-16">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               <img 
                 src="/lovable-uploads/d0544c04-760a-4cf9-824c-612e5ef4aeaa.png" 
                 alt="Unboxable" 
-                className="h-8"
+                className="h-6 sm:h-8"
               />
-              <div className="h-8 w-px bg-gray-300"></div>
-              <h1 className="text-xl font-semibold text-unboxable-navy">Admin Portal</h1>
+              <div className="h-6 sm:h-8 w-px bg-gray-300 hidden sm:block"></div>
+              <h1 className="text-lg sm:text-xl font-semibold text-unboxable-navy">Admin Portal</h1>
             </div>
             
-            <div className="flex items-center space-x-4">
-              <EmailTestModal />
-              <span className="text-sm text-gray-600">Administrator</span>
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <div className="hidden sm:block">
+                <EmailTestModal />
+              </div>
+              <span className="text-xs sm:text-sm text-gray-600 hidden md:block">Administrator</span>
               <Button variant="ghost" size="sm" onClick={onLogout} className="hover:bg-slate-100">
-                <LogOut className="h-4 w-4 mr-2" />
-                Logout
+                <LogOut className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Logout</span>
               </Button>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="users">Users</TabsTrigger>
-            <TabsTrigger value="courses">Courses</TabsTrigger>
-            <TabsTrigger value="surveys">Surveys</TabsTrigger>
-            <TabsTrigger value="approval">Approval</TabsTrigger>
-            <TabsTrigger value="calendar">Calendar</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 h-auto p-1">
+            <TabsTrigger value="overview" className="text-xs sm:text-sm px-2 py-2">Overview</TabsTrigger>
+            <TabsTrigger value="users" className="text-xs sm:text-sm px-2 py-2">Users</TabsTrigger>
+            <TabsTrigger value="courses" className="text-xs sm:text-sm px-2 py-2">Courses</TabsTrigger>
+            <TabsTrigger value="surveys" className="text-xs sm:text-sm px-2 py-2">Surveys</TabsTrigger>
+            <TabsTrigger value="approval" className="text-xs sm:text-sm px-2 py-2">Approval</TabsTrigger>
+            <TabsTrigger value="calendar" className="text-xs sm:text-sm px-2 py-2">Calendar</TabsTrigger>
+            <TabsTrigger value="analytics" className="text-xs sm:text-sm px-2 py-2">Analytics</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview" className="space-y-6">
+          <TabsContent value="overview" className="space-y-4 sm:space-y-6">
             {/* Key Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-gray-600 flex items-center">
@@ -163,7 +165,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
               </Card>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               {/* Recent Activity */}
               <Card>
                 <CardHeader>

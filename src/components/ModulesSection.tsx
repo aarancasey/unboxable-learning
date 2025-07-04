@@ -128,7 +128,7 @@ const ModulesSection = ({ modules, onModuleClick }: ModulesSectionProps) => {
             <p className="text-gray-600">Check back later for new learning content.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {modules.map((module) => {
               const isUnlocked = isModuleUnlocked(module);
               const unlockDate = getModuleUnlockDate(module);
@@ -143,7 +143,7 @@ const ModulesSection = ({ modules, onModuleClick }: ModulesSectionProps) => {
                   }`}
                   onClick={() => handleModuleClick(module)}
                 >
-                  <CardContent className="p-4">
+                  <CardContent className="p-3 sm:p-4">
                     <div className="flex items-start justify-between mb-3">
                       <div className={`${!isUnlocked ? 'text-gray-400' : ''}`}>
                         {getStatusIcon(isUnlocked ? module.status : 'locked', isUnlocked)}

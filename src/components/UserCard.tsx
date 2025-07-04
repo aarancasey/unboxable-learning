@@ -66,58 +66,63 @@ const UserCard = ({ learner, onActivate, onDelete, onResendInvite }: UserCardPro
   };
 
   return (
-    <div className="p-6 hover:bg-gray-50">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+    <div className="p-4 sm:p-6 hover:bg-gray-50">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-3 sm:space-y-0">
+        <div className="flex items-center space-x-3 sm:space-x-4">
           <div className="flex-shrink-0">
-            <div className="w-10 h-10 bg-unboxable-navy rounded-full flex items-center justify-center text-white font-medium">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-unboxable-navy rounded-full flex items-center justify-center text-white font-medium text-sm">
               {learner.name.charAt(0).toUpperCase()}
             </div>
           </div>
-          <div>
-            <h4 className="text-sm font-medium text-gray-900">{learner.name}</h4>
-            <p className="text-sm text-gray-500">{learner.email}</p>
-            <div className="flex items-center space-x-4 mt-1">
+          <div className="min-w-0 flex-1">
+            <h4 className="text-sm font-medium text-gray-900 truncate">{learner.name}</h4>
+            <p className="text-xs sm:text-sm text-gray-500 truncate">{learner.email}</p>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mt-1 space-y-1 sm:space-y-0">
               <span className="text-xs text-gray-500">{learner.mobile}</span>
               <span className="text-xs text-gray-500">{learner.department}</span>
             </div>
           </div>
         </div>
-        <div className="flex items-center space-x-3">
-          {getStatusIcon(learner.status)}
-          {getStatusBadge(learner.status)}
-          {learner.status === 'pending' && (
-            <Button 
-              size="sm" 
-              className="bg-green-600 hover:bg-green-700 text-white"
-              onClick={() => onActivate(learner.id)}
-            >
-              <UserCheck className="h-4 w-4 mr-1" />
-              Activate
-            </Button>
-          )}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              {learner.status === 'invited' && (
-                <DropdownMenuItem onClick={() => onResendInvite(learner.id)}>
-                  <Send className="h-4 w-4 mr-2" />
-                  Resend Invite
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuItem 
-                onClick={() => onDelete(learner.id)}
-                className="text-red-600 focus:text-red-600"
+        <div className="flex items-center justify-between sm:justify-end space-x-2 sm:space-x-3">
+          <div className="flex items-center space-x-2">
+            <div className="hidden sm:block">{getStatusIcon(learner.status)}</div>
+            {getStatusBadge(learner.status)}
+          </div>
+          <div className="flex items-center space-x-2">
+            {learner.status === 'pending' && (
+              <Button 
+                size="sm" 
+                className="bg-green-600 hover:bg-green-700 text-white text-xs px-2 py-1"
+                onClick={() => onActivate(learner.id)}
               >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete Learner
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <UserCheck className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                <span className="hidden sm:inline">Activate</span>
+                <span className="sm:hidden">✓</span>
+              </Button>
+            )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                  <MoreHorizontal className="h-3 w-3 sm:h-4 sm:w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-40 sm:w-48 bg-white border shadow-lg z-50">
+                {learner.status === 'invited' && (
+                  <DropdownMenuItem onClick={() => onResendInvite(learner.id)}>
+                    <Send className="h-4 w-4 mr-2" />
+                    Resend Invite
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem 
+                  onClick={() => onDelete(learner.id)}
+                  className="text-red-600 focus:text-red-600"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Learner
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
     </div>
