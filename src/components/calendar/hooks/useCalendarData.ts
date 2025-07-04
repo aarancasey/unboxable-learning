@@ -71,10 +71,34 @@ export const useCalendarData = () => {
     loadScheduledCourses();
   }, []);
 
+  const clearAllCourses = async () => {
+    try {
+      // Clear Supabase course schedules
+      await supabase.from('course_schedules').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      
+      // Clear Supabase module schedules  
+      await supabase.from('module_schedules').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      
+      // Clear localStorage
+      localStorage.removeItem('scheduledCourses');
+      
+      // Clear local state
+      setScheduledCourses([]);
+      
+      console.log('All scheduled courses cleared successfully');
+    } catch (error) {
+      console.error('Error clearing scheduled courses:', error);
+      // Fallback: at least clear localStorage and state
+      localStorage.removeItem('scheduledCourses');
+      setScheduledCourses([]);
+    }
+  };
+
   return {
     scheduledCourses,
     setScheduledCourses,
     loadScheduledCourses,
-    saveScheduledCourses
+    saveScheduledCourses,
+    clearAllCourses
   };
 };

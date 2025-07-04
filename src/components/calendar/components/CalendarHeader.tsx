@@ -1,19 +1,21 @@
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 
 interface CalendarHeaderProps {
   view: 'week' | 'month';
   onViewChange: (view: 'week' | 'month') => void;
   onScheduleDialog: () => void;
   onMultiWeekDialog: () => void;
+  onClearCalendar: () => void;
 }
 
 export const CalendarHeader = ({
   view,
   onViewChange,
   onScheduleDialog,
-  onMultiWeekDialog
+  onMultiWeekDialog,
+  onClearCalendar
 }: CalendarHeaderProps) => {
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
@@ -31,6 +33,13 @@ export const CalendarHeader = ({
         </Tabs>
         
         <div className="flex space-x-2">
+          <Button 
+            variant="destructive"
+            onClick={onClearCalendar}
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Clear Calendar
+          </Button>
           <Button 
             className="bg-primary hover:bg-primary/90"
             onClick={onMultiWeekDialog}

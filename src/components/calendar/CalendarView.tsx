@@ -7,6 +7,16 @@ import { UpcomingCourses } from './components/UpcomingCourses';
 import { CalendarDialogs } from './components/CalendarDialogs';
 import { useCalendarData } from './hooks/useCalendarData';
 import { ScheduledCourse } from './types';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 export const CalendarView = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -14,6 +24,7 @@ export const CalendarView = () => {
   const [showScheduleDialog, setShowScheduleDialog] = useState(false);
   const [showMultiWeekDialog, setShowMultiWeekDialog] = useState(false);
   const [showReminderDialog, setShowReminderDialog] = useState(false);
+  const [showClearDialog, setShowClearDialog] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedCourse, setSelectedCourse] = useState<ScheduledCourse | null>(null);
 
@@ -21,7 +32,8 @@ export const CalendarView = () => {
     scheduledCourses,
     setScheduledCourses,
     loadScheduledCourses,
-    saveScheduledCourses
+    saveScheduledCourses,
+    clearAllCourses
   } = useCalendarData();
 
   const navigateDate = (direction: 'prev' | 'next') => {
@@ -91,6 +103,11 @@ export const CalendarView = () => {
     setSelectedCourse(null);
   };
 
+  const handleClearCalendar = async () => {
+    await clearAllCourses();
+    setShowClearDialog(false);
+  };
+
   const days = getDaysToDisplay();
 
   return (
@@ -100,6 +117,7 @@ export const CalendarView = () => {
         onViewChange={setView}
         onScheduleDialog={() => setShowScheduleDialog(true)}
         onMultiWeekDialog={() => setShowMultiWeekDialog(true)}
+        onClearCalendar={() => setShowClearDialog(true)}
       />
 
       <CalendarGrid
@@ -139,6 +157,23 @@ export const CalendarView = () => {
         onScheduleMultiWeekCourse={handleScheduleMultiWeekCourse}
         onUpdateReminder={handleUpdateReminder}
       />
+
+      <AlertDialog open={showClearDialog} onOpenChange={setShowClearDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Clear Calendar</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to clear all scheduled courses? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleClearCalendar}>
+              Clear All
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
