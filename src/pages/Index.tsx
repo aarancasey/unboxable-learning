@@ -56,14 +56,13 @@ const Index = () => {
         <div className="flex-1 flex items-center p-8">
           <div className="max-w-6xl w-full">
             <div className="max-w-2xl">
-              {/* Logo and tagline */}
-              <div className="space-y-4 mb-8">
+              {/* Logo */}
+              <div className="mb-8">
                 <img 
                   src="/lovable-uploads/72877e4c-8de7-499d-86f0-77c477293eeb.png" 
                   alt="Unboxable" 
                   className="h-12 w-auto"
                 />
-                <p className="text-sm text-white font-medium">RETHINKING BUSINESS</p>
               </div>
               
               {/* Heading and subheading */}
@@ -72,7 +71,7 @@ const Index = () => {
                   Sparking the shift<br />
                   Inspiring action<span className="text-unboxable-orange">.</span>
                 </h1>
-                <p className="text-xl text-white/90">
+                <p className="text-xl text-white/90 font-medium">
                   Learning to help you move forward
                 </p>
               </div>
