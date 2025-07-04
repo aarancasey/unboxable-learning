@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import UserManagementHeader from './UserManagementHeader';
 import UserSearchBar from './UserSearchBar';
 import UsersList from './UsersList';
@@ -77,14 +78,36 @@ const UserManagement = () => {
     });
   };
 
-  const handleResendInvite = (learnerId: number) => {
+  const handleResendInvite = async (learnerId: number) => {
     const learner = learners.find(l => l.id === learnerId);
     
-    // In a real app, this would send an actual email
-    toast({
-      title: "Invite Resent",
-      description: `A new invitation has been sent to ${learner?.email}.`,
-    });
+    if (!learner) return;
+
+    try {
+      const { error } = await supabase.functions.invoke('send-learner-invite', {
+        body: {
+          learnerName: learner.name,
+          learnerEmail: learner.email,
+          department: learner.department
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Invite Resent",
+        description: `A new invitation has been sent to ${learner.email}.`,
+      });
+    } catch (error) {
+      console.error('Error resending invite:', error);
+      toast({
+        title: "Error",
+        description: "Failed to resend invite. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   // Load learners from localStorage on component mount
