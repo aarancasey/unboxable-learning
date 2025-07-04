@@ -8,7 +8,7 @@ import UserSearchBar from './UserSearchBar';
 import UsersList from './UsersList';
 import AddLearnerForm from './AddLearnerForm';
 import SendInvitesModal from './SendInvitesModal';
-import BulkUploadModal from './BulkUploadModal';
+import BulkUploadModal from './bulk-upload/BulkUploadModal';
 
 const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
