@@ -32,18 +32,11 @@ export const CalendarHeader = ({
         
         <div className="flex space-x-2">
           <Button 
-            variant="outline"
-            onClick={onScheduleDialog}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Single Session
-          </Button>
-          <Button 
             className="bg-primary hover:bg-primary/90"
             onClick={onMultiWeekDialog}
           >
             <Plus className="h-4 w-4 mr-2" />
-            Multi-Week Course
+            Schedule Course
           </Button>
         </div>
       </div>
