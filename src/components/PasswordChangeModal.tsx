@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff } from 'lucide-react';
+import PasswordStrengthIndicator from './PasswordStrengthIndicator';
 
 interface PasswordChangeModalProps {
   isOpen: boolean;
@@ -24,13 +25,19 @@ const PasswordChangeModal = ({ isOpen, onPasswordChanged, learnerName }: Passwor
   });
   const { toast } = useToast();
 
+  const isPasswordStrong = (password: string) => {
+    return password.length >= 8 && 
+           /[A-Z]/.test(password) && 
+           /[0-9]/.test(password);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (passwords.newPassword.length < 6) {
+    if (!isPasswordStrong(passwords.newPassword)) {
       toast({
-        title: "Password Too Short",
-        description: "Password must be at least 6 characters long",
+        title: "Password Requirements Not Met",
+        description: "Please ensure your password meets all the requirements below",
         variant: "destructive",
       });
       return;
@@ -76,9 +83,9 @@ const PasswordChangeModal = ({ isOpen, onPasswordChanged, learnerName }: Passwor
                 type={showPasswords.new ? "text" : "password"}
                 value={passwords.newPassword}
                 onChange={(e) => setPasswords(prev => ({ ...prev, newPassword: e.target.value }))}
-                placeholder="Enter new password (min. 6 characters)"
+                placeholder="Enter new password"
                 required
-                minLength={6}
+                minLength={8}
               />
               <Button
                 type="button"
@@ -102,7 +109,7 @@ const PasswordChangeModal = ({ isOpen, onPasswordChanged, learnerName }: Passwor
                 onChange={(e) => setPasswords(prev => ({ ...prev, confirmPassword: e.target.value }))}
                 placeholder="Confirm your new password"
                 required
-                minLength={6}
+                minLength={8}
               />
               <Button
                 type="button"
@@ -115,6 +122,11 @@ const PasswordChangeModal = ({ isOpen, onPasswordChanged, learnerName }: Passwor
               </Button>
             </div>
           </div>
+
+          {/* Password Strength Indicator */}
+          {passwords.newPassword && (
+            <PasswordStrengthIndicator password={passwords.newPassword} />
+          )}
 
           <div className="flex justify-end pt-4">
             <Button type="submit" className="bg-unboxable-navy hover:bg-unboxable-navy/90">
