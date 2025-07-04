@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Mail, Send, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Learner {
   id: number;
@@ -61,8 +62,27 @@ const SendInvitesModal = ({ isOpen, onClose, learners, onInvitesSent }: SendInvi
     setIsLoading(true);
 
     try {
-      // Simulate API call to send emails
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const selectedLearnerData = learners.filter(learner => 
+        selectedLearners.includes(learner.id)
+      );
+
+      // Send individual emails to each selected learner
+      const emailPromises = selectedLearnerData.map(async (learner) => {
+        const { error } = await supabase.functions.invoke('send-learner-invite', {
+          body: {
+            learnerName: learner.name,
+            learnerEmail: learner.email,
+            department: learner.department
+          }
+        });
+
+        if (error) {
+          console.error(`Failed to send invite to ${learner.email}:`, error);
+          throw error;
+        }
+      });
+
+      await Promise.all(emailPromises);
 
       onInvitesSent(selectedLearners);
       
@@ -74,6 +94,7 @@ const SendInvitesModal = ({ isOpen, onClose, learners, onInvitesSent }: SendInvi
       setSelectedLearners([]);
       onClose();
     } catch (error) {
+      console.error('Error sending invites:', error);
       toast({
         title: "Error",
         description: "Failed to send invites. Please try again.",
