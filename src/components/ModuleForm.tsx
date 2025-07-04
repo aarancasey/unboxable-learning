@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { ModuleBasicFields } from './module/ModuleBasicFields';
 import { ModuleContentFields } from './module/ModuleContentFields';
 import { ModuleFileUploadSimple } from './module/ModuleFileUploadSimple';
@@ -83,13 +83,13 @@ export const ModuleForm = ({ open, onOpenChange, module, onSave }: ModuleFormPro
   const isValid = title.trim() && duration.trim();
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{module ? 'Edit Module' : 'Add New Module'}</DialogTitle>
-        </DialogHeader>
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto">
+        <SheetHeader>
+          <SheetTitle>{module ? 'Edit Module' : 'Add New Module'}</SheetTitle>
+        </SheetHeader>
         
-        <div className="space-y-6">
+        <div className="space-y-6 mt-6">
           <ModuleBasicFields
             title={title}
             setTitle={setTitle}
@@ -123,7 +123,7 @@ export const ModuleForm = ({ open, onOpenChange, module, onSave }: ModuleFormPro
             isValid={!!isValid}
           />
         </div>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 };
