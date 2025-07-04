@@ -306,6 +306,42 @@ export type Database = {
         }
         Relationships: []
       }
+      courses: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          duration: string | null
+          id: number
+          max_enrollment: number | null
+          module_list: Json | null
+          status: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          duration?: string | null
+          id?: number
+          max_enrollment?: number | null
+          module_list?: Json | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          duration?: string | null
+          id?: number
+          max_enrollment?: number | null
+          module_list?: Json | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       email_campaigns: {
         Row: {
           campaign_type: string
@@ -412,6 +448,45 @@ export type Database = {
           hero_title?: string
           id?: string
           topic_cards?: Json
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      learners: {
+        Row: {
+          created_at: string | null
+          department: string
+          email: string
+          id: number
+          mobile: string
+          name: string
+          password: string | null
+          requires_password_change: boolean | null
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          department: string
+          email: string
+          id?: number
+          mobile: string
+          name: string
+          password?: string | null
+          requires_password_change?: boolean | null
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          department?: string
+          email?: string
+          id?: number
+          mobile?: string
+          name?: string
+          password?: string | null
+          requires_password_change?: boolean | null
+          status?: string
           updated_at?: string | null
         }
         Relationships: []
@@ -835,6 +910,41 @@ export type Database = {
           Theme?: string | null
         }
         Relationships: []
+      }
+      survey_submissions: {
+        Row: {
+          id: number
+          learner_id: number | null
+          learner_name: string
+          responses: Json
+          status: string | null
+          submitted_at: string | null
+        }
+        Insert: {
+          id?: number
+          learner_id?: number | null
+          learner_name: string
+          responses: Json
+          status?: string | null
+          submitted_at?: string | null
+        }
+        Update: {
+          id?: number
+          learner_id?: number | null
+          learner_name?: string
+          responses?: Json
+          status?: string | null
+          submitted_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "survey_submissions_learner_id_fkey"
+            columns: ["learner_id"]
+            isOneToOne: false
+            referencedRelation: "learners"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tags: {
         Row: {

@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { DataService } from '@/services/dataService';
 import UserManagementHeader from './UserManagementHeader';
 import UserSearchBar from './UserSearchBar';
 import UsersList from './UsersList';
@@ -17,59 +18,53 @@ const UserManagement = () => {
   const [learners, setLearners] = useState<any[]>([]);
   const { toast } = useToast();
 
-  const handleAddLearner = (newLearner: any) => {
-    setLearners(prev => [...prev, newLearner]);
-    
-    // Save to localStorage for persistence
-    const existingLearners = JSON.parse(localStorage.getItem('learners') || '[]');
-    const updatedLearners = [...existingLearners, newLearner];
-    localStorage.setItem('learners', JSON.stringify(updatedLearners));
+  const handleAddLearner = async (newLearner: any) => {
+    const addedLearner = await DataService.addLearner(newLearner);
+    setLearners(prev => [...prev, addedLearner]);
   };
 
-  const handleActivateLearner = (learnerId: number) => {
-    const updatedLearners = learners.map(learner => 
+  const handleActivateLearner = async (learnerId: number) => {
+    const updatedLearner = await DataService.updateLearner(learnerId, { status: 'active' });
+    
+    setLearners(prev => prev.map(learner => 
       learner.id === learnerId 
         ? { ...learner, status: 'active' }
         : learner
-    );
+    ));
     
-    setLearners(updatedLearners);
-    localStorage.setItem('learners', JSON.stringify(updatedLearners));
-    
-    const activatedLearner = updatedLearners.find(l => l.id === learnerId);
     toast({
       title: "Learner Activated",
-      description: `${activatedLearner?.name} has been successfully activated and can now access the learning portal.`,
+      description: `${updatedLearner?.name} has been successfully activated and can now access the learning portal.`,
     });
   };
 
-  const handleInvitesSent = (learnerIds: number[]) => {
-    const updatedLearners = learners.map(learner => 
+  const handleInvitesSent = async (learnerIds: number[]) => {
+    // Update multiple learners
+    for (const id of learnerIds) {
+      await DataService.updateLearner(id, { status: 'invited' });
+    }
+    
+    setLearners(prev => prev.map(learner => 
       learnerIds.includes(learner.id) 
         ? { ...learner, status: 'invited' }
         : learner
-    );
-    
-    setLearners(updatedLearners);
-    localStorage.setItem('learners', JSON.stringify(updatedLearners));
+    ));
   };
 
-  const handleBulkImport = (newLearners: any[]) => {
-    const updatedLearners = [...learners, ...newLearners];
-    setLearners(updatedLearners);
+  const handleBulkImport = async (newLearners: any[]) => {
+    // Add each learner to Supabase
+    for (const learner of newLearners) {
+      await DataService.addLearner(learner);
+    }
     
-    // Save to localStorage for persistence
-    const existingLearners = JSON.parse(localStorage.getItem('learners') || '[]');
-    const allLearners = [...existingLearners, ...newLearners];
-    localStorage.setItem('learners', JSON.stringify(allLearners));
+    setLearners(prev => [...prev, ...newLearners]);
   };
 
-  const handleDeleteLearner = (learnerId: number) => {
+  const handleDeleteLearner = async (learnerId: number) => {
     const learnerToDelete = learners.find(l => l.id === learnerId);
-    const updatedLearners = learners.filter(learner => learner.id !== learnerId);
+    await DataService.deleteLearner(learnerId);
     
-    setLearners(updatedLearners);
-    localStorage.setItem('learners', JSON.stringify(updatedLearners));
+    setLearners(prev => prev.filter(learner => learner.id !== learnerId));
     
     toast({
       title: "Learner Deleted",
@@ -110,10 +105,13 @@ const UserManagement = () => {
     }
   };
 
-  // Load learners from localStorage on component mount
+  // Load learners from Supabase on component mount
   useEffect(() => {
-    const savedLearners = JSON.parse(localStorage.getItem('learners') || '[]');
-    setLearners(savedLearners);
+    const loadLearners = async () => {
+      const data = await DataService.getLearners();
+      setLearners(data);
+    };
+    loadLearners();
   }, []);
 
   const filteredUsers = learners.filter(user =>
