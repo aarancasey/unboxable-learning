@@ -4,6 +4,7 @@ import SurveyForm from './SurveyForm';
 import LearnerHeader from './LearnerHeader';
 import ProgressOverview from './ProgressOverview';
 import ModulesSection from './ModulesSection';
+import SurveyPrerequisiteSection from './SurveyPrerequisiteSection';
 import PasswordChangeModal from './PasswordChangeModal';
 import { useAnalytics } from '@/hooks/useAnalytics';
 
@@ -19,6 +20,8 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [currentLearner, setCurrentLearner] = useState(learnerData);
   const [availableModules, setAvailableModules] = useState<any[]>([]);
+  const [surveyModules, setSurveyModules] = useState<any[]>([]);
+  const [surveyStatus, setSurveyStatus] = useState<'not_started' | 'completed' | 'approved'>('not_started');
   const { trackModuleStart, trackSurveySubmission } = useAnalytics();
 
   useEffect(() => {
@@ -27,42 +30,59 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
       setShowPasswordModal(true);
     }
 
-    // Check if survey has been completed
+    // Check survey status
     const surveySubmissions = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
     const hasSurveyCompleted = surveySubmissions.length > 0;
-    console.log('Survey completion status:', hasSurveyCompleted, 'Submissions:', surveySubmissions.length);
+    const adminApproval = localStorage.getItem('surveyApproved') === 'true';
+    
+    let currentSurveyStatus: 'not_started' | 'completed' | 'approved' = 'not_started';
+    if (hasSurveyCompleted && adminApproval) {
+      currentSurveyStatus = 'approved';
+    } else if (hasSurveyCompleted) {
+      currentSurveyStatus = 'completed';
+    }
+    setSurveyStatus(currentSurveyStatus);
 
-    // Load available courses and their modules
+    // Load available courses and separate surveys from learning modules
     const savedCourses = JSON.parse(localStorage.getItem('courses') || '[]');
     console.log('Loading courses for learner:', savedCourses);
     
     if (savedCourses.length > 0) {
-      // Combine all modules from all active courses
-      const allModules = savedCourses.reduce((modules: any[], course: any) => {
+      const allModules: any[] = [];
+      const allSurveys: any[] = [];
+      
+      savedCourses.forEach((course: any) => {
         if (course.status === 'active' && course.moduleList) {
-          const courseModules = course.moduleList.map((module: any, index: number) => {
-            // First module (survey) is always unlocked
-            // Other modules are unlocked only after survey completion
-            const isFirstModule = index === 0;
-            const isSurveyModule = module.type === 'survey';
-            const shouldUnlock = isFirstModule || isSurveyModule || hasSurveyCompleted;
-            
-            console.log(`Module "${module.title}": type=${module.type}, index=${index}, shouldUnlock=${shouldUnlock}, hasSurveyCompleted=${hasSurveyCompleted}`);
-            
-            return {
+          course.moduleList.forEach((module: any) => {
+            const moduleData = {
               ...module,
               courseId: course.id,
               courseName: course.title,
-              unlocked: shouldUnlock,
-              status: shouldUnlock ? (isSurveyModule && !hasSurveyCompleted ? 'available' : 'available') : 'locked',
-              unlockDate: !shouldUnlock ? 'Complete survey to unlock' : undefined
             };
+            
+            if (module.type === 'survey') {
+              // Surveys are always available as pre-requisites
+              allSurveys.push({
+                ...moduleData,
+                unlocked: true,
+                status: 'available'
+              });
+            } else {
+              // Learning modules are locked until survey is approved by admin
+              const shouldUnlock = currentSurveyStatus === 'approved';
+              allModules.push({
+                ...moduleData,
+                unlocked: shouldUnlock,
+                status: shouldUnlock ? 'available' : 'locked',
+                unlockDate: !shouldUnlock ? 'Complete and get survey approved to unlock' : undefined
+              });
+            }
           });
-          return [...modules, ...courseModules];
         }
-        return modules;
-      }, []);
+      });
+      
       setAvailableModules(allModules);
+      setSurveyModules(allSurveys);
     }
   }, [learnerData]);
 
@@ -72,7 +92,7 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
     progress: 0,
     completedModules: 0,
     totalModules: availableModules.length,
-    nextSurvey: "Customer Service Assessment",
+    nextSurvey: surveyStatus === 'approved' ? "Post-Course Assessment" : "Pre-Course Assessment",
     modules: availableModules
   };
 
@@ -145,6 +165,17 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Survey Pre-requisite Section */}
+        {surveyModules.length > 0 && (
+          <SurveyPrerequisiteSection
+            surveys={surveyModules}
+            surveyStatus={surveyStatus}
+            onStartSurvey={() => setActiveView('survey')}
+            onStartPostSurvey={() => setActiveView('survey')}
+            hasCompletedModules={displayData.completedModules > 0}
+          />
+        )}
+
         <ProgressOverview
           progress={displayData.progress}
           completedModules={displayData.completedModules}
