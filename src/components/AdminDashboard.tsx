@@ -50,11 +50,16 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
       const savedSurveys = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
       const learners = await DataService.getLearners();
       
+      // Calculate completion rate based on active learners
+      const activeLearners = learners.filter(learner => learner.status === 'active').length;
+      const completionRate = learners.length > 0 ? Math.round((activeLearners / learners.length) * 100) : 0;
+      
       setAdminData(prev => ({
         ...prev,
         totalLearners: learners.length,
         activeCourses: savedSurveys.length > 0 ? 1 : 0,
-        pendingSurveys: savedSurveys.filter(survey => survey.status === 'pending').length
+        pendingSurveys: savedSurveys.filter(survey => survey.status === 'pending').length,
+        completionRate
       }));
     };
     
