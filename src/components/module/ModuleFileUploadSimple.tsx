@@ -210,10 +210,10 @@ export const ModuleFileUploadSimple = ({
               <div className="space-y-2">
                 {uploadedFiles.map((file, index) => (
                   <div key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border">
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-3 min-w-0 flex-1">
                       {getFileIcon(file.name)}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{file.name}</p>
+                        <p className="text-sm font-medium truncate max-w-[200px]">{file.name}</p>
                         <p className="text-xs text-muted-foreground">
                           {formatFileSize(file.size)}
                         </p>
@@ -224,7 +224,7 @@ export const ModuleFileUploadSimple = ({
                       variant="ghost"
                       size="sm"
                       onClick={() => removeFile(index)}
-                      className="text-destructive hover:text-destructive"
+                      className="text-destructive hover:text-destructive ml-2 flex-shrink-0"
                     >
                       <X className="h-4 w-4" />
                     </Button>
