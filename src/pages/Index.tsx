@@ -55,32 +55,31 @@ const Index = () => {
         {/* Hero Section */}
         <div className="flex-1 flex items-center p-8">
           <div className="max-w-6xl w-full">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              {/* Left side - Content */}
-              <div className="space-y-8">
-                <div className="space-y-4">
-                  <img 
-                    src="/lovable-uploads/72877e4c-8de7-499d-86f0-77c477293eeb.png" 
-                    alt="Unboxable" 
-                    className="h-12 w-auto"
-                  />
-                  <p className="text-sm text-white font-medium">RETHINKING BUSINESS</p>
-                </div>
-                
-                <div className="space-y-6">
-                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
-                    Sparking the shift<br />
-                    Inspiring action<span className="text-unboxable-orange">.</span>
-                  </h1>
-                  <p className="text-xl text-white/90 max-w-xl">
-                    Learning to help you move forward
-                  </p>
-                </div>
+            <div className="max-w-2xl">
+              {/* Logo and tagline */}
+              <div className="space-y-4 mb-8">
+                <img 
+                  src="/lovable-uploads/72877e4c-8de7-499d-86f0-77c477293eeb.png" 
+                  alt="Unboxable" 
+                  className="h-12 w-auto"
+                />
+                <p className="text-sm text-white font-medium">RETHINKING BUSINESS</p>
+              </div>
+              
+              {/* Heading and subheading */}
+              <div className="space-y-6 mb-12">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
+                  Sparking the shift<br />
+                  Inspiring action<span className="text-unboxable-orange">.</span>
+                </h1>
+                <p className="text-xl text-white/90">
+                  Learning to help you move forward
+                </p>
               </div>
 
-              {/* Right side - Learner Access */}
-              <div className="flex justify-center lg:justify-end">
-                <Card className="max-w-sm w-full bg-white border-0 shadow-xl">
+              {/* Learner Access - positioned under heading */}
+              <div className="max-w-sm">
+                <Card className="bg-white border-0 shadow-xl">
                   <CardContent className="p-8 text-center">
                     <GraduationCap className="mx-auto h-16 w-16 text-unboxable-navy mb-4" />
                     <h3 className="text-2xl font-semibold mb-3 text-unboxable-navy">Learner Access</h3>
