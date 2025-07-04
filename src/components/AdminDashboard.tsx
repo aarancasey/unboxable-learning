@@ -37,11 +37,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
     pendingSurveys: 0,
     completionRate: 0,
     recentActivity: [],
-    upcomingTasks: [
-      { id: 1, task: "Review Q4 Survey Responses", priority: "high", due: "Today" },
-      { id: 2, task: "Update Module 4 Content", priority: "medium", due: "Tomorrow" },
-      { id: 3, task: "Send Weekly Progress Report", priority: "low", due: "Friday" },
-    ]
+    upcomingTasks: []
   });
 
   // Update admin data based on survey submissions and learners
@@ -192,21 +188,29 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    {adminData.upcomingTasks.map((task) => (
-                      <div key={task.id} className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-unboxable-navy">{task.task}</p>
-                          <p className="text-xs text-gray-500">Due: {task.due}</p>
+                  {adminData.upcomingTasks.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                      <p className="text-gray-600">No upcoming tasks</p>
+                      <p className="text-sm text-gray-500">Tasks will appear here as they are scheduled</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {adminData.upcomingTasks.map((task) => (
+                        <div key={task.id} className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-unboxable-navy">{task.task}</p>
+                            <p className="text-xs text-gray-500">Due: {task.due}</p>
+                          </div>
+                          <Badge 
+                            variant={task.priority === 'high' ? 'destructive' : task.priority === 'medium' ? 'default' : 'secondary'}
+                          >
+                            {task.priority}
+                          </Badge>
                         </div>
-                        <Badge 
-                          variant={task.priority === 'high' ? 'destructive' : task.priority === 'medium' ? 'default' : 'secondary'}
-                        >
-                          {task.priority}
-                        </Badge>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
