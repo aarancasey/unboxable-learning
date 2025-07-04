@@ -23,10 +23,14 @@ export const CourseProgressChart = ({ data }: CourseProgressChartProps) => {
             <YAxis stroke="hsl(var(--muted-foreground))" />
             <Tooltip 
               contentStyle={{ 
-                backgroundColor: 'hsl(var(--card))', 
-                border: '1px solid hsl(var(--border))',
-                borderRadius: '6px'
+                backgroundColor: 'white', 
+                border: '1px solid #e2e8f0',
+                borderRadius: '6px',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                fontSize: '14px'
               }}
+              formatter={(value, name) => [value, name === 'completed' ? 'Completed' : name === 'inProgress' ? 'In Progress' : 'Not Started']}
+              labelFormatter={(label) => `Course: ${label}`}
             />
             <Bar dataKey="completed" stackId="a" fill="hsl(var(--primary))" />
             <Bar dataKey="inProgress" stackId="a" fill="hsl(var(--accent))" />
