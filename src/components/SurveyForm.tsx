@@ -552,9 +552,9 @@ Your facilitator and coach will have oversight into your responses as this will 
             onValueChange={(value) => handleAnswerChange(value)}
           >
             {radioQ.options?.map((option, index) => (
-              <div key={index} className="flex items-center space-x-2">
-                <RadioGroupItem value={option} id={`option-${index}`} />
-                <Label htmlFor={`option-${index}`} className="flex-1 cursor-pointer">
+              <div key={index} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer">
+                <RadioGroupItem value={option} id={`option-${index}`} className="mt-1" />
+                <Label htmlFor={`option-${index}`} className="flex-1 cursor-pointer leading-relaxed">
                   {option}
                 </Label>
               </div>
@@ -575,7 +575,7 @@ Your facilitator and coach will have oversight into your responses as this will 
               </p>
             )}
             {checkboxQ.options?.map((option, index) => (
-              <div key={index} className="flex items-center space-x-2">
+              <div key={index} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer">
                 <Checkbox
                   id={`checkbox-${index}`}
                   checked={selectedOptions.includes(option)}
@@ -591,8 +591,9 @@ Your facilitator and coach will have oversight into your responses as this will 
                     handleAnswerChange(newSelection);
                   }}
                   disabled={maxSelections && selectedOptions.length >= maxSelections && !selectedOptions.includes(option)}
+                  className="mt-1"
                 />
-                <Label htmlFor={`checkbox-${index}`} className="flex-1 cursor-pointer">
+                <Label htmlFor={`checkbox-${index}`} className="flex-1 cursor-pointer leading-relaxed">
                   {option}
                 </Label>
               </div>
@@ -608,9 +609,9 @@ Your facilitator and coach will have oversight into your responses as this will 
             onValueChange={(value) => handleAnswerChange(value)}
           >
             {scaleQ.scaleLabels?.map((label, index) => (
-              <div key={index} className="flex items-center space-x-2">
-                <RadioGroupItem value={(index + 1).toString()} id={`scale-${index}`} />
-                <Label htmlFor={`scale-${index}`} className="flex-1 cursor-pointer">
+              <div key={index} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer">
+                <RadioGroupItem value={(index + 1).toString()} id={`scale-${index}`} className="mt-1" />
+                <Label htmlFor={`scale-${index}`} className="flex-1 cursor-pointer leading-relaxed">
                   <span className="font-medium mr-2">{index + 1}.</span>
                   {label}
                 </Label>
