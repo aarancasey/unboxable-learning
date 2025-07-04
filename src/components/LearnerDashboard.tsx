@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import ModuleViewer from './ModuleViewer';
 import SurveyForm from './SurveyForm';
 import LearnerHeader from './LearnerHeader';
+import LearnerWelcomeSection from './LearnerWelcomeSection';
 import ProgressOverview from './ProgressOverview';
 import ModulesSection from './ModulesSection';
 import SurveyPrerequisiteSection from './SurveyPrerequisiteSection';
@@ -165,6 +166,12 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Welcome Section */}
+        <LearnerWelcomeSection 
+          learnerName={displayData.name}
+          surveyStatus={surveyStatus}
+        />
+
         {/* Survey Pre-requisite Section */}
         {surveyModules.length > 0 && (
           <SurveyPrerequisiteSection
