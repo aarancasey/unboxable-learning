@@ -23,6 +23,7 @@ import SurveyReviewer from './SurveyReviewer';
 import { CalendarView } from './calendar/CalendarView';
 import AnalyticsDashboard from './analytics/AnalyticsDashboard';
 import EmailTestModal from './EmailTestModal';
+import { DataService } from '@/services/dataService';
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -43,15 +44,21 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
     ]
   });
 
-  // Update admin data based on survey submissions
+  // Update admin data based on survey submissions and learners
   useEffect(() => {
-    const savedSurveys = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
+    const loadAdminData = async () => {
+      const savedSurveys = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
+      const learners = await DataService.getLearners();
+      
+      setAdminData(prev => ({
+        ...prev,
+        totalLearners: learners.length,
+        activeCourses: savedSurveys.length > 0 ? 1 : 0,
+        pendingSurveys: savedSurveys.filter(survey => survey.status === 'pending').length
+      }));
+    };
     
-    setAdminData(prev => ({
-      ...prev,
-      activeCourses: savedSurveys.length > 0 ? 1 : 0,
-      pendingSurveys: savedSurveys.filter(survey => survey.status === 'pending').length
-    }));
+    loadAdminData();
   }, []);
 
   return (
