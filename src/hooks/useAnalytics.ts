@@ -15,10 +15,18 @@ export const useAnalytics = () => {
 
   const trackPageView = (path: string) => {
     if (typeof window !== 'undefined' && window.gtag) {
-      window.gtag('config', 'GA_MEASUREMENT_ID', {
+      // Replace with your actual GA4 Measurement ID
+      window.gtag('config', 'G-XXXXXXXXXX', {
         page_path: path,
       });
     }
+    
+    // Store page views locally for analytics dashboard
+    const pageViews = JSON.parse(localStorage.getItem('pageViews') || '{}');
+    pageViews[path] = (pageViews[path] || 0) + 1;
+    pageViews.total = (pageViews.total || 0) + 1;
+    pageViews.lastVisit = new Date().toISOString();
+    localStorage.setItem('pageViews', JSON.stringify(pageViews));
   };
 
   return {
