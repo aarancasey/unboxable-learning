@@ -75,11 +75,18 @@ export const MultiWeekCourseScheduleDialog = ({
       setMaxEnrollment(course.maxEnrollment.toString());
       
       // Generate module schedules based on course modules
-      const courseStartDate = startDate ? new Date(startDate) : selectedDate!;
+      const courseStartDate = startDate ? new Date(startDate) : (selectedDate || new Date());
       const courseEndDate = endDate ? new Date(endDate) : addWeeks(courseStartDate, 4);
+      
+      // Ensure courseStartDate is valid before using getTime()
+      if (!courseStartDate || isNaN(courseStartDate.getTime())) {
+        console.error('Invalid course start date');
+        return;
+      }
+      
       const totalWeeks = Math.ceil((courseEndDate.getTime() - courseStartDate.getTime()) / (7 * 24 * 60 * 60 * 1000));
       
-      const schedules: ModuleSchedule[] = course.moduleList.map((module: any, index: number) => {
+      const schedules: ModuleSchedule[] = course.moduleList?.map((module: any, index: number) => {
         const weekNumber = Math.floor(index / Math.max(1, Math.floor(course.moduleList.length / totalWeeks))) + 1;
         const unlockDate = addWeeks(courseStartDate, Math.min(weekNumber - 1, totalWeeks - 1));
         const emailNotificationDate = addDays(unlockDate, -7);
@@ -93,7 +100,7 @@ export const MultiWeekCourseScheduleDialog = ({
           weekNumber,
           emailNotificationDate
         };
-      });
+      }) || [];
       
       setModuleSchedules(schedules);
     }
