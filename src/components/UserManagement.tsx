@@ -63,6 +63,30 @@ const UserManagement = () => {
     localStorage.setItem('learners', JSON.stringify(allLearners));
   };
 
+  const handleDeleteLearner = (learnerId: number) => {
+    const learnerToDelete = learners.find(l => l.id === learnerId);
+    const updatedLearners = learners.filter(learner => learner.id !== learnerId);
+    
+    setLearners(updatedLearners);
+    localStorage.setItem('learners', JSON.stringify(updatedLearners));
+    
+    toast({
+      title: "Learner Deleted",
+      description: `${learnerToDelete?.name} has been removed from the system.`,
+      variant: "destructive",
+    });
+  };
+
+  const handleResendInvite = (learnerId: number) => {
+    const learner = learners.find(l => l.id === learnerId);
+    
+    // In a real app, this would send an actual email
+    toast({
+      title: "Invite Resent",
+      description: `A new invitation has been sent to ${learner?.email}.`,
+    });
+  };
+
   // Load learners from localStorage on component mount
   useEffect(() => {
     const savedLearners = JSON.parse(localStorage.getItem('learners') || '[]');
@@ -95,6 +119,8 @@ const UserManagement = () => {
         filteredUsers={filteredUsers}
         onAddLearner={() => setIsAddLearnerOpen(true)}
         onActivateLearner={handleActivateLearner}
+        onDeleteLearner={handleDeleteLearner}
+        onResendInvite={handleResendInvite}
       />
 
       <AddLearnerForm

@@ -1,13 +1,21 @@
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { 
   CheckCircle,
   Clock,
   Mail,
   AlertCircle,
   UserCheck,
-  MoreHorizontal
+  MoreHorizontal,
+  Trash2,
+  Send
 } from 'lucide-react';
 
 interface Learner {
@@ -22,9 +30,11 @@ interface Learner {
 interface UserCardProps {
   learner: Learner;
   onActivate: (learnerId: number) => void;
+  onDelete: (learnerId: number) => void;
+  onResendInvite: (learnerId: number) => void;
 }
 
-const UserCard = ({ learner, onActivate }: UserCardProps) => {
+const UserCard = ({ learner, onActivate, onDelete, onResendInvite }: UserCardProps) => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'active':
@@ -86,9 +96,28 @@ const UserCard = ({ learner, onActivate }: UserCardProps) => {
               Activate
             </Button>
           )}
-          <Button variant="ghost" size="sm">
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              {learner.status === 'invited' && (
+                <DropdownMenuItem onClick={() => onResendInvite(learner.id)}>
+                  <Send className="h-4 w-4 mr-2" />
+                  Resend Invite
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem 
+                onClick={() => onDelete(learner.id)}
+                className="text-red-600 focus:text-red-600"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete Learner
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </div>
