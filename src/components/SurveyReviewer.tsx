@@ -136,118 +136,159 @@ const SurveyReviewer = () => {
 
           {/* AI Summary */}
           <div className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Brain className="h-5 w-5 text-purple-600" />
-                  <span>AI Leadership Assessment Summary</span>
+            <Card className="border-2 border-purple-100">
+              <CardHeader className="bg-gradient-to-r from-purple-50 to-indigo-50 pb-6">
+                <CardTitle className="flex items-center space-x-3">
+                  <Brain className="h-6 w-6 text-purple-600" aria-hidden="true" />
+                  <span className="text-xl font-semibold text-gray-900">AI Leadership Assessment Summary</span>
                 </CardTitle>
+                <p className="text-sm text-gray-600 mt-2" id="ai-summary-description">
+                  Comprehensive analysis of leadership capabilities, sentiment, and development opportunities based on survey responses.
+                </p>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-8 pt-8" aria-describedby="ai-summary-description">
+                
                 {/* Section 1: Leadership Sentiment Snapshot */}
-                <div className="border-b pb-4">
-                  <h4 className="font-semibold text-gray-900 mb-3">Section 1: Leadership Sentiment Snapshot</h4>
+                <section className="border-l-4 border-blue-500 pl-6 pb-8 border-b border-gray-100 last:border-b-0" aria-labelledby="sentiment-heading">
+                  <h3 id="sentiment-heading" className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
+                    <span className="bg-blue-100 text-blue-800 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-3" aria-hidden="true">1</span>
+                    Leadership Sentiment Snapshot
+                  </h3>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <h5 className="font-medium text-gray-800 mb-2">Current Leadership Style</h5>
-                      <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
-                        {selectedSurvey.aiSummary.currentLeadershipStyle || 'Managing, but close to overload'}
-                      </span>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div className="bg-white border border-gray-200 rounded-lg p-4">
+                      <h4 className="font-medium text-gray-800 mb-3" id="leadership-style-label">Current Leadership Style</h4>
+                      <div className="flex items-center" role="group" aria-labelledby="leadership-style-label">
+                        <span className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                          {selectedSurvey.aiSummary.currentLeadershipStyle || 'Managing, but close to overload'}
+                        </span>
+                      </div>
                     </div>
                     
-                    <div>
-                      <h5 className="font-medium text-gray-800 mb-2">Confidence Rating</h5>
-                      <span className="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
-                        {selectedSurvey.aiSummary.confidenceRating || 'Developing Confidence (2.5–3.4)'}
-                      </span>
+                    <div className="bg-white border border-gray-200 rounded-lg p-4">
+                      <h4 className="font-medium text-gray-800 mb-3" id="confidence-rating-label">Confidence Rating</h4>
+                      <div className="flex items-center" role="group" aria-labelledby="confidence-rating-label">
+                        <span className="inline-flex items-center px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                          {selectedSurvey.aiSummary.confidenceRating || 'Developing Confidence (2.5–3.4)'}
+                        </span>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <h5 className="font-medium text-green-700 mb-2">Strongest Area</h5>
-                      <p className="text-sm text-gray-700">{selectedSurvey.aiSummary.strongestArea || 'Motivate and align your team'}</p>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                      <h4 className="font-medium text-green-800 mb-3 flex items-center" id="strongest-area-label">
+                        <span className="text-green-600 mr-2" aria-hidden="true">✓</span>
+                        Strongest Area
+                      </h4>
+                      <p className="text-sm text-green-700 leading-relaxed" aria-labelledby="strongest-area-label">
+                        {selectedSurvey.aiSummary.strongestArea || 'Motivate and align your team'}
+                      </p>
                     </div>
                     
-                    <div>
-                      <h5 className="font-medium text-orange-700 mb-2">Area to Focus On</h5>
-                      <p className="text-sm text-gray-700">{selectedSurvey.aiSummary.focusArea || 'Lead through complexity and ambiguity'}</p>
+                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                      <h4 className="font-medium text-orange-800 mb-3 flex items-center" id="focus-area-label">
+                        <span className="text-orange-600 mr-2" aria-hidden="true">→</span>
+                        Area to Focus On
+                      </h4>
+                      <p className="text-sm text-orange-700 leading-relaxed" aria-labelledby="focus-area-label">
+                        {selectedSurvey.aiSummary.focusArea || 'Lead through complexity and ambiguity'}
+                      </p>
                     </div>
                   </div>
-                </div>
+                </section>
 
                 {/* Section 2: Leadership Intent & Purpose */}
-                <div className="border-b pb-4">
-                  <h4 className="font-semibold text-gray-900 mb-3">Section 2: Leadership Intent & Purpose</h4>
+                <section className="border-l-4 border-purple-500 pl-6 pb-8 border-b border-gray-100 last:border-b-0" aria-labelledby="intent-heading">
+                  <h3 id="intent-heading" className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
+                    <span className="bg-purple-100 text-purple-800 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-3" aria-hidden="true">2</span>
+                    Leadership Intent & Purpose
+                  </h3>
                   
-                  <div className="mb-4">
-                    <h5 className="font-medium text-gray-800 mb-2">Leadership Aspirations</h5>
-                    <div className="flex flex-wrap gap-2">
+                  <div className="mb-6">
+                    <h4 className="font-medium text-gray-800 mb-4" id="aspirations-label">Leadership Aspirations</h4>
+                    <div className="flex flex-wrap gap-3" role="list" aria-labelledby="aspirations-label">
                       {(selectedSurvey.aiSummary.leadershipAspirations || ['Empowering and people-centred', 'Strategic and future-focused', 'Curious and adaptive']).map((aspiration: string, index: number) => (
-                        <span key={index} className="inline-block px-2 py-1 bg-purple-100 text-purple-800 rounded text-sm">
+                        <span key={index} role="listitem" className="inline-flex items-center px-3 py-2 bg-purple-100 text-purple-800 rounded-lg text-sm font-medium border border-purple-200">
                           {aspiration}
                         </span>
                       ))}
                     </div>
                   </div>
 
-                  <div>
-                    <h5 className="font-medium text-gray-800 mb-2">Connection to Purpose Rating</h5>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-2xl font-bold text-blue-600">{selectedSurvey.aiSummary.purposeRating || '4'}</span>
-                      <span className="text-sm text-gray-600">/ 6 - Connected and gaining clarity</span>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h4 className="font-medium text-gray-800 mb-3" id="purpose-rating-label">Connection to Purpose Rating</h4>
+                    <div className="flex items-center space-x-3" role="group" aria-labelledby="purpose-rating-label">
+                      <span className="text-3xl font-bold text-blue-600" aria-label={`Rating: ${selectedSurvey.aiSummary.purposeRating || '4'} out of 6`}>
+                        {selectedSurvey.aiSummary.purposeRating || '4'}
+                      </span>
+                      <div>
+                        <span className="text-sm text-gray-600 block">/ 6</span>
+                        <span className="text-sm text-blue-700 font-medium">Connected and gaining clarity</span>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </section>
 
                 {/* Section 3: Adaptive & Agile Leadership Snapshot */}
-                <div className="border-b pb-4">
-                  <h4 className="font-semibold text-gray-900 mb-3">Section 3: Adaptive & Agile Leadership Snapshot</h4>
+                <section className="border-l-4 border-indigo-500 pl-6 pb-8 border-b border-gray-100 last:border-b-0" aria-labelledby="agility-heading">
+                  <h3 id="agility-heading" className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
+                    <span className="bg-indigo-100 text-indigo-800 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-3" aria-hidden="true">3</span>
+                    Adaptive & Agile Leadership Snapshot
+                  </h3>
                   
-                  <div className="mb-4">
-                    <h5 className="font-medium text-gray-800 mb-2">Leadership Agility Level</h5>
-                    <span className="inline-block px-4 py-2 bg-indigo-100 text-indigo-800 rounded-lg font-medium">
+                  <div className="mb-6">
+                    <h4 className="font-medium text-gray-800 mb-4" id="agility-level-label">Leadership Agility Level</h4>
+                    <div className="inline-flex items-center px-6 py-3 bg-indigo-100 text-indigo-800 rounded-lg font-semibold text-base border border-indigo-200" role="group" aria-labelledby="agility-level-label">
                       {selectedSurvey.aiSummary.agilityLevel || 'Achiever'}
-                    </span>
+                    </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <h5 className="font-medium text-green-700 mb-2">Notable Strengths (Top 3)</h5>
-                      <ul className="space-y-1">
+                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-5">
+                      <h4 className="font-medium text-green-800 mb-4 flex items-center" id="strengths-label">
+                        <span className="text-green-600 mr-2" aria-hidden="true">🌟</span>
+                        Notable Strengths (Top 3)
+                      </h4>
+                      <ul className="space-y-3" role="list" aria-labelledby="strengths-label">
                         {(selectedSurvey.aiSummary.topStrengths || ['Action Orientation & Delivery', 'Decision-Making Agility', 'Empowering Others & Collaboration']).map((strength: string, index: number) => (
-                          <li key={index} className="text-sm text-gray-700 flex items-start">
-                            <span className="w-2 h-2 bg-green-500 rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                          <li key={index} role="listitem" className="text-sm text-green-700 flex items-start leading-relaxed">
+                            <span className="w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0" aria-hidden="true"></span>
                             {strength}
                           </li>
                         ))}
                       </ul>
                     </div>
                     
-                    <div>
-                      <h5 className="font-medium text-orange-700 mb-2">Development Areas (Bottom 3)</h5>
-                      <ul className="space-y-1">
+                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-5">
+                      <h4 className="font-medium text-orange-800 mb-4 flex items-center" id="development-areas-label">
+                        <span className="text-orange-600 mr-2" aria-hidden="true">🎯</span>
+                        Development Areas (Focus Areas)
+                      </h4>
+                      <ul className="space-y-3" role="list" aria-labelledby="development-areas-label">
                         {(selectedSurvey.aiSummary.developmentAreas || ['Navigating Change & Uncertainty', 'Strategic Agility & Systems Thinking', 'Learning Agility & Growth Mindset']).map((area: string, index: number) => (
-                          <li key={index} className="text-sm text-gray-700 flex items-start">
-                            <span className="w-2 h-2 bg-orange-500 rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                          <li key={index} role="listitem" className="text-sm text-orange-700 flex items-start leading-relaxed">
+                            <span className="w-2 h-2 bg-orange-500 rounded-full mt-2 mr-3 flex-shrink-0" aria-hidden="true"></span>
                             {area}
                           </li>
                         ))}
                       </ul>
                     </div>
                   </div>
-                </div>
+                </section>
 
                 {/* Section 4: General Summary */}
-                <div>
-                  <h4 className="font-semibold text-gray-900 mb-3">Section 4: General Summary</h4>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="text-sm text-gray-700">
+                <section className="border-l-4 border-gray-500 pl-6" aria-labelledby="summary-heading">
+                  <h3 id="summary-heading" className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
+                    <span className="bg-gray-100 text-gray-800 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-3" aria-hidden="true">4</span>
+                    Overall Assessment Summary
+                  </h3>
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+                    <p className="text-base text-gray-700 leading-relaxed" aria-labelledby="summary-heading">
                       {selectedSurvey.aiSummary.overallAssessment || 'This leader demonstrates strong operational capabilities with clear areas for strategic development. Focus on building confidence in navigating ambiguity while leveraging existing strengths in team motivation and decision-making.'}
                     </p>
                   </div>
-                </div>
+                </section>
               </CardContent>
             </Card>
 
