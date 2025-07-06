@@ -51,7 +51,7 @@ const Index = () => {
         onBack={() => setShowLearnerLogin(false)} 
       />
     ) : (
-      <div className="min-h-screen bg-unboxable-navy flex flex-col font-poppins">
+      <div className="min-h-screen bg-unboxable-navy flex flex-col font-montserrat">
         {/* Hero Section */}
         <div className="flex-1 flex items-center p-4 sm:p-6 lg:p-8">
           <div className="max-w-[1200px] mx-auto w-full">
@@ -67,11 +67,11 @@ const Index = () => {
               
               {/* Heading and subheading */}
               <div className="space-y-4 sm:space-y-6 mb-8 sm:mb-12 text-center lg:text-left">
-                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-montserrat-black font-black text-white leading-tight">
                   Sparking the shift<br className="hidden sm:block" />
                   <span className="sm:hidden"> </span>Inspiring action<span className="text-unboxable-orange">.</span>
                 </h1>
-                <p className="text-lg sm:text-xl text-white/90 font-medium">
+                <p className="text-lg sm:text-xl text-white/90 font-montserrat-black font-black">
                   Learning to help you move forward
                 </p>
               </div>
