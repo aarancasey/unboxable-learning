@@ -15,7 +15,8 @@ import {
   CheckCircle,
   AlertCircle,
   Settings,
-  Eye
+  Eye,
+  ArrowLeft
 } from 'lucide-react';
 import UserManagement from './UserManagement';
 import CourseManagement from './CourseManagement';
@@ -70,6 +71,16 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-14 sm:h-16">
             <div className="flex items-center space-x-2 sm:space-x-4">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => window.location.href = 'https://unboxable.co.nz'}
+                className="hover:bg-slate-100 text-unboxable-navy hover:text-unboxable-navy mr-2"
+              >
+                <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                <span className="hidden sm:inline">Back to Unboxable</span>
+                <span className="sm:hidden">Back</span>
+              </Button>
               <img 
                 src="/lovable-uploads/d0544c04-760a-4cf9-824c-612e5ef4aeaa.png" 
                 alt="Unboxable" 

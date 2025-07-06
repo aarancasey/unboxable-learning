@@ -99,8 +99,17 @@ const Index = () => {
         {/* Footer */}
         <footer className="bg-unboxable-navy/50 backdrop-blur-sm border-t border-white/10 p-4 sm:p-6">
           <div className="max-w-[1200px] mx-auto flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
-            <div className="text-white/60 text-xs sm:text-sm text-center sm:text-left">
-              © 2024 Unboxable. All rights reserved.
+            <div className="flex items-center space-x-4">
+              <Button 
+                variant="ghost" 
+                onClick={() => window.location.href = 'https://unboxable.co.nz'}
+                className="text-white/60 hover:text-white text-sm"
+              >
+                ← Back to Unboxable.co.nz
+              </Button>
+              <div className="text-white/60 text-xs sm:text-sm text-center sm:text-left">
+                © 2024 Unboxable. All rights reserved.
+              </div>
             </div>
             
             <Dialog open={isAdminModalOpen} onOpenChange={setIsAdminModalOpen}>

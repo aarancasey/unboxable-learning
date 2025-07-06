@@ -1,4 +1,53 @@
-# Welcome to your Lovable project
+# Unboxable Learning Portal
+
+A learning management system integrated with unboxable.co.nz, featuring course management, learner dashboards, and survey functionality.
+
+## Integration Configuration
+
+This application is configured to be deployed at `unboxable.co.nz/learning` as a subdirectory of the main Unboxable website.
+
+### Development vs Production
+
+- **Development**: Runs on `localhost:8080` with standard routing
+- **Production**: Configured for `/learning` subdirectory with appropriate base paths
+
+### Key Configuration Files
+
+- `vite.config.ts`: Configured with base path for production deployment
+- `src/App.tsx`: Router basename configuration for subdirectory routing
+- Components include "Back to Unboxable" navigation for seamless integration
+
+### Deployment Steps
+
+1. Build the application: `npm run build`
+2. Deploy the `dist` folder contents to your web server under `/learning` directory
+3. Configure web server (Apache/Nginx) to handle React Router for SPA routing
+4. Update Supabase authentication redirect URLs to match your domain structure
+
+### Features
+
+- **Learner Dashboard**: Course progress tracking and module access
+- **Admin Dashboard**: User management, course creation, survey approval
+- **Course Management**: Create and manage learning modules
+- **Survey System**: Pre/post course assessments
+- **Analytics**: Learning progress and engagement tracking
+- **Calendar**: Course scheduling and email automation
+
+### Brand Integration
+
+The learning portal maintains consistent branding with the main Unboxable website:
+- Montserrat font family
+- Unboxable color scheme (navy blue #2B4C7E, orange #FF6500)
+- Consistent navigation and user experience
+- Seamless transitions between main site and learning portal
+
+### Authentication
+
+Uses Supabase for authentication and data management. Configure your Supabase project settings to match your deployment domain for proper authentication flow.
+
+---
+
+# Original Lovable Project Info
 
 ## Project info
 
