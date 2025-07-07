@@ -60,6 +60,32 @@ export const CourseDetailView = ({ course, onBack, onCourseUpdate }: CourseDetai
     }
   };
 
+  const handleModuleDelete = (moduleId: number) => {
+    console.log('Module deleted:', moduleId);
+    // Remove the module from the course
+    const updatedModules = currentCourse.moduleList.filter(module => module.id !== moduleId);
+    
+    const updatedCourse = {
+      ...currentCourse,
+      moduleList: updatedModules,
+      modules: updatedModules.length
+    };
+    
+    setCurrentCourse(updatedCourse);
+    
+    // Update in localStorage
+    const savedCourses = JSON.parse(localStorage.getItem('courses') || '[]');
+    const updatedCourses = savedCourses.map((c: any) => 
+      c.id === course.id ? updatedCourse : c
+    );
+    localStorage.setItem('courses', JSON.stringify(updatedCourses));
+    
+    // Notify parent component if callback provided
+    if (onCourseUpdate) {
+      onCourseUpdate(updatedCourse);
+    }
+  };
+
   const handleAddModule = (newModuleData: any) => {
     const newModule = {
       id: Date.now().toString(),
@@ -131,6 +157,7 @@ export const CourseDetailView = ({ course, onBack, onCourseUpdate }: CourseDetai
       <CourseModulesList 
         modules={currentCourse.moduleList.filter((module: any) => module.type !== 'survey')} 
         onModuleUpdate={handleModuleUpdate}
+        onModuleDelete={handleModuleDelete}
       />
 
       {/* Add Module Modal */}

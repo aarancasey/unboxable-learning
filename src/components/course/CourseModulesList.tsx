@@ -3,21 +3,40 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { PlayCircle, Settings, FileText, Eye } from 'lucide-react';
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { PlayCircle, Settings, FileText, Eye, Trash2 } from 'lucide-react';
 import { ModulePreviewModal } from './ModulePreviewModal';
-import { ModuleSettingsModal } from './ModuleSettingsModal';
+import { ModuleForm } from '../ModuleForm';
+import { useToast } from '@/hooks/use-toast';
 
 interface Module {
   id: number;
   title: string;
-  type: string;
+  type: 'survey' | 'video' | 'document' | 'interactive';
   duration: string;
   status: string;
+  description?: string;
+  content?: {
+    files?: File[];
+    videoUrl?: string;
+    documentUrl?: string;
+    googleDocsLinks?: string[];
+  };
 }
 
 interface CourseModulesListProps {
   modules: Module[];
-  onModuleUpdate?: (moduleId: number, updatedModule: Partial<Module>) => void;
+  onModuleUpdate?: (moduleId: number, updatedModule: any) => void;
+  onModuleDelete?: (moduleId: number) => void;
 }
 
 const getModuleIcon = (type: string) => {
@@ -50,26 +69,75 @@ const getStatusBadge = (status: string) => {
   }
 };
 
-export const CourseModulesList = ({ modules, onModuleUpdate }: CourseModulesListProps) => {
+export const CourseModulesList = ({ modules, onModuleUpdate, onModuleDelete }: CourseModulesListProps) => {
   const [previewModule, setPreviewModule] = useState<Module | null>(null);
-  const [settingsModule, setSettingsModule] = useState<Module | null>(null);
+  const [editModule, setEditModule] = useState<Module | null>(null);
+  const [deleteModule, setDeleteModule] = useState<Module | null>(null);
   const [showPreview, setShowPreview] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const { toast } = useToast();
 
   const handleViewModule = (module: Module) => {
     setPreviewModule(module);
     setShowPreview(true);
   };
 
-  const handleSettingsModule = (module: Module) => {
-    setSettingsModule(module);
-    setShowSettings(true);
+  const handleEditModule = (module: Module) => {
+    setEditModule(module);
+    setShowEdit(true);
   };
 
-  const handleModuleSave = (updatedModule: Partial<Module>) => {
-    if (settingsModule && onModuleUpdate) {
-      onModuleUpdate(settingsModule.id, updatedModule);
+  const handleDeleteModule = (module: Module) => {
+    setDeleteModule(module);
+    setShowDeleteDialog(true);
+  };
+
+// Type for ModuleForm module interface
+interface ModuleFormModule {
+  id: string;
+  title: string;
+  type: 'survey' | 'video' | 'document' | 'interactive';
+  duration: string;
+  description: string;
+  content?: {
+    files?: File[];
+    videoUrl?: string;
+    documentUrl?: string;
+    googleDocsLinks?: string[];
+  };
+}
+
+  const handleModuleSave = (updatedModuleData: Omit<ModuleFormModule, 'id'>) => {
+    if (editModule && onModuleUpdate) {
+      // Convert the ModuleForm data to match the CourseModulesList Module type
+      const updatedModule = {
+        title: updatedModuleData.title,
+        type: updatedModuleData.type,
+        duration: updatedModuleData.duration,
+        description: updatedModuleData.description || '',
+        status: editModule.status, // Preserve existing status
+        content: updatedModuleData.content
+      };
+      
+      onModuleUpdate(editModule.id, updatedModule);
+      toast({
+        title: "Module updated",
+        description: "The module has been successfully updated.",
+      });
     }
+  };
+
+  const confirmDelete = () => {
+    if (deleteModule && onModuleDelete) {
+      onModuleDelete(deleteModule.id);
+      toast({
+        title: "Module deleted",
+        description: "The module has been successfully deleted.",
+      });
+    }
+    setShowDeleteDialog(false);
+    setDeleteModule(null);
   };
 
   return (
@@ -102,8 +170,16 @@ export const CourseModulesList = ({ modules, onModuleUpdate }: CourseModulesList
                     <Button variant="ghost" size="sm" onClick={() => handleViewModule(module)}>
                       <Eye className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => handleSettingsModule(module)}>
+                    <Button variant="ghost" size="sm" onClick={() => handleEditModule(module)}>
                       <Settings className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => handleDeleteModule(module)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
@@ -120,13 +196,38 @@ export const CourseModulesList = ({ modules, onModuleUpdate }: CourseModulesList
         onOpenChange={setShowPreview}
       />
 
-      {/* Settings Modal */}
-      <ModuleSettingsModal
-        module={settingsModule}
-        open={showSettings}
-        onOpenChange={setShowSettings}
+      {/* Edit Modal */}
+      <ModuleForm
+        open={showEdit}
+        onOpenChange={setShowEdit}
+        module={editModule ? {
+          id: editModule.id.toString(),
+          title: editModule.title,
+          type: editModule.type,
+          duration: editModule.duration,
+          description: editModule.description || '',
+          content: editModule.content
+        } : null}
         onSave={handleModuleSave}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Module</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{deleteModule?.title}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };
