@@ -5,9 +5,11 @@ import { LogOut, ArrowLeft } from 'lucide-react';
 interface LearnerHeaderProps {
   learnerName: string;
   onLogout: () => void;
+  clientLogo?: string;
+  courseName?: string;
 }
 
-const LearnerHeader = ({ learnerName, onLogout }: LearnerHeaderProps) => {
+const LearnerHeader = ({ learnerName, onLogout, clientLogo, courseName }: LearnerHeaderProps) => {
   return (
     <header className="bg-white shadow-sm border-b">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -23,13 +25,35 @@ const LearnerHeader = ({ learnerName, onLogout }: LearnerHeaderProps) => {
               <span className="hidden sm:inline">Back to Unboxable</span>
               <span className="sm:hidden">Back</span>
             </Button>
-            <img 
-              src="/lovable-uploads/d0544c04-760a-4cf9-824c-612e5ef4aeaa.png" 
-              alt="Unboxable" 
-              className="h-6 sm:h-8"
-            />
-            <div className="h-6 sm:h-8 w-px bg-gray-300 hidden sm:block"></div>
-            <h1 className="text-lg sm:text-xl font-semibold text-unboxable-navy">Learning Portal</h1>
+            
+            <div className="flex items-center space-x-3">
+              {/* Client Logo */}
+              {clientLogo && (
+                <>
+                  <img 
+                    src={clientLogo} 
+                    alt="Client logo" 
+                    className="h-6 sm:h-8 max-w-24 object-contain"
+                  />
+                  <div className="h-6 sm:h-8 w-px bg-gray-300"></div>
+                </>
+              )}
+              
+              {/* Unboxable Logo */}
+              <img 
+                src="/lovable-uploads/d0544c04-760a-4cf9-824c-612e5ef4aeaa.png" 
+                alt="Unboxable" 
+                className="h-6 sm:h-8"
+              />
+              
+              <div className="h-6 sm:h-8 w-px bg-gray-300 hidden sm:block"></div>
+              <div className="flex flex-col">
+                <h1 className="text-lg sm:text-xl font-semibold text-unboxable-navy">Learning Portal</h1>
+                {courseName && (
+                  <span className="text-xs text-gray-500 hidden sm:block">{courseName}</span>
+                )}
+              </div>
+            </div>
           </div>
           
           <div className="flex items-center space-x-2 sm:space-x-4">

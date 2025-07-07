@@ -265,6 +265,7 @@ export type Database = {
           id: string
           instructor: string | null
           location: string | null
+          logo_url: string | null
           max_enrollment: number
           module_unlock_schedule: Json | null
           pre_course_survey_date: string | null
@@ -287,6 +288,7 @@ export type Database = {
           id?: string
           instructor?: string | null
           location?: string | null
+          logo_url?: string | null
           max_enrollment: number
           module_unlock_schedule?: Json | null
           pre_course_survey_date?: string | null
@@ -309,6 +311,7 @@ export type Database = {
           id?: string
           instructor?: string | null
           location?: string | null
+          logo_url?: string | null
           max_enrollment?: number
           module_unlock_schedule?: Json | null
           pre_course_survey_date?: string | null
@@ -378,6 +381,7 @@ export type Database = {
           description: string | null
           duration: string | null
           id: number
+          logo_url: string | null
           max_enrollment: number | null
           module_list: Json | null
           status: string | null
@@ -389,6 +393,7 @@ export type Database = {
           description?: string | null
           duration?: string | null
           id?: number
+          logo_url?: string | null
           max_enrollment?: number | null
           module_list?: Json | null
           status?: string | null
@@ -400,6 +405,7 @@ export type Database = {
           description?: string | null
           duration?: string | null
           id?: number
+          logo_url?: string | null
           max_enrollment?: number | null
           module_list?: Json | null
           status?: string | null

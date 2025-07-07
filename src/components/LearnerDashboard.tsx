@@ -23,6 +23,7 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
   const [availableModules, setAvailableModules] = useState<any[]>([]);
   const [surveyModules, setSurveyModules] = useState<any[]>([]);
   const [surveyStatus, setSurveyStatus] = useState<'not_started' | 'completed' | 'approved'>('not_started');
+  const [currentCourse, setCurrentCourse] = useState<any>(null);
   const { trackModuleStart, trackSurveySubmission } = useAnalytics();
 
   useEffect(() => {
@@ -49,6 +50,9 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
     console.log('Loading courses for learner:', savedCourses);
     
     if (savedCourses.length > 0) {
+      const activeCourse = savedCourses.find((course: any) => course.status === 'active');
+      setCurrentCourse(activeCourse);
+      
       const allModules: any[] = [];
       const allSurveys: any[] = [];
       
@@ -163,6 +167,8 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
       <LearnerHeader 
         learnerName={displayData.name}
         onLogout={onLogout}
+        clientLogo={currentCourse?.logoUrl}
+        courseName={currentCourse?.title}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">

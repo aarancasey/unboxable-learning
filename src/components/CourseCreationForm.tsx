@@ -44,6 +44,7 @@ export const CourseCreationForm = ({ open, onOpenChange, onSave }: CourseCreatio
   const [courseLocation, setCourseLocation] = useState('');
   const [courseInstructor, setCourseInstructor] = useState('');
   const [startDate, setStartDate] = useState('');
+  const [clientLogo, setClientLogo] = useState<File | null>(null);
   
   const { toast } = useToast();
   const [modules, setModules] = useState<Module[]>([
@@ -104,6 +105,23 @@ export const CourseCreationForm = ({ open, onOpenChange, onSave }: CourseCreatio
     }
 
     try {
+      let logoUrl = null;
+
+      // Upload logo if provided
+      if (clientLogo) {
+        const logoFileName = `${Date.now()}-${clientLogo.name}`;
+        const { data: logoData, error: logoError } = await supabase.storage
+          .from('course-logos')
+          .upload(logoFileName, clientLogo);
+
+        if (logoError) throw logoError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('course-logos')
+          .getPublicUrl(logoFileName);
+
+        logoUrl = publicUrl;
+      }
       // Calculate end date based on duration
       const start = new Date(startDate);
       let endDate = new Date(start);
@@ -130,6 +148,7 @@ export const CourseCreationForm = ({ open, onOpenChange, onSave }: CourseCreatio
         duration_value: durationValue,
         location: courseLocation,
         instructor: courseInstructor,
+        logo_url: logoUrl,
         email_schedule_config: {
           reminder_days_before: reminderDaysBefore
         }
@@ -180,6 +199,7 @@ export const CourseCreationForm = ({ open, onOpenChange, onSave }: CourseCreatio
         status: 'active',
         createdDate: new Date().toISOString().split('T')[0],
         estimatedDuration: `${durationValue} ${durationType}`,
+        logoUrl: logoUrl,
         moduleList: modules.map((module, index) => ({
           id: module.id,
           title: module.title,
@@ -218,6 +238,7 @@ export const CourseCreationForm = ({ open, onOpenChange, onSave }: CourseCreatio
     setCourseLocation('');
     setCourseInstructor('');
     setStartDate('');
+    setClientLogo(null);
     setModules([{
       id: '1',
       title: 'Leadership Sentiment, Adaptive and Agile Self-Assessment',
@@ -255,6 +276,8 @@ export const CourseCreationForm = ({ open, onOpenChange, onSave }: CourseCreatio
                 setMaxLearners={setMaxLearners}
                 enrolledLearners={enrolledLearners}
                 setEnrolledLearners={setEnrolledLearners}
+                clientLogo={clientLogo}
+                setClientLogo={setClientLogo}
               />
               
               <div className="space-y-2">

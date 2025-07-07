@@ -153,7 +153,7 @@ export class DataService {
 
       // Also update localStorage as backup
       const localCourses = JSON.parse(localStorage.getItem('courses') || '[]');
-      localCourses.push({ ...course, id: data.id });
+      localCourses.push({ ...course, id: data.id, logoUrl: course.logo_url });
       localStorage.setItem('courses', JSON.stringify(localCourses));
 
       return data;
