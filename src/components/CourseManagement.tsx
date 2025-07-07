@@ -15,20 +15,28 @@ const CourseManagement = () => {
     const savedCourses = JSON.parse(localStorage.getItem('courses') || '[]');
     const savedSurveys = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
     
-    // If no saved courses but surveys exist, create the default course
-    if (savedCourses.length === 0 && savedSurveys.length > 0) {
+    // If no saved courses, create a default course with survey
+    if (savedCourses.length === 0) {
       const defaultCourse = {
         id: 1,
-        title: "Module 2: Advanced Customer Service Skills",
-        description: "Building on Module 1 foundations, develop advanced customer service techniques and conflict resolution skills",
-        modules: 4,
-        maxEnrollment: 17,
-        enrolledUsers: Math.min(savedSurveys.length, 17),
+        title: "Leadership Development Course",
+        description: "Complete the pre-course assessment and unlock learning modules",
+        modules: 5,
+        maxEnrollment: 20,
+        enrolledUsers: Math.min(savedSurveys.length, 20),
         completionRate: 0,
         status: "active",
         createdDate: new Date().toISOString().split('T')[0],
         estimatedDuration: "4 weeks",
         moduleList: [
+          { 
+            id: '1', 
+            title: 'Leadership Sentiment, Adaptive and Agile Self-Assessment', 
+            type: 'survey', 
+            duration: '45 min',
+            description: 'Comprehensive leadership self-assessment covering sentiment, purpose, and agility',
+            status: "active" 
+          },
           { id: 2, title: "Advanced Communication Techniques", type: "video", duration: "25 min", status: "active" },
           { id: 3, title: "Handling Difficult Customers", type: "interactive", duration: "30 min", status: "active" },
           { id: 4, title: "Service Excellence & Team Collaboration", type: "document", duration: "20 min", status: "active" },
