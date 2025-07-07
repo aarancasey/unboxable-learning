@@ -17,6 +17,14 @@ const Index = () => {
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
   const { trackUserLogin, trackPageView } = useAnalytics();
 
+  // Debug logging
+  console.log('Index component state:', {
+    userRole,
+    isAuthenticated,
+    showLearnerLogin,
+    isAdminModalOpen
+  });
+
   const handleLearnerLogin = (userData?: any) => {
     setUserRole('learner');
     setIsAuthenticated(true);
