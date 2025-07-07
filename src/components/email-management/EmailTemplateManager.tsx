@@ -189,8 +189,8 @@ export const EmailTemplateManager = ({ onTemplateSelect }: EmailTemplateManagerP
               </DialogTitle>
             </DialogHeader>
             
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-6">
+              <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="template-name">Template Name</Label>
                   <Input
@@ -215,41 +215,42 @@ export const EmailTemplateManager = ({ onTemplateSelect }: EmailTemplateManagerP
                 </div>
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="subject">Email Subject Template</Label>
-                <Input
-                  value={subjectTemplate}
-                  onChange={(e) => setSubjectTemplate(e.target.value)}
-                  placeholder="e.g., Welcome to {{course_name}} - Starting {{course_start_date}}"
-                />
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="subject">Email Subject</Label>
+                  <Input
+                    value={subjectTemplate}
+                    onChange={(e) => setSubjectTemplate(e.target.value)}
+                    placeholder="Welcome to {{course_name}} - Starting {{course_start_date}}"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="content">Email Message</Label>
+                  <Textarea
+                    value={contentTemplate}
+                    onChange={(e) => setContentTemplate(e.target.value)}
+                    rows={10}
+                    placeholder="Dear {{participant_name}},
+
+Welcome to {{course_name}}! Your course starts on {{course_start_date}}.
+
+Best regards,
+The Learning Team"
+                    className="resize-none"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Use {"{{course_name}}"}, {"{{participant_name}}"}, {"{{course_start_date}}"} to personalize your message
+                  </p>
+                </div>
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="content">Email Content Template</Label>
-                <Textarea
-                  value={contentTemplate}
-                  onChange={(e) => setContentTemplate(e.target.value)}
-                  rows={12}
-                  placeholder="Use {{variable_name}} for dynamic content..."
-                  className="font-mono text-sm"
-                />
-              </div>
-              
-              <div className="flex flex-wrap gap-2">
-                <span className="text-sm font-medium">Available Variables:</span>
-                {extractVariables(subjectTemplate + ' ' + contentTemplate).map((variable) => (
-                  <Badge key={variable} variant="outline">
-                    {`{{${variable}}}`}
-                  </Badge>
-                ))}
-              </div>
-              
-              <div className="flex justify-end gap-2">
+              <div className="flex justify-end gap-2 pt-4 border-t">
                 <Button variant="outline" onClick={resetForm}>
                   Cancel
                 </Button>
                 <Button onClick={handleSaveTemplate}>
-                  {editingTemplate ? 'Update Template' : 'Create Template'}
+                  {editingTemplate ? "Update Template" : "Create Template"}
                 </Button>
               </div>
             </div>
