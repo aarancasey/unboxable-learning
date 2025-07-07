@@ -256,13 +256,17 @@ export type Database = {
           course_name: string
           created_at: string
           description: string | null
+          duration_type: string | null
+          duration_value: number | null
           duration_weeks: number
+          email_schedule_config: Json | null
           end_date: string
           enrolled_count: number
           id: string
           instructor: string | null
           location: string | null
           max_enrollment: number
+          module_unlock_schedule: Json | null
           pre_course_survey_date: string | null
           start_date: string
           status: string
@@ -274,13 +278,17 @@ export type Database = {
           course_name: string
           created_at?: string
           description?: string | null
+          duration_type?: string | null
+          duration_value?: number | null
           duration_weeks?: number
+          email_schedule_config?: Json | null
           end_date: string
           enrolled_count?: number
           id?: string
           instructor?: string | null
           location?: string | null
           max_enrollment: number
+          module_unlock_schedule?: Json | null
           pre_course_survey_date?: string | null
           start_date: string
           status?: string
@@ -292,19 +300,77 @@ export type Database = {
           course_name?: string
           created_at?: string
           description?: string | null
+          duration_type?: string | null
+          duration_value?: number | null
           duration_weeks?: number
+          email_schedule_config?: Json | null
           end_date?: string
           enrolled_count?: number
           id?: string
           instructor?: string | null
           location?: string | null
           max_enrollment?: number
+          module_unlock_schedule?: Json | null
           pre_course_survey_date?: string | null
           start_date?: string
           status?: string
           updated_at?: string
         }
         Relationships: []
+      }
+      course_timeline_events: {
+        Row: {
+          course_schedule_id: string | null
+          created_at: string | null
+          email_template_id: string | null
+          event_data: Json | null
+          event_date: string
+          event_time: string | null
+          event_type: string
+          id: string
+          status: string | null
+          target_recipients: Json | null
+        }
+        Insert: {
+          course_schedule_id?: string | null
+          created_at?: string | null
+          email_template_id?: string | null
+          event_data?: Json | null
+          event_date: string
+          event_time?: string | null
+          event_type: string
+          id?: string
+          status?: string | null
+          target_recipients?: Json | null
+        }
+        Update: {
+          course_schedule_id?: string | null
+          created_at?: string | null
+          email_template_id?: string | null
+          event_data?: Json | null
+          event_date?: string
+          event_time?: string | null
+          event_type?: string
+          id?: string
+          status?: string | null
+          target_recipients?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_timeline_events_course_schedule_id_fkey"
+            columns: ["course_schedule_id"]
+            isOneToOne: false
+            referencedRelation: "course_schedules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_timeline_events_email_template_id_fkey"
+            columns: ["email_template_id"]
+            isOneToOne: false
+            referencedRelation: "email_templates"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       courses: {
         Row: {
@@ -391,6 +457,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      email_templates: {
+        Row: {
+          content_template: string
+          created_at: string | null
+          id: string
+          is_default: boolean | null
+          subject_template: string
+          template_name: string
+          template_type: string
+          updated_at: string | null
+          variables: Json | null
+        }
+        Insert: {
+          content_template: string
+          created_at?: string | null
+          id?: string
+          is_default?: boolean | null
+          subject_template: string
+          template_name: string
+          template_type: string
+          updated_at?: string | null
+          variables?: Json | null
+        }
+        Update: {
+          content_template?: string
+          created_at?: string | null
+          id?: string
+          is_default?: boolean | null
+          subject_template?: string
+          template_name?: string
+          template_type?: string
+          updated_at?: string | null
+          variables?: Json | null
+        }
+        Relationships: []
       }
       hero_content: {
         Row: {

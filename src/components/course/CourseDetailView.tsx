@@ -28,6 +28,7 @@ interface CourseDetailViewProps {
 
 export const CourseDetailView = ({ course, onBack, onCourseUpdate }: CourseDetailViewProps) => {
   const [showAddModuleForm, setShowAddModuleForm] = useState(false);
+  const [showTimelineDialog, setShowTimelineDialog] = useState(false);
   const [currentCourse, setCurrentCourse] = useState(course);
 
   const handleModuleUpdate = (moduleId: number, updatedModule: any) => {
@@ -100,6 +101,10 @@ export const CourseDetailView = ({ course, onBack, onCourseUpdate }: CourseDetai
           <p className="text-gray-600">{currentCourse.description}</p>
         </div>
         <div className="flex space-x-3">
+          <Button variant="outline" onClick={() => setShowTimelineDialog(true)}>
+            <Timeline className="h-4 w-4 mr-2" />
+            View Timeline
+          </Button>
           <Button variant="outline" onClick={() => setShowAddModuleForm(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Add Module
@@ -133,6 +138,21 @@ export const CourseDetailView = ({ course, onBack, onCourseUpdate }: CourseDetai
         module={null}
         onSave={handleAddModule}
       />
+
+      {/* Timeline Dialog */}
+      <Dialog open={showTimelineDialog} onOpenChange={setShowTimelineDialog}>
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Course Timeline & Email Automation</DialogTitle>
+          </DialogHeader>
+          <CourseTimelineView
+            courseScheduleId={currentCourse.id.toString()}
+            courseName={currentCourse.title}
+            startDate={new Date().toISOString().split('T')[0]}
+            endDate={new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
