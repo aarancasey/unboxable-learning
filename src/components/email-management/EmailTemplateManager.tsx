@@ -307,7 +307,6 @@ export const EmailTemplateManager = ({ onTemplateSelect }: EmailTemplateManagerP
                   variant="outline"
                   size="sm"
                   onClick={() => handleEditTemplate(template)}
-                  disabled={template.is_default}
                 >
                   <Edit className="h-4 w-4 mr-1" />
                   Edit
