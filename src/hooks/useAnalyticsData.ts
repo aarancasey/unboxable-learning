@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { generateUserGrowthData, calculateAvgSessionDuration, processPageViews } from '@/lib/analyticsUtils';
+import { DataService } from '@/services/dataService';
 
 interface AnalyticsData {
   totalPageViews: number;
@@ -31,9 +32,9 @@ export const useAnalyticsData = () => {
       setLoading(true);
       
       try {
-        const learners = JSON.parse(localStorage.getItem('learners') || '[]');
-        const courses = JSON.parse(localStorage.getItem('courses') || '[]');
-        const surveySubmissions = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
+        const learners = await DataService.getLearners();
+        const courses = await DataService.getCourses();
+        const surveySubmissions = await DataService.getSurveySubmissions();
         const pageViews = JSON.parse(localStorage.getItem('pageViews') || '{}');
 
         // Calculate real metrics
