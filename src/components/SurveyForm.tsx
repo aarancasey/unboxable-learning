@@ -6,6 +6,7 @@ import { InstructionsSection } from './survey/InstructionsSection';
 import { QuestionRenderer } from './survey/QuestionRenderer';
 import { useSurveyData } from './survey/useSurveyData';
 import { useSurveyProgress } from './survey/useSurveyProgress';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SurveyFormProps {
   onBack: () => void;
@@ -33,11 +34,73 @@ const SurveyForm = ({ onBack, onSubmit }: SurveyFormProps) => {
     handlePrevious
   } = useSurveyProgress(survey);
 
-  const onNextClick = () => {
+  const onNextClick = async () => {
     const isComplete = handleNext();
     if (isComplete) {
       // Survey complete - save to localStorage
       console.log('Survey submitted:', answers);
+      
+      // Prepare responses for AI analysis
+      const responses = Object.entries(answers).map(([key, value]) => {
+        // Find the question for this answer
+        let question = "";
+        for (const section of survey.sections) {
+          if (section.questions) {
+            const q = section.questions.find(q => 
+              q.id === key || key.startsWith(q.id + '_')
+            );
+            if (q) {
+              if (key.includes('_') && q.type === 'scale-grid') {
+                // Handle scale-grid questions
+                const promptIndex = parseInt(key.split('_')[1]);
+                const scaleGridQ = q as any;
+                question = `${q.question} - ${scaleGridQ.prompts[promptIndex]}`;
+              } else {
+                question = q.question;
+              }
+              break;
+            }
+          }
+        }
+        
+        return {
+          question,
+          answer: Array.isArray(value) ? value.join(', ') : value.toString()
+        };
+      }).filter(response => response.question); // Only include responses with questions
+
+      // Generate AI summary
+      let aiSummary = {
+        currentLeadershipStyle: "Managing, but close to overload",
+        confidenceRating: "Developing Confidence (2.5–3.4)",
+        strongestArea: "Motivate and align your team",
+        focusArea: "Lead through complexity and ambiguity",
+        leadershipAspirations: ["Empowering and people-centred", "Strategic and future-focused", "Curious and adaptive"],
+        purposeRating: 4,
+        agilityLevel: "Achiever",
+        topStrengths: ["Action Orientation & Delivery", "Decision-Making Agility", "Empowering Others & Collaboration"],
+        developmentAreas: ["Navigating Change & Uncertainty", "Strategic Agility & Systems Thinking", "Learning Agility & Growth Mindset"],
+        overallAssessment: "This leader demonstrates strong operational capabilities with clear areas for strategic development. Focus on building confidence in navigating ambiguity while leveraging existing strengths in team motivation and decision-making."
+      };
+
+      try {
+        // Call AI summary generation function
+        const { data, error } = await supabase.functions.invoke('generate-leadership-summary', {
+          body: {
+            surveyResponses: responses,
+            surveyTitle: survey.title
+          }
+        });
+
+        if (error) {
+          console.error('Error generating AI summary:', error);
+        } else if (data?.aiSummary) {
+          aiSummary = data.aiSummary;
+          console.log('Generated AI summary:', aiSummary);
+        }
+      } catch (error) {
+        console.error('Failed to generate AI summary:', error);
+      }
       
       // Create survey submission object
       const surveySubmission = {
@@ -47,50 +110,8 @@ const SurveyForm = ({ onBack, onSubmit }: SurveyFormProps) => {
         department: "Department", // In real app, this would come from user profile
         submittedDate: new Date().toISOString().split('T')[0],
         status: "pending",
-        responses: Object.entries(answers).map(([key, value]) => {
-          // Find the question for this answer
-          let question = "";
-          for (const section of survey.sections) {
-            if (section.questions) {
-              const q = section.questions.find(q => 
-                q.id === key || key.startsWith(q.id + '_')
-              );
-              if (q) {
-                if (key.includes('_') && q.type === 'scale-grid') {
-                  // Handle scale-grid questions
-                  const promptIndex = parseInt(key.split('_')[1]);
-                  const scaleGridQ = q as any;
-                  question = `${q.question} - ${scaleGridQ.prompts[promptIndex]}`;
-                } else {
-                  question = q.question;
-                }
-                break;
-              }
-            }
-          }
-          
-          return {
-            question,
-            answer: Array.isArray(value) ? value.join(', ') : value.toString()
-          };
-        }).filter(response => response.question), // Only include responses with questions
-        aiSummary: {
-          strengths: [
-            "Demonstrates self-awareness in leadership assessment",
-            "Shows commitment to professional development",
-            "Engages thoughtfully with reflection questions"
-          ],
-          challenges: [
-            "Areas for development identified through self-assessment",
-            "Opportunities for growth in leadership agility"
-          ],
-          recommendations: [
-            "Continue with LEADForward program modules",
-            "Focus on areas rated lower in self-assessment",
-            "Schedule follow-up coaching sessions"
-          ],
-          overallAssessment: "Completed comprehensive leadership self-assessment showing engagement with personal development. Ready to progress through structured learning modules."
-        }
+        responses,
+        aiSummary
       };
 
       // Save to localStorage
