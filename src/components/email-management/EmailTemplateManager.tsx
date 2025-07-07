@@ -286,12 +286,12 @@ The Learning Team"
               <div className="flex flex-wrap gap-1 mb-4">
                 {template.variables.slice(0, 3).map((variable) => (
                   <Badge key={variable} variant="outline" className="text-xs">
-                    {`{{${variable}}}`}
+                    {variable}
                   </Badge>
                 ))}
                 {template.variables.length > 3 && (
                   <Badge variant="outline" className="text-xs">
-                    +{template.variables.length - 3} more
+                    +{template.variables.length - 3} more variables
                   </Badge>
                 )}
               </div>
