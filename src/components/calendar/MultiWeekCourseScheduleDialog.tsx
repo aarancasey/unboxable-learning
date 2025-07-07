@@ -448,47 +448,129 @@ export const MultiWeekCourseScheduleDialog = ({
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center space-x-2">
-                  <Clock className="h-5 w-5" />
-                  <span>Module Schedule ({moduleSchedules.length} modules)</span>
+                  <Clock className="h-5 w-5 text-blue-600" />
+                  <span>Module Schedule</span>
+                  <Badge variant="secondary" className="ml-2">
+                    {moduleSchedules.length} modules
+                  </Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {moduleSchedules.map((schedule, index) => (
-                    <div key={index} className="p-4 border border-gray-200 rounded-lg">
-                      <div className="flex items-center justify-between mb-3">
-                        <h4 className="font-medium">{schedule.moduleTitle}</h4>
-                        <Badge variant="outline">Week {schedule.weekNumber}</Badge>
+                    <div 
+                      key={index} 
+                      className="group relative bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 rounded-lg p-4 hover:shadow-md transition-all duration-200 animate-fade-in"
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
+                      {/* Week Badge - Top Right */}
+                      <div className="absolute top-3 right-3">
+                        <Badge 
+                          className="bg-blue-600 text-white shadow-sm"
+                          style={{ backgroundColor: `hsl(${220 + (schedule.weekNumber * 15)}, 70%, 50%)` }}
+                        >
+                          Week {schedule.weekNumber}
+                        </Badge>
                       </div>
                       
-                      <div className="grid grid-cols-3 gap-4">
-                        <div>
-                          <Label>Unlock Date</Label>
+                      {/* Module Header */}
+                      <div className="mb-4 pr-20">
+                        <h4 className="font-semibold text-gray-900 text-lg mb-1">
+                          {schedule.moduleTitle}
+                        </h4>
+                        <div className="flex items-center space-x-3 text-sm text-gray-600">
+                          <div className="flex items-center space-x-1">
+                            <div className={`w-2 h-2 rounded-full ${
+                              schedule.moduleType === 'video' ? 'bg-red-400' :
+                              schedule.moduleType === 'document' ? 'bg-green-400' :
+                              schedule.moduleType === 'interactive' ? 'bg-purple-400' :
+                              'bg-blue-400'
+                            }`} />
+                            <span className="capitalize font-medium">{schedule.moduleType}</span>
+                          </div>
+                          <span>•</span>
+                          <span>Module {index + 1}</span>
+                        </div>
+                      </div>
+                      
+                      {/* Schedule Details */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium text-gray-700 flex items-center space-x-1">
+                            <Calendar className="h-3 w-3" />
+                            <span>Unlock Date</span>
+                          </Label>
                           <Input
                             type="date"
                             value={format(schedule.unlockDate, 'yyyy-MM-dd')}
                             onChange={(e) => updateModuleSchedule(index, 'unlockDate', new Date(e.target.value))}
+                            className="bg-white border-gray-300 focus:border-blue-500"
                           />
                         </div>
-                        <div>
-                          <Label>Unlock Time</Label>
+                        
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium text-gray-700 flex items-center space-x-1">
+                            <Clock className="h-3 w-3" />
+                            <span>Unlock Time</span>
+                          </Label>
                           <Input
                             type="time"
                             value={schedule.unlockTime}
                             onChange={(e) => updateModuleSchedule(index, 'unlockTime', e.target.value)}
+                            className="bg-white border-gray-300 focus:border-blue-500"
                           />
                         </div>
-                        <div>
-                          <Label>Email Notification Date</Label>
+                        
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium text-gray-700 flex items-center space-x-1">
+                            <Mail className="h-3 w-3" />
+                            <span>Email Reminder</span>
+                          </Label>
                           <Input
                             type="date"
                             value={format(schedule.emailNotificationDate, 'yyyy-MM-dd')}
                             onChange={(e) => updateModuleSchedule(index, 'emailNotificationDate', new Date(e.target.value))}
+                            className="bg-white border-gray-300 focus:border-blue-500"
                           />
                         </div>
                       </div>
+                      
+                      {/* Visual Timeline Connector */}
+                      {index < moduleSchedules.length - 1 && (
+                        <div className="absolute -bottom-1.5 left-6 w-0.5 h-3 bg-gradient-to-b from-blue-400 to-transparent"></div>
+                      )}
                     </div>
                   ))}
+                </div>
+                
+                {/* Schedule Summary */}
+                <div className="mt-6 p-4 bg-gray-50 rounded-lg border">
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center space-x-4">
+                      <span className="font-medium text-gray-700">Course Duration:</span>
+                      <span className="text-gray-600">
+                        {Math.max(...moduleSchedules.map(s => s.weekNumber))} weeks
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 rounded-full bg-red-400"></div>
+                        <span className="text-xs text-gray-600">Video</span>
+                      </div>
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 rounded-full bg-green-400"></div>
+                        <span className="text-xs text-gray-600">Document</span>
+                      </div>
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 rounded-full bg-purple-400"></div>
+                        <span className="text-xs text-gray-600">Interactive</span>
+                      </div>
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+                        <span className="text-xs text-gray-600">Survey</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
