@@ -10,21 +10,12 @@ import { useAnalytics } from '@/hooks/useAnalytics';
 import LoginForm from '@/components/login/LoginForm';
 
 const Index = () => {
-  console.log('Index component is rendering...'); // Debug log
   const [userRole, setUserRole] = useState<'learner' | 'admin' | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [learnerData, setLearnerData] = useState<any>(null);
   const [showLearnerLogin, setShowLearnerLogin] = useState(false);
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
   const { trackUserLogin, trackPageView } = useAnalytics();
-
-  // Debug logging
-  console.log('Index component state:', {
-    userRole,
-    isAuthenticated,
-    showLearnerLogin,
-    isAdminModalOpen
-  });
 
   const handleLearnerLogin = (userData?: any) => {
     setUserRole('learner');
