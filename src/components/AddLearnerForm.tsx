@@ -38,15 +38,13 @@ const AddLearnerForm = ({ isOpen, onClose, onAddLearner }: AddLearnerFormProps) 
 
     const generatedPassword = generatePassword();
     const newLearner = {
-      id: Date.now(),
       name: formData.name,
       email: formData.email,
       mobile: formData.mobile,
       password: generatedPassword,
       status: 'pending',
       department: 'Customer Service',
-      enrolledDate: new Date().toISOString().split('T')[0],
-      requiresPasswordChange: true,
+      requires_password_change: true,
     };
 
     onAddLearner(newLearner);

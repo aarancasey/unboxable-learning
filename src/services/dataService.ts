@@ -49,7 +49,8 @@ export class DataService {
       console.error('Error adding learner:', error);
       // Fallback to localStorage
       const localLearners = JSON.parse(localStorage.getItem('learners') || '[]');
-      const newLearner = { ...learner, id: Date.now() };
+      const newId = localLearners.length > 0 ? Math.max(...localLearners.map((l: any) => l.id)) + 1 : 1;
+      const newLearner = { ...learner, id: newId };
       localLearners.push(newLearner);
       localStorage.setItem('learners', JSON.stringify(localLearners));
       return newLearner;
