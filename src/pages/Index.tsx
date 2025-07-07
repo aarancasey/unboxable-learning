@@ -10,6 +10,7 @@ import { useAnalytics } from '@/hooks/useAnalytics';
 import LoginForm from '@/components/login/LoginForm';
 
 const Index = () => {
+  console.log('Index component is rendering...'); // Debug log
   const [userRole, setUserRole] = useState<'learner' | 'admin' | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [learnerData, setLearnerData] = useState<any>(null);
