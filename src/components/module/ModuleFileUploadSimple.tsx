@@ -62,15 +62,37 @@ export const ModuleFileUploadSimple = ({
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-    const validFiles = files.filter(validateFile);
+    const totalItems = uploadedFiles.length + googleDocsLinks.length;
+    const remainingSlots = 5 - totalItems;
+    
+    if (remainingSlots <= 0) {
+      toast({
+        title: "Upload limit reached",
+        description: "You can only upload up to 5 items total (files + links).",
+        variant: "destructive"
+      });
+      event.target.value = '';
+      return;
+    }
+    
+    const filesToUpload = files.slice(0, remainingSlots);
+    const validFiles = filesToUpload.filter(validateFile);
     
     if (validFiles.length > 0) {
       setUploadedFiles([...uploadedFiles, ...validFiles]);
       
-      toast({
-        title: "Files uploaded",
-        description: `Successfully uploaded ${validFiles.length} document(s).`,
-      });
+      if (files.length > remainingSlots) {
+        toast({
+          title: "Some files not uploaded",
+          description: `Only ${validFiles.length} file(s) uploaded. Maximum 5 items allowed.`,
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Files uploaded",
+          description: `Successfully uploaded ${validFiles.length} document(s).`,
+        });
+      }
     }
     
     // Reset input
@@ -91,6 +113,16 @@ export const ModuleFileUploadSimple = ({
       toast({
         title: "Invalid URL",
         description: "Please enter a valid Google Docs, Sheets, or Slides URL.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const totalItems = uploadedFiles.length + googleDocsLinks.length;
+    if (totalItems >= 5) {
+      toast({
+        title: "Upload limit reached",
+        description: "You can only upload up to 5 items total (files + links).",
         variant: "destructive"
       });
       return;
@@ -137,9 +169,14 @@ export const ModuleFileUploadSimple = ({
       <CardContent className="p-6">
         <div className="space-y-6">
           <div>
-            <Label className="text-base font-medium">Course Documents</Label>
+            <div className="flex items-center justify-between">
+              <Label className="text-base font-medium">Course Documents</Label>
+              <div className="text-sm text-muted-foreground">
+                {uploadedFiles.length + googleDocsLinks.length}/5 items
+              </div>
+            </div>
             <p className="text-sm text-muted-foreground mt-1">
-              Add supporting materials, resources, and documents for this module
+              Add supporting materials, resources, and documents for this module (maximum 5 items)
             </p>
           </div>
 
@@ -161,6 +198,7 @@ export const ModuleFileUploadSimple = ({
                   variant="outline"
                   size="sm"
                   onClick={() => document.getElementById('file-upload')?.click()}
+                  disabled={uploadedFiles.length + googleDocsLinks.length >= 5}
                 >
                   <Upload className="h-4 w-4 mr-2" />
                   Upload Documents
@@ -192,7 +230,7 @@ export const ModuleFileUploadSimple = ({
                 variant="outline"
                 size="sm"
                 onClick={handleGoogleDocsAdd}
-                disabled={!googleDocsUrl.trim()}
+                disabled={!googleDocsUrl.trim() || uploadedFiles.length + googleDocsLinks.length >= 5}
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Add
