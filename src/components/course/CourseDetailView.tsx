@@ -1,10 +1,12 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Settings } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Plus, Settings, Calendar } from 'lucide-react';
 import { CourseStats } from './CourseStats';
 import { CourseModulesList } from './CourseModulesList';
 import { ModuleForm } from '../ModuleForm';
+import { CourseTimelineView } from '../course-timeline/CourseTimelineView';
 
 interface Course {
   id: number;
@@ -102,7 +104,7 @@ export const CourseDetailView = ({ course, onBack, onCourseUpdate }: CourseDetai
         </div>
         <div className="flex space-x-3">
           <Button variant="outline" onClick={() => setShowTimelineDialog(true)}>
-            <Timeline className="h-4 w-4 mr-2" />
+            <Calendar className="h-4 w-4 mr-2" />
             View Timeline
           </Button>
           <Button variant="outline" onClick={() => setShowAddModuleForm(true)}>
