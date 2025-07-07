@@ -328,35 +328,46 @@ The Learning Team"
 
       {/* Preview Dialog */}
       <Dialog open={!!previewTemplate} onOpenChange={() => setPreviewTemplate(null)}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Template Preview: {previewTemplate?.template_name}</DialogTitle>
+            <DialogTitle>Email Preview: {previewTemplate?.template_name}</DialogTitle>
           </DialogHeader>
           
           {previewTemplate && (
             <div className="space-y-4">
-              <div>
-                <Label className="text-sm font-medium">Subject:</Label>
-                <p className="mt-1 p-2 bg-muted rounded">{previewTemplate.subject_template}</p>
-              </div>
-              
-              <div>
-                <Label className="text-sm font-medium">Content:</Label>
-                <div 
-                  className="mt-1 p-4 bg-muted rounded"
-                  dangerouslySetInnerHTML={{ __html: previewTemplate.content_template }}
-                />
-              </div>
-              
-              <div>
-                <Label className="text-sm font-medium">Variables:</Label>
-                <div className="flex flex-wrap gap-1 mt-1">
-                  {previewTemplate.variables.map((variable) => (
-                    <Badge key={variable} variant="outline">
-                      {`{{${variable}}}`}
-                    </Badge>
-                  ))}
+              <div className="bg-white border rounded-lg p-6 shadow-sm">
+                <div className="mb-4 pb-4 border-b">
+                  <div className="text-sm text-gray-600 mb-1">Subject:</div>
+                  <div className="font-semibold text-gray-900">
+                    {previewTemplate.subject_template
+                      .replace(/\{\{course_name\}\}/g, "Leadership Development Course")
+                      .replace(/\{\{participant_name\}\}/g, "John Smith")
+                      .replace(/\{\{course_start_date\}\}/g, "March 15, 2024")
+                      .replace(/\{\{time_until_start\}\}/g, "2 days")
+                      .replace(/\{\{course_duration\}\}/g, "4 weeks")
+                      .replace(/\{\{course_location\}\}/g, "Online")
+                    }
+                  </div>
                 </div>
+                
+                <div className="prose prose-sm max-w-none">
+                  <div className="whitespace-pre-wrap text-gray-800 leading-relaxed">
+                    {previewTemplate.content_template
+                      .replace(/\{\{course_name\}\}/g, "Leadership Development Course")
+                      .replace(/\{\{participant_name\}\}/g, "John Smith")
+                      .replace(/\{\{course_start_date\}\}/g, "March 15, 2024")
+                      .replace(/\{\{time_until_start\}\}/g, "2 days")
+                      .replace(/\{\{course_duration\}\}/g, "4 weeks")
+                      .replace(/\{\{course_location\}\}/g, "Online")
+                      .replace(/\{\{survey_incomplete\}\}/g, "")
+                      .replace(/\{\{survey_link\}\}/g, "https://example.com/survey")
+                    }
+                  </div>
+                </div>
+              </div>
+              
+              <div className="text-xs text-gray-500 text-center">
+                This is a preview with sample data. Actual emails will use real course information.
               </div>
             </div>
           )}
