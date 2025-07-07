@@ -462,6 +462,7 @@ export type Database = {
         Row: {
           content_template: string
           created_at: string | null
+          html_template: string | null
           id: string
           is_default: boolean | null
           subject_template: string
@@ -473,6 +474,7 @@ export type Database = {
         Insert: {
           content_template: string
           created_at?: string | null
+          html_template?: string | null
           id?: string
           is_default?: boolean | null
           subject_template: string
@@ -484,6 +486,7 @@ export type Database = {
         Update: {
           content_template?: string
           created_at?: string | null
+          html_template?: string | null
           id?: string
           is_default?: boolean | null
           subject_template?: string

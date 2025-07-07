@@ -7,7 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Mail, Edit, Plus, Eye } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Mail, Edit, Plus, Eye, Code, FileText } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { BrandedEmailPreview } from './BrandedEmailPreview';
@@ -18,6 +19,7 @@ interface EmailTemplate {
   template_type: string;
   subject_template: string;
   content_template: string;
+  html_template: string;
   variables: string[];
   is_default: boolean;
 }
@@ -38,6 +40,7 @@ export const EmailTemplateManager = ({ onTemplateSelect }: EmailTemplateManagerP
   const [templateType, setTemplateType] = useState<string>('course_reminder');
   const [subjectTemplate, setSubjectTemplate] = useState('');
   const [contentTemplate, setContentTemplate] = useState('');
+  const [htmlTemplate, setHtmlTemplate] = useState('');
 
   useEffect(() => {
     loadTemplates();
@@ -72,7 +75,8 @@ export const EmailTemplateManager = ({ onTemplateSelect }: EmailTemplateManagerP
       template_type: templateType,
       subject_template: subjectTemplate,
       content_template: contentTemplate,
-      variables: extractVariables(subjectTemplate + ' ' + contentTemplate),
+      html_template: htmlTemplate,
+      variables: extractVariables(subjectTemplate + ' ' + contentTemplate + ' ' + htmlTemplate),
       is_default: false
     };
 
@@ -135,6 +139,7 @@ export const EmailTemplateManager = ({ onTemplateSelect }: EmailTemplateManagerP
     setTemplateType('course_reminder');
     setSubjectTemplate('');
     setContentTemplate('');
+    setHtmlTemplate('');
     setEditingTemplate(null);
     setIsCreateDialogOpen(false);
   };
@@ -144,6 +149,7 @@ export const EmailTemplateManager = ({ onTemplateSelect }: EmailTemplateManagerP
     setTemplateType(template.template_type);
     setSubjectTemplate(template.subject_template);
     setContentTemplate(template.content_template);
+    setHtmlTemplate(template.html_template || '');
     setEditingTemplate(template);
     setIsCreateDialogOpen(true);
   };
@@ -227,19 +233,53 @@ export const EmailTemplateManager = ({ onTemplateSelect }: EmailTemplateManagerP
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="content">Email Message</Label>
-                  <Textarea
-                    value={contentTemplate}
-                    onChange={(e) => setContentTemplate(e.target.value)}
-                    rows={10}
-                    placeholder="Dear {{participant_name}},
+                  <Label htmlFor="content">Email Content</Label>
+                  <Tabs defaultValue="plain" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="plain" className="flex items-center gap-2">
+                        <FileText className="h-4 w-4" />
+                        Plain Text
+                      </TabsTrigger>
+                      <TabsTrigger value="html" className="flex items-center gap-2">
+                        <Code className="h-4 w-4" />
+                        HTML
+                      </TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="plain" className="mt-4">
+                      <Textarea
+                        value={contentTemplate}
+                        onChange={(e) => setContentTemplate(e.target.value)}
+                        rows={10}
+                        placeholder="Dear {{participant_name}},
 
 Welcome to {{course_name}}! Your course starts on {{course_start_date}}.
 
 Best regards,
 The Learning Team"
-                    className="resize-none"
-                  />
+                        className="resize-none"
+                      />
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Plain text version - will be used as fallback for email clients that don't support HTML
+                      </p>
+                    </TabsContent>
+                    <TabsContent value="html" className="mt-4">
+                      <Textarea
+                        value={htmlTemplate}
+                        onChange={(e) => setHtmlTemplate(e.target.value)}
+                        rows={10}
+                        placeholder="<div style='font-family: Arial, sans-serif;'>
+  <h2>Welcome to {{course_name}}!</h2>
+  <p>Dear {{participant_name}},</p>
+  <p>Your course starts on <strong>{{course_start_date}}</strong>.</p>
+  <p>Best regards,<br/>The Learning Team</p>
+</div>"
+                        className="resize-none font-mono text-sm"
+                      />
+                      <p className="text-xs text-muted-foreground mt-2">
+                        HTML version - allows for rich formatting and styling
+                      </p>
+                    </TabsContent>
+                  </Tabs>
                   <p className="text-xs text-muted-foreground">
                     Use {"{{course_name}}"}, {"{{participant_name}}"}, {"{{course_start_date}}"} to personalize your message
                   </p>
