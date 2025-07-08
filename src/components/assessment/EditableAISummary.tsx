@@ -16,6 +16,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { exportToPDF } from '@/lib/pdfExport';
 import { supabase } from '@/integrations/supabase/client';
+import * as XLSX from 'xlsx';
 
 interface EditableAISummaryProps {
   survey: any;
@@ -114,6 +115,62 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
     }
   };
 
+  const handleExportCSV = () => {
+    try {
+      const csvData = survey.responses.map((response: any) => ({
+        Question: response.question,
+        Answer: response.answer
+      }));
+
+      const ws = XLSX.utils.json_to_sheet(csvData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Survey Responses');
+      
+      const filename = `survey-responses-${survey.learner.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.csv`;
+      XLSX.writeFile(wb, filename, { bookType: 'csv' });
+
+      toast({
+        title: "Export Successful",
+        description: "Survey responses exported to CSV.",
+      });
+    } catch (error) {
+      console.error('CSV export failed:', error);
+      toast({
+        title: "Export Failed",
+        description: "Failed to export CSV. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleExportXLS = () => {
+    try {
+      const xlsData = survey.responses.map((response: any) => ({
+        Question: response.question,
+        Answer: response.answer
+      }));
+
+      const ws = XLSX.utils.json_to_sheet(xlsData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Survey Responses');
+      
+      const filename = `survey-responses-${survey.learner.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.xlsx`;
+      XLSX.writeFile(wb, filename, { bookType: 'xlsx' });
+
+      toast({
+        title: "Export Successful",
+        description: "Survey responses exported to Excel.",
+      });
+    } catch (error) {
+      console.error('Excel export failed:', error);
+      toast({
+        title: "Export Failed",
+        description: "Failed to export Excel. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const currentSummary = isEditing ? editedSummary : survey.aiSummary;
 
   return (
@@ -137,35 +194,6 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
             </div>
           </div>
           
-          <div className="flex items-center space-x-2">
-            {!isEditing ? (
-              <>
-                <Button variant="outline" size="sm" onClick={handleEdit}>
-                  <Edit3 className="h-4 w-4 mr-2" />
-                  Edit
-                </Button>
-                <Button variant="outline" size="sm" onClick={handleExportPDF} disabled={isExporting}>
-                  <Download className="h-4 w-4 mr-2" />
-                  {isExporting ? 'Exporting...' : 'Export PDF'}
-                </Button>
-                <Button variant="outline" size="sm" onClick={handleSendEmail} disabled={isSendingEmail}>
-                  <Mail className="h-4 w-4 mr-2" />
-                  {isSendingEmail ? 'Sending...' : 'Email to Learner'}
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button variant="outline" size="sm" onClick={handleCancel}>
-                  <X className="h-4 w-4 mr-2" />
-                  Cancel
-                </Button>
-                <Button size="sm" onClick={handleSave} className="bg-unboxable-navy hover:bg-unboxable-navy/90">
-                  <Save className="h-4 w-4 mr-2" />
-                  Save
-                </Button>
-              </>
-            )}
-          </div>
         </div>
       </CardHeader>
       
@@ -437,6 +465,45 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
               </p>
             )}
           </div>
+        </section>
+
+        {/* Action Buttons */}
+        <section className="flex flex-wrap gap-3 pt-6 border-t border-gray-200">
+          {!isEditing ? (
+            <>
+              <Button variant="outline" onClick={handleEdit}>
+                <Edit3 className="h-4 w-4 mr-2" />
+                Edit Summary
+              </Button>
+              <Button variant="outline" onClick={handleExportPDF} disabled={isExporting}>
+                <Download className="h-4 w-4 mr-2" />
+                {isExporting ? 'Exporting...' : 'Export PDF'}
+              </Button>
+              <Button variant="outline" onClick={handleSendEmail} disabled={isSendingEmail}>
+                <Mail className="h-4 w-4 mr-2" />
+                {isSendingEmail ? 'Sending...' : 'Email to Learner'}
+              </Button>
+              <Button variant="outline" onClick={handleExportCSV}>
+                <FileText className="h-4 w-4 mr-2" />
+                Export CSV
+              </Button>
+              <Button variant="outline" onClick={handleExportXLS}>
+                <FileText className="h-4 w-4 mr-2" />
+                Export Excel
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="outline" onClick={handleCancel}>
+                <X className="h-4 w-4 mr-2" />
+                Cancel
+              </Button>
+              <Button onClick={handleSave} className="bg-unboxable-navy hover:bg-unboxable-navy/90">
+                <Save className="h-4 w-4 mr-2" />
+                Save Changes
+              </Button>
+            </>
+          )}
         </section>
       </CardContent>
     </Card>
