@@ -45,50 +45,59 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
     }
     setSurveyStatus(currentSurveyStatus);
 
-    // Load available courses and separate surveys from learning modules
-    const savedCourses = JSON.parse(localStorage.getItem('courses') || '[]');
-    console.log('Loading courses for learner:', savedCourses);
-    
-    if (savedCourses.length > 0) {
-      const activeCourse = savedCourses.find((course: any) => course.status === 'active');
-      setCurrentCourse(activeCourse);
-      
-      const allModules: any[] = [];
-      const allSurveys: any[] = [];
-      
-      savedCourses.forEach((course: any) => {
-        if (course.status === 'active' && course.moduleList) {
-          course.moduleList.forEach((module: any) => {
-            const moduleData = {
-              ...module,
-              courseId: course.id,
-              courseName: course.title,
-            };
-            
-            if (module.type === 'survey') {
-              // Surveys are always available as pre-requisites
-              allSurveys.push({
-                ...moduleData,
-                unlocked: true,
-                status: 'available'
-              });
-            } else {
-              // Learning modules are locked until survey is approved by admin
-              const shouldUnlock = currentSurveyStatus === 'approved';
-              allModules.push({
-                ...moduleData,
-                unlocked: shouldUnlock,
-                status: shouldUnlock ? 'available' : 'locked',
-                unlockDate: !shouldUnlock ? 'Complete and get survey approved to unlock' : undefined
+    // Load available courses from DataService (Supabase)
+    const loadCoursesFromDatabase = async () => {
+      try {
+        const { DataService } = await import('@/services/dataService');
+        const coursesData = await DataService.getCourses();
+        console.log('Loading courses for learner from database:', coursesData);
+        
+        if (coursesData.length > 0) {
+          const activeCourse = coursesData.find((course: any) => course.status === 'active');
+          setCurrentCourse(activeCourse);
+          
+          const allModules: any[] = [];
+          const allSurveys: any[] = [];
+          
+          coursesData.forEach((course: any) => {
+            if (course.status === 'active' && course.module_list) {
+              course.module_list.forEach((module: any) => {
+                const moduleData = {
+                  ...module,
+                  courseId: course.id,
+                  courseName: course.title,
+                };
+                
+                if (module.type === 'survey') {
+                  // Surveys are always available as pre-requisites
+                  allSurveys.push({
+                    ...moduleData,
+                    unlocked: true,
+                    status: 'available'
+                  });
+                } else {
+                  // Learning modules are locked until survey is approved by admin
+                  const shouldUnlock = currentSurveyStatus === 'approved';
+                  allModules.push({
+                    ...moduleData,
+                    unlocked: shouldUnlock,
+                    status: shouldUnlock ? 'available' : 'locked',
+                    unlockDate: !shouldUnlock ? 'Complete and get survey approved to unlock' : undefined
+                  });
+                }
               });
             }
           });
+          
+          setAvailableModules(allModules);
+          setSurveyModules(allSurveys);
         }
-      });
-      
-      setAvailableModules(allModules);
-      setSurveyModules(allSurveys);
-    }
+      } catch (error) {
+        console.error('Error loading courses:', error);
+      }
+    };
+
+    loadCoursesFromDatabase();
   }, [learnerData]);
 
   // Default empty data structure if no learner data provided
