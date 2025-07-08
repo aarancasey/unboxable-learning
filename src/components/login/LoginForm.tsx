@@ -14,7 +14,7 @@ const LoginForm = ({ role, onLogin }: LoginFormProps) => {
   const [credentials, setCredentials] = useState({ email: '', password: '' });
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (role === 'admin') {
@@ -42,50 +42,69 @@ const LoginForm = ({ role, onLogin }: LoginFormProps) => {
       return;
     }
 
-    // Get learners from localStorage
-    const storedLearners = localStorage.getItem('learners');
-    const learners = storedLearners ? JSON.parse(storedLearners) : [];
-    
-    // Find learner by email
-    const learner = learners.find((l: any) => l.email.toLowerCase() === credentials.email.toLowerCase());
-    
-    if (!learner) {
-      toast({
-        title: "Learner Not Found",
-        description: "No learner found with this email address",
-        variant: "destructive",
-      });
-      return;
-    }
+    try {
+      // Get learners from DataService (checks both Supabase and localStorage)
+      const { DataService } = await import('@/services/dataService');
+      const learners = await DataService.getLearners();
+      
+      // Find learner by email
+      const learner = learners.find((l: any) => l.email.toLowerCase() === credentials.email.toLowerCase());
+      
+      if (!learner) {
+        toast({
+          title: "Learner Not Found",
+          description: "No learner found with this email address",
+          variant: "destructive",
+        });
+        return;
+      }
 
-    // Check if learner requires password change (first time login)
-    if (learner.requiresPasswordChange) {
-      // For first-time login, just email is enough
+      // Check if learner is active
+      if (learner.status !== 'active') {
+        toast({
+          title: "Account Inactive",
+          description: "Your account is not active. Please contact support.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Check if learner requires password change (first time login)
+      if (learner.requires_password_change || learner.requiresPasswordChange) {
+        // For first-time login, just email is enough
+        onLogin(learner);
+        return;
+      }
+
+      // For returning users, check password
+      if (!credentials.password) {
+        toast({
+          title: "Password Required",
+          description: "Please enter your password",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (credentials.password !== learner.password) {
+        toast({
+          title: "Invalid Password",
+          description: "The password you entered is incorrect",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Successful login
       onLogin(learner);
-      return;
-    }
-
-    // For returning users, check password
-    if (!credentials.password) {
+    } catch (error) {
+      console.error('Login error:', error);
       toast({
-        title: "Password Required",
-        description: "Please enter your password",
+        title: "Login Error",
+        description: "An error occurred during login. Please try again.",
         variant: "destructive",
       });
-      return;
     }
-
-    if (credentials.password !== learner.password) {
-      toast({
-        title: "Invalid Password",
-        description: "The password you entered is incorrect",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Successful login
-    onLogin(learner);
   };
 
   const isLearner = role === 'learner';
@@ -121,15 +140,10 @@ const LoginForm = ({ role, onLogin }: LoginFormProps) => {
         </div>
       )}
 
-      {/* Show password field for learners who don't require password change */}
-      {isLearner && credentials.email && (() => {
-        const storedLearners = localStorage.getItem('learners');
-        const learners = storedLearners ? JSON.parse(storedLearners) : [];
-        const learner = learners.find((l: any) => l.email.toLowerCase() === credentials.email.toLowerCase());
-        return learner && !learner.requiresPasswordChange;
-      })() && (
+      {/* Show password field for learners - simplified since we handle logic in submit */}
+      {isLearner && (
         <div>
-          <Label htmlFor="password" className="text-unboxable-navy">Password</Label>
+          <Label htmlFor="password" className="text-unboxable-navy">Password (if not first time login)</Label>
           <Input
             id="password"
             type="password"
@@ -137,8 +151,8 @@ const LoginForm = ({ role, onLogin }: LoginFormProps) => {
             value={credentials.password}
             onChange={(e) => setCredentials(prev => ({ ...prev, password: e.target.value }))}
             className="border-slate-300 focus:border-unboxable-navy focus:ring-unboxable-navy"
-            required
           />
+          <p className="text-sm text-gray-600 mt-1">Leave blank for first-time login</p>
         </div>
       )}
 
