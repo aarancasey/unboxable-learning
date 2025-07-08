@@ -169,6 +169,39 @@ export class DataService {
     }
   }
 
+  static async updateCourse(id: number, updates: any) {
+    try {
+      const { data, error } = await supabase
+        .from('courses')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Also update localStorage as backup
+      const localCourses = JSON.parse(localStorage.getItem('courses') || '[]');
+      const index = localCourses.findIndex((c: any) => c.id === id);
+      if (index !== -1) {
+        localCourses[index] = { ...localCourses[index], ...updates };
+        localStorage.setItem('courses', JSON.stringify(localCourses));
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error updating course:', error);
+      // Fallback to localStorage
+      const localCourses = JSON.parse(localStorage.getItem('courses') || '[]');
+      const index = localCourses.findIndex((c: any) => c.id === id);
+      if (index !== -1) {
+        localCourses[index] = { ...localCourses[index], ...updates };
+        localStorage.setItem('courses', JSON.stringify(localCourses));
+      }
+      return localCourses[index];
+    }
+  }
+
   // Survey submissions management
   static async getSurveySubmissions() {
     try {

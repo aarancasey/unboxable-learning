@@ -33,7 +33,7 @@ export const CourseDetailView = ({ course, onBack, onCourseUpdate }: CourseDetai
   const [showTimelineDialog, setShowTimelineDialog] = useState(false);
   const [currentCourse, setCurrentCourse] = useState(course);
 
-  const handleModuleUpdate = (moduleId: number, updatedModule: any) => {
+  const handleModuleUpdate = async (moduleId: number, updatedModule: any) => {
     console.log('Module updated:', moduleId, updatedModule);
     // Update the module in the course
     const updatedModules = currentCourse.moduleList.map(module => 
@@ -47,12 +47,15 @@ export const CourseDetailView = ({ course, onBack, onCourseUpdate }: CourseDetai
     
     setCurrentCourse(updatedCourse);
     
-    // Update in localStorage
-    const savedCourses = JSON.parse(localStorage.getItem('courses') || '[]');
-    const updatedCourses = savedCourses.map((c: any) => 
-      c.id === course.id ? updatedCourse : c
-    );
-    localStorage.setItem('courses', JSON.stringify(updatedCourses));
+    try {
+      // Update the course in Supabase with new module list
+      const { DataService } = await import('@/services/dataService');
+      await DataService.updateCourse(course.id, { module_list: updatedModules });
+      
+      console.log('Course updated successfully in database');
+    } catch (error) {
+      console.error('Failed to update course in database:', error);
+    }
     
     // Notify parent component if callback provided
     if (onCourseUpdate) {
