@@ -205,6 +205,31 @@ export class DataService {
     }
   }
 
+  static async deleteCourse(id: number) {
+    try {
+      const { error } = await supabase
+        .from('courses')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      // Also update localStorage as backup
+      const localCourses = JSON.parse(localStorage.getItem('courses') || '[]');
+      const filtered = localCourses.filter((c: any) => c.id !== id);
+      localStorage.setItem('courses', JSON.stringify(filtered));
+
+      return true;
+    } catch (error) {
+      console.error('Error deleting course:', error);
+      // Fallback to localStorage
+      const localCourses = JSON.parse(localStorage.getItem('courses') || '[]');
+      const filtered = localCourses.filter((c: any) => c.id !== id);
+      localStorage.setItem('courses', JSON.stringify(filtered));
+      return true;
+    }
+  }
+
   // Survey submissions management
   static async getSurveySubmissions() {
     try {

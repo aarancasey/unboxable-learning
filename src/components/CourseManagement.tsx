@@ -70,6 +70,20 @@ const CourseManagement = () => {
     }
   };
 
+  const handleDeleteCourse = async (courseId: number) => {
+    try {
+      const { DataService } = await import('@/services/dataService');
+      await DataService.deleteCourse(courseId);
+      
+      // Reload courses to reflect changes
+      await loadCourses();
+      
+      console.log('Course deleted successfully');
+    } catch (error) {
+      console.error('Error deleting course:', error);
+    }
+  };
+
   const handleCourseUpdate = async () => {
     // Reload courses after update
     await loadCourses();
@@ -101,6 +115,7 @@ const CourseManagement = () => {
                 key={course.id}
                 course={course}
                 onSelect={setSelectedCourse}
+                onDelete={handleDeleteCourse}
               />
             ))}
           </div>
