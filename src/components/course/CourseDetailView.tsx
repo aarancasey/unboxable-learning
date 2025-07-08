@@ -12,14 +12,19 @@ interface Course {
   id: number;
   title: string;
   description: string;
-  modules: number;
-  maxEnrollment: number;
-  enrolledUsers: number;
-  completionRate: number;
+  modules?: number;
+  maxEnrollment?: number;
+  max_enrollment?: number;
+  enrolledUsers?: number;
+  enrolled_count?: number;
+  completionRate?: number;
   status: string;
-  createdDate: string;
-  estimatedDuration: string;
-  moduleList: any[];
+  createdDate?: string;
+  created_at?: string;
+  estimatedDuration?: string;
+  duration?: string;
+  moduleList?: any[];
+  module_list?: any[];
 }
 
 interface CourseDetailViewProps {
@@ -35,14 +40,19 @@ export const CourseDetailView = ({ course, onBack, onCourseUpdate }: CourseDetai
 
   const handleModuleUpdate = async (moduleId: number, updatedModule: any) => {
     console.log('Module updated:', moduleId, updatedModule);
+    
+    // Use the correct module list property (module_list from DB or moduleList for legacy)
+     const moduleList = (currentCourse as any).module_list || currentCourse.moduleList || [];
+    
     // Update the module in the course
-    const updatedModules = currentCourse.moduleList.map(module => 
+    const updatedModules = moduleList.map((module: any) => 
       module.id === moduleId ? { ...module, ...updatedModule } : module
     );
     
     const updatedCourse = {
       ...currentCourse,
-      moduleList: updatedModules
+      module_list: updatedModules,
+      moduleList: updatedModules // Keep both for compatibility
     };
     
     setCurrentCourse(updatedCourse);
@@ -65,12 +75,17 @@ export const CourseDetailView = ({ course, onBack, onCourseUpdate }: CourseDetai
 
   const handleModuleDelete = (moduleId: number) => {
     console.log('Module deleted:', moduleId);
+    
+    // Use the correct module list property
+     const moduleList = (currentCourse as any).module_list || currentCourse.moduleList || [];
+    
     // Remove the module from the course
-    const updatedModules = currentCourse.moduleList.filter(module => module.id !== moduleId);
+    const updatedModules = moduleList.filter((module: any) => module.id !== moduleId);
     
     const updatedCourse = {
       ...currentCourse,
-      moduleList: updatedModules,
+      module_list: updatedModules,
+      moduleList: updatedModules, // Keep both for compatibility
       modules: updatedModules.length
     };
     
@@ -96,10 +111,14 @@ export const CourseDetailView = ({ course, onBack, onCourseUpdate }: CourseDetai
       status: 'active'
     };
 
-    const updatedModules = [...currentCourse.moduleList, newModule];
+    // Use the correct module list property
+    const moduleList = (currentCourse as any).module_list || currentCourse.moduleList || [];
+    
+    const updatedModules = [...moduleList, newModule];
     const updatedCourse = {
       ...currentCourse,
-      moduleList: updatedModules,
+      module_list: updatedModules,
+      moduleList: updatedModules, // Keep both for compatibility
       modules: updatedModules.length
     };
     
@@ -149,16 +168,16 @@ export const CourseDetailView = ({ course, onBack, onCourseUpdate }: CourseDetai
 
       {/* Course Stats */}
       <CourseStats
-        modules={currentCourse.modules}
-        enrolledUsers={currentCourse.enrolledUsers}
-        maxEnrollment={currentCourse.maxEnrollment}
-        completionRate={currentCourse.completionRate}
-        estimatedDuration={currentCourse.estimatedDuration}
-      />
+         modules={currentCourse.modules || ((currentCourse as any).module_list || currentCourse.moduleList || []).length}
+         enrolledUsers={currentCourse.enrolledUsers || (currentCourse as any).enrolled_count || 0}
+         maxEnrollment={currentCourse.maxEnrollment || (currentCourse as any).max_enrollment || 20}
+         completionRate={currentCourse.completionRate || 0}
+         estimatedDuration={currentCourse.estimatedDuration || (currentCourse as any).duration || 'N/A'}
+       />
 
-      {/* Modules List */}
-      <CourseModulesList 
-        modules={currentCourse.moduleList.filter((module: any) => module.type !== 'survey')} 
+       {/* Modules List */}
+       <CourseModulesList 
+         modules={((currentCourse as any).module_list || currentCourse.moduleList || []).filter((module: any) => module.type !== 'survey')}
         onModuleUpdate={handleModuleUpdate}
         onModuleDelete={handleModuleDelete}
       />
