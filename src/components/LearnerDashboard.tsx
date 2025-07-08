@@ -32,18 +32,38 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
       setShowPasswordModal(true);
     }
 
-    // Check survey status
-    const surveySubmissions = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
-    const hasSurveyCompleted = surveySubmissions.length > 0;
+    // Check survey status from database
+    const checkSurveyStatus = async () => {
+      try {
+        const { DataService } = await import('@/services/dataService');
+        const surveySubmissions = await DataService.getSurveySubmissions();
+        const hasSurveyCompleted = surveySubmissions.length > 0;
+        
+        let currentSurveyStatus: 'not_started' | 'completed' | 'approved' = 'not_started';
+        if (hasSurveyCompleted && adminApproval) {
+          currentSurveyStatus = 'approved';
+        } else if (hasSurveyCompleted) {
+          currentSurveyStatus = 'completed';
+        }
+        setSurveyStatus(currentSurveyStatus);
+      } catch (error) {
+        console.error('Failed to check survey status:', error);
+        // Fallback to localStorage
+        const surveySubmissions = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
+        const hasSurveyCompleted = surveySubmissions.length > 0;
+        
+        let currentSurveyStatus: 'not_started' | 'completed' | 'approved' = 'not_started';
+        if (hasSurveyCompleted && adminApproval) {
+          currentSurveyStatus = 'approved';
+        } else if (hasSurveyCompleted) {
+          currentSurveyStatus = 'completed';
+        }
+        setSurveyStatus(currentSurveyStatus);
+      }
+    };
+
     const adminApproval = localStorage.getItem('surveyApproved') === 'true';
-    
-    let currentSurveyStatus: 'not_started' | 'completed' | 'approved' = 'not_started';
-    if (hasSurveyCompleted && adminApproval) {
-      currentSurveyStatus = 'approved';
-    } else if (hasSurveyCompleted) {
-      currentSurveyStatus = 'completed';
-    }
-    setSurveyStatus(currentSurveyStatus);
+    checkSurveyStatus();
 
     // Load available courses from DataService (Supabase)
     const loadCoursesFromDatabase = async () => {
@@ -77,7 +97,7 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
                   });
                 } else {
                   // Learning modules are locked until survey is approved by admin
-                  const shouldUnlock = currentSurveyStatus === 'approved';
+                  const shouldUnlock = surveyStatus === 'approved';
                   allModules.push({
                     ...moduleData,
                     unlocked: shouldUnlock,

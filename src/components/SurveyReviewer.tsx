@@ -25,10 +25,22 @@ const SurveyReviewer = () => {
   const [filter, setFilter] = useState('all');
   const [storedSurveys, setStoredSurveys] = useState<any[]>([]);
 
-  // Load surveys from localStorage on component mount
+  // Load surveys from Supabase database on component mount
   useEffect(() => {
-    const savedSurveys = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
-    setStoredSurveys(savedSurveys);
+    const loadSurveys = async () => {
+      try {
+        const { DataService } = await import('@/services/dataService');
+        const surveys = await DataService.getSurveySubmissions();
+        setStoredSurveys(surveys);
+      } catch (error) {
+        console.error('Failed to load surveys:', error);
+        // Fallback to localStorage
+        const savedSurveys = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
+        setStoredSurveys(savedSurveys);
+      }
+    };
+    
+    loadSurveys();
   }, []);
 
   const getStatusBadge = (status: string) => {

@@ -114,10 +114,17 @@ const SurveyForm = ({ onBack, onSubmit }: SurveyFormProps) => {
         aiSummary
       };
 
-      // Save to localStorage
-      const existingSurveys = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
-      existingSurveys.push(surveySubmission);
-      localStorage.setItem('surveySubmissions', JSON.stringify(existingSurveys));
+      // Save to Supabase database
+      try {
+        const { DataService } = await import('@/services/dataService');
+        await DataService.addSurveySubmission(surveySubmission);
+      } catch (error) {
+        console.error('Failed to save survey submission:', error);
+        // Fallback to localStorage
+        const existingSurveys = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
+        existingSurveys.push(surveySubmission);
+        localStorage.setItem('surveySubmissions', JSON.stringify(existingSurveys));
+      }
 
       onSubmit();
     }
