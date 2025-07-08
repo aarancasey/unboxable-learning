@@ -102,7 +102,14 @@ const SurveyForm = ({ onBack, onSubmit }: SurveyFormProps) => {
         console.error('Failed to generate AI summary:', error);
       }
       
-      // Create survey submission object
+      // Create survey submission object for database (matching schema)
+      const surveySubmissionForDB = {
+        learner_name: "Current User", // In real app, this would come from auth
+        responses,
+        status: "pending"
+      };
+
+      // Create full survey submission object for localStorage fallback
       const surveySubmission = {
         id: Date.now(), // Simple ID generation
         title: survey.title,
@@ -117,7 +124,7 @@ const SurveyForm = ({ onBack, onSubmit }: SurveyFormProps) => {
       // Save to Supabase database
       try {
         const { DataService } = await import('@/services/dataService');
-        await DataService.addSurveySubmission(surveySubmission);
+        await DataService.addSurveySubmission(surveySubmissionForDB);
       } catch (error) {
         console.error('Failed to save survey submission:', error);
         // Fallback to localStorage
