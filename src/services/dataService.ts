@@ -176,16 +176,18 @@ export class DataService {
         .update(updates)
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle(); // Use maybeSingle instead of single
 
       if (error) throw error;
 
-      // Also update localStorage as backup
-      const localCourses = JSON.parse(localStorage.getItem('courses') || '[]');
-      const index = localCourses.findIndex((c: any) => c.id === id);
-      if (index !== -1) {
-        localCourses[index] = { ...localCourses[index], ...updates };
-        localStorage.setItem('courses', JSON.stringify(localCourses));
+      // Also update localStorage as backup if we got data back
+      if (data) {
+        const localCourses = JSON.parse(localStorage.getItem('courses') || '[]');
+        const index = localCourses.findIndex((c: any) => c.id === id);
+        if (index !== -1) {
+          localCourses[index] = { ...localCourses[index], ...updates };
+          localStorage.setItem('courses', JSON.stringify(localCourses));
+        }
       }
 
       return data;
@@ -197,8 +199,9 @@ export class DataService {
       if (index !== -1) {
         localCourses[index] = { ...localCourses[index], ...updates };
         localStorage.setItem('courses', JSON.stringify(localCourses));
+        return localCourses[index];
       }
-      return localCourses[index];
+      throw error; // Re-throw if no fallback possible
     }
   }
 
