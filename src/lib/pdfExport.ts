@@ -15,7 +15,7 @@ export const exportToPDF = async (survey: any, filename: string = 'assessment') 
     // Add Unboxable branding and content
     tempDiv.innerHTML = `
       <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #2B4A7C; padding-bottom: 20px;">
-        <img src="/lovable-uploads/c8eb7e6b-35a2-4f41-a9d7-c1dd08c9b30b.png" alt="Unboxable Logo" style="height: 40px; margin-bottom: 10px;" />
+        <img src="/lovable-uploads/c8eb7e6b-35a2-4f41-a9d7-c1dd08c9b30b.png" alt="Unboxable Logo" style="height: 28px; margin-bottom: 10px;" />
         <h1 style="color: #2B4A7C; margin: 10px 0; font-size: 24px;">Leadership Assessment Summary</h1>
         <p style="color: #666; margin: 0; font-size: 14px;">Comprehensive analysis of leadership capabilities and development opportunities</p>
       </div>

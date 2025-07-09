@@ -181,7 +181,7 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
             <img 
               src="/lovable-uploads/c8eb7e6b-35a2-4f41-a9d7-c1dd08c9b30b.png" 
               alt="Unboxable Logo" 
-              className="h-8 w-auto"
+              className="h-6 w-auto"
             />
             <div>
               <CardTitle className="flex items-center space-x-3">
