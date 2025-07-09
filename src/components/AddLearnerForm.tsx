@@ -17,6 +17,7 @@ const AddLearnerForm = ({ isOpen, onClose, onAddLearner }: AddLearnerFormProps) 
     name: '',
     email: '',
     mobile: '',
+    department: '',
   });
   const { toast } = useToast();
 
@@ -27,7 +28,7 @@ const AddLearnerForm = ({ isOpen, onClose, onAddLearner }: AddLearnerFormProps) 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.email || !formData.mobile) {
+    if (!formData.name || !formData.email || !formData.mobile || !formData.department) {
       toast({
         title: "Error",
         description: "Please fill in all fields",
@@ -43,7 +44,7 @@ const AddLearnerForm = ({ isOpen, onClose, onAddLearner }: AddLearnerFormProps) 
       mobile: formData.mobile,
       password: generatedPassword,
       status: 'pending',
-      department: 'Customer Service',
+      department: formData.department,
       requires_password_change: true,
     };
 
@@ -55,7 +56,7 @@ const AddLearnerForm = ({ isOpen, onClose, onAddLearner }: AddLearnerFormProps) 
     });
 
     // Reset form and close modal
-    setFormData({ name: '', email: '', mobile: '' });
+    setFormData({ name: '', email: '', mobile: '', department: '' });
     onClose();
   };
 
@@ -102,6 +103,18 @@ const AddLearnerForm = ({ isOpen, onClose, onAddLearner }: AddLearnerFormProps) 
               value={formData.mobile}
               onChange={(e) => handleInputChange('mobile', e.target.value)}
               placeholder="Enter mobile number"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="department">Department</Label>
+            <Input
+              id="department"
+              type="text"
+              value={formData.department}
+              onChange={(e) => handleInputChange('department', e.target.value)}
+              placeholder="Enter department"
               required
             />
           </div>
