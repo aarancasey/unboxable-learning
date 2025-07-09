@@ -41,7 +41,7 @@ const LearnerHeader = ({ learnerName, onLogout, clientLogo, courseName }: Learne
               
               {/* Unboxable Logo */}
               <img 
-                src="/lovable-uploads/d0544c04-760a-4cf9-824c-612e5ef4aeaa.png" 
+                src="/lovable-uploads/c8eb7e6b-35a2-4f41-a9d7-c1dd08c9b30b.png" 
                 alt="Unboxable" 
                 className="h-6 sm:h-8"
               />
