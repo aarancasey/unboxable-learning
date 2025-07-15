@@ -31,15 +31,24 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
 
   React.useEffect(() => {
     if (isOpen) {
+      console.log('Modal opened, fetching categories...');
       fetchCategories();
     }
   }, [isOpen]);
 
   const fetchCategories = async () => {
+    // Check authentication status
+    const { data: { user } } = await supabase.auth.getUser();
+    console.log('Current user:', user);
+    console.log('User is authenticated:', !!user);
+    
     const { data, error } = await supabase
       .from('content_categories')
       .select('*')
       .order('name');
+    
+    console.log('Categories response:', { data, error });
+    console.log('Categories count:', data?.length || 0);
     
     if (error) {
       console.error('Error fetching categories:', error);
@@ -49,7 +58,10 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
         variant: "destructive"
       });
     } else if (data) {
+      console.log('Setting categories:', data);
       setCategories(data);
+    } else {
+      console.log('No categories data received');
     }
   };
 
