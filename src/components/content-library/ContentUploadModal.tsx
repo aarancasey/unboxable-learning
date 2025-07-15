@@ -104,7 +104,7 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.title || !formData.content_type || !formData.category_id || !formData.extracted_content) {
+    if (!formData.title || !formData.content_type || !formData.extracted_content) {
       toast({
         title: "Missing required fields",
         description: "Please fill in all required fields",
@@ -135,7 +135,7 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
         .insert({
           title: formData.title,
           content_type: formData.content_type,
-          category_id: formData.category_id,
+          category_id: formData.category_id || null,
           extracted_content: formData.extracted_content,
           tags: formData.tags,
           file_url: fileUrl,
@@ -230,7 +230,7 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
             </div>
 
             <div>
-              <Label htmlFor="category_id">Category *</Label>
+              <Label htmlFor="category_id">Category (optional)</Label>
               <Select value={formData.category_id} onValueChange={(value) => setFormData(prev => ({ ...prev, category_id: value }))}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select category" />
