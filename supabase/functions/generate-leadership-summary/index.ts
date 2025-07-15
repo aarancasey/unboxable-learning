@@ -1,12 +1,65 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.2';
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Function to fetch relevant content from the library
+async function fetchContentLibrary() {
+  try {
+    const { data: contentData, error } = await supabase
+      .from('content_library')
+      .select(`
+        title,
+        content_type,
+        extracted_content,
+        tags,
+        content_categories (
+          name,
+          framework_section
+        )
+      `)
+      .eq('is_active', true);
+
+    if (error) {
+      console.error('Error fetching content library:', error);
+      return '';
+    }
+
+    if (!contentData || contentData.length === 0) {
+      return 'No additional content library available.';
+    }
+
+    // Format content for AI consumption
+    const formattedContent = contentData.map(item => {
+      const category = item.content_categories?.name || 'General';
+      const section = item.content_categories?.framework_section || 'general';
+      
+      return `
+=== ${item.title} (${item.content_type}) ===
+Category: ${category} (${section})
+Tags: ${item.tags?.join(', ') || 'None'}
+
+Content:
+${item.extracted_content}
+`;
+    }).join('\n');
+
+    return formattedContent;
+  } catch (error) {
+    console.error('Error in fetchContentLibrary:', error);
+    return 'Content library temporarily unavailable.';
+  }
+}
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -17,8 +70,17 @@ serve(async (req) => {
   try {
     const { surveyResponses, surveyTitle } = await req.json();
 
-    // Build comprehensive prompt based on LEADForward framework
+    // Fetch relevant content from the content library
+    const contentLibraryData = await fetchContentLibrary();
+
+    // Build comprehensive prompt enhanced with content library
     const prompt = `As a professional leadership development expert, analyze the following survey responses and create a comprehensive leadership assessment summary following the LEADForward framework structure. The summary should be professional, personalized, and actionable.
+
+IMPORTANT: Use the provided content library below to enhance your analysis with specific frameworks, methodologies, and assessment criteria. Reference and apply the relevant content to make the assessment more accurate and valuable.
+
+=== CONTENT LIBRARY ===
+${contentLibraryData}
+=== END CONTENT LIBRARY ===
 
 Survey Title: ${surveyTitle}
 Survey Responses:

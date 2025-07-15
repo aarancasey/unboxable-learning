@@ -16,7 +16,8 @@ import {
   AlertCircle,
   Settings,
   Eye,
-  ArrowLeft
+  ArrowLeft,
+  Library
 } from 'lucide-react';
 import UserManagement from './UserManagement';
 import CourseManagement from './CourseManagement';
@@ -25,6 +26,7 @@ import { CalendarView } from './calendar/CalendarView';
 import AnalyticsDashboard from './analytics/AnalyticsDashboard';
 import EmailTestModal from './EmailTestModal';
 import { EmailTemplateManager } from './email-management/EmailTemplateManager';
+import { ContentLibraryManager } from './content-library/ContentLibraryManager';
 import { DataService } from '@/services/dataService';
 
 interface AdminDashboardProps {
@@ -106,11 +108,12 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 h-auto p-1">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 h-auto p-1">
             <TabsTrigger value="overview" className="text-xs sm:text-sm px-2 py-2">Overview</TabsTrigger>
             <TabsTrigger value="users" className="text-xs sm:text-sm px-2 py-2">Users</TabsTrigger>
             <TabsTrigger value="courses" className="text-xs sm:text-sm px-2 py-2">Courses</TabsTrigger>
             <TabsTrigger value="surveys" className="text-xs sm:text-sm px-2 py-2">Surveys</TabsTrigger>
+            <TabsTrigger value="content-library" className="text-xs sm:text-sm px-2 py-2">Content Library</TabsTrigger>
             <TabsTrigger value="calendar" className="text-xs sm:text-sm px-2 py-2">Calendar</TabsTrigger>
             <TabsTrigger value="emails" className="text-xs sm:text-sm px-2 py-2">Email Templates</TabsTrigger>
             <TabsTrigger value="analytics" className="text-xs sm:text-sm px-2 py-2">Analytics</TabsTrigger>
@@ -241,6 +244,10 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
 
           <TabsContent value="surveys">
             <SurveyReviewer />
+          </TabsContent>
+
+          <TabsContent value="content-library">
+            <ContentLibraryManager />
           </TabsContent>
 
           <TabsContent value="calendar">

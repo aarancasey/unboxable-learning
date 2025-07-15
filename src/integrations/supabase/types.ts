@@ -56,6 +56,54 @@ export type Database = {
         }
         Relationships: []
       }
+      assessment_rubrics: {
+        Row: {
+          category_id: string | null
+          content_library_id: string | null
+          created_at: string
+          criteria: Json
+          id: string
+          name: string
+          scoring_scale: Json
+          updated_at: string
+        }
+        Insert: {
+          category_id?: string | null
+          content_library_id?: string | null
+          created_at?: string
+          criteria: Json
+          id?: string
+          name: string
+          scoring_scale: Json
+          updated_at?: string
+        }
+        Update: {
+          category_id?: string | null
+          content_library_id?: string | null
+          created_at?: string
+          criteria?: Json
+          id?: string
+          name?: string
+          scoring_scale?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessment_rubrics_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "content_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assessment_rubrics_content_library_id_fkey"
+            columns: ["content_library_id"]
+            isOneToOne: false
+            referencedRelation: "content_library"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blog_posts: {
         Row: {
           author: string
@@ -218,6 +266,113 @@ export type Database = {
           subtitle?: string | null
           title?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      content_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          framework_section: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          framework_section?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          framework_section?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      content_library: {
+        Row: {
+          category_id: string | null
+          content_type: string
+          created_at: string
+          extracted_content: string
+          file_url: string | null
+          id: string
+          is_active: boolean | null
+          metadata: Json | null
+          original_filename: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+          version: number | null
+        }
+        Insert: {
+          category_id?: string | null
+          content_type: string
+          created_at?: string
+          extracted_content: string
+          file_url?: string | null
+          id?: string
+          is_active?: boolean | null
+          metadata?: Json | null
+          original_filename?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          version?: number | null
+        }
+        Update: {
+          category_id?: string | null
+          content_type?: string
+          created_at?: string
+          extracted_content?: string
+          file_url?: string | null
+          id?: string
+          is_active?: boolean | null
+          metadata?: Json | null
+          original_filename?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          version?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_library_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "content_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      content_tags: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
         }
         Relationships: []
       }
