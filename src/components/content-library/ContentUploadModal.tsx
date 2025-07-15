@@ -6,7 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Upload, X, FileText } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Upload, X, FileText, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -27,6 +28,8 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
   const [categories, setCategories] = useState<any[]>([]);
   const [currentTag, setCurrentTag] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [autoGenerateRubrics, setAutoGenerateRubrics] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { toast } = useToast();
 
   React.useEffect(() => {
@@ -101,6 +104,52 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
     }));
   };
 
+  const analyzeDocumentContent = async () => {
+    if (!formData.extracted_content) {
+      toast({
+        title: "No content to analyze",
+        description: "Please add content text before generating rubrics",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsAnalyzing(true);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('analyze-document-content', {
+        body: {
+          extractedContent: formData.extracted_content,
+          documentTitle: formData.title || 'Leadership Assessment Document'
+        }
+      });
+
+      if (error) throw error;
+
+      if (data.success) {
+        toast({
+          title: "AI Analysis Complete",
+          description: data.message,
+          duration: 5000
+        });
+        
+        // Refresh categories list
+        await fetchCategories();
+      } else {
+        throw new Error(data.error || 'Analysis failed');
+      }
+    } catch (error: any) {
+      console.error('Document analysis error:', error);
+      toast({
+        title: "Analysis failed",
+        description: error.message || "Failed to analyze document content",
+        variant: "destructive"
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -129,6 +178,11 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
         fileUrl = uploadData.path;
       }
 
+      // If auto-generate is enabled, analyze content first
+      if (autoGenerateRubrics && !isAnalyzing) {
+        await analyzeDocumentContent();
+      }
+
       // Save to content library
       const { error } = await supabase
         .from('content_library')
@@ -144,9 +198,13 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
 
       if (error) throw error;
 
+      const successMessage = autoGenerateRubrics 
+        ? "Content uploaded and assessment rubrics generated successfully"
+        : "Content uploaded successfully";
+
       toast({
-        title: "Content uploaded successfully",
-        description: "Your content has been added to the library"
+        title: "Upload completed",
+        description: successMessage
       });
 
       // Reset form
@@ -158,6 +216,7 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
         tags: []
       });
       setFile(null);
+      setAutoGenerateRubrics(false);
       onClose();
 
     } catch (error: any) {
@@ -260,6 +319,56 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
               </p>
             </div>
 
+            <div className="space-y-4">
+              <div className="flex items-start space-x-3 p-4 bg-gradient-to-r from-primary/5 to-accent/5 rounded-lg border border-primary/20">
+                <Checkbox
+                  id="auto-generate"
+                  checked={autoGenerateRubrics}
+                  onCheckedChange={(checked) => setAutoGenerateRubrics(checked as boolean)}
+                />
+                <div className="space-y-1 leading-none">
+                  <Label 
+                    htmlFor="auto-generate" 
+                    className="flex items-center gap-2 text-sm font-medium cursor-pointer"
+                  >
+                    <Sparkles className="h-4 w-4 text-primary" />
+                    Auto-generate Assessment Rubrics & Categories
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    AI will analyze the document content and automatically create relevant categories and assessment rubrics for leadership evaluation
+                  </p>
+                </div>
+              </div>
+
+              {autoGenerateRubrics && formData.extracted_content && (
+                <div className="p-3 bg-secondary/50 rounded-lg">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={analyzeDocumentContent}
+                    disabled={isAnalyzing}
+                    className="w-full"
+                  >
+                    {isAnalyzing ? (
+                      <>
+                        <Sparkles className="h-4 w-4 mr-2 animate-spin" />
+                        Analyzing Content...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        Preview AI Analysis
+                      </>
+                    )}
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-2 text-center">
+                    Click to preview what categories and rubrics will be generated
+                  </p>
+                </div>
+              )}
+            </div>
+
             <div>
               <Label htmlFor="tags">Tags</Label>
               <Input
@@ -289,8 +398,12 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Uploading...' : 'Upload Content'}
+            <Button type="submit" disabled={isLoading || isAnalyzing}>
+              {isLoading ? (
+                autoGenerateRubrics ? 'Uploading & Generating...' : 'Uploading...'
+              ) : (
+                autoGenerateRubrics ? 'Upload & Generate Rubrics' : 'Upload Content'
+              )}
             </Button>
           </div>
         </form>
