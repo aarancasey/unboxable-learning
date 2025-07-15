@@ -21,6 +21,12 @@ export const RubricsTestButton: React.FC = () => {
     setTestResults([]);
 
     try {
+      setTestResults(prev => [...prev, {
+        status: 'success',
+        message: 'Starting environment validation...',
+        details: { step: 'initialization' }
+      }]);
+
       // Get the most recent document without rubrics
       const { data: contentData, error: contentError } = await supabase
         .from('content_library')
@@ -31,22 +37,44 @@ export const RubricsTestButton: React.FC = () => {
         .single();
 
       if (contentError) {
+        setTestResults(prev => [...prev, {
+          status: 'error',
+          message: `Database query failed: ${contentError.message}`,
+          details: { error: contentError, step: 'document_fetch' }
+        }]);
         throw new Error(`Failed to fetch document: ${contentError.message}`);
       }
 
       if (!contentData) {
+        setTestResults(prev => [...prev, {
+          status: 'error',
+          message: 'No documents found to analyze',
+          details: { step: 'document_validation' }
+        }]);
         throw new Error('No documents found to analyze');
       }
 
       setTestResults(prev => [...prev, {
         status: 'success',
         message: `Found document: ${contentData.title}`,
-        details: { contentLength: contentData.extracted_content.length }
+        details: { 
+          documentId: contentData.id,
+          title: contentData.title,
+          contentLength: contentData.extracted_content?.length || 0,
+          step: 'document_found'
+        }
       }]);
 
       // Test the edge function directly
       console.log('🔍 Testing edge function with document:', contentData.title);
       
+      setTestResults(prev => [...prev, {
+        status: 'success',
+        message: 'Calling analyze-document-content edge function...',
+        details: { step: 'edge_function_call' }
+      }]);
+
+      const startTime = Date.now();
       const { data: analysisResult, error: analysisError } = await supabase.functions.invoke(
         'analyze-document-content',
         {
@@ -56,13 +84,18 @@ export const RubricsTestButton: React.FC = () => {
           }
         }
       );
+      const duration = Date.now() - startTime;
 
       if (analysisError) {
         console.error('❌ Edge function error:', analysisError);
         setTestResults(prev => [...prev, {
           status: 'error',
-          message: `Edge function error: ${analysisError.message}`,
-          details: analysisError
+          message: `Edge function failed: ${analysisError.message || 'Unknown error'}`,
+          details: { 
+            error: analysisError,
+            duration: `${duration}ms`,
+            step: 'edge_function_error'
+          }
         }]);
         return;
       }
