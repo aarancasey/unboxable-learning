@@ -31,11 +31,34 @@ interface AssessmentRubric {
 
 serve(async (req) => {
   console.log('=== Document Analysis Function Started ===');
+  console.log('Request method:', req.method);
+  console.log('Request URL:', req.url);
   
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
+    console.log('Handling CORS preflight request');
     return new Response(null, { headers: corsHeaders });
   }
+
+  // Add a simple health check endpoint
+  if (req.url.includes('health')) {
+    console.log('Health check requested');
+    return new Response(
+      JSON.stringify({ 
+        status: 'healthy', 
+        timestamp: new Date().toISOString(),
+        openai_key_present: !!openAIApiKey,
+        supabase_url_present: !!supabaseUrl,
+        supabase_key_present: !!supabaseServiceKey
+      }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+
+  console.log('Environment check:');
+  console.log('- OpenAI API key present:', !!openAIApiKey);
+  console.log('- Supabase URL present:', !!supabaseUrl);
+  console.log('- Supabase service key present:', !!supabaseServiceKey);
 
   if (!openAIApiKey) {
     console.error('❌ OpenAI API key not found');
@@ -45,7 +68,15 @@ serve(async (req) => {
     );
   }
 
-  console.log('✅ OpenAI API key found');
+  if (!supabaseUrl || !supabaseServiceKey) {
+    console.error('❌ Supabase configuration incomplete');
+    return new Response(
+      JSON.stringify({ error: 'Supabase configuration incomplete' }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+
+  console.log('✅ All environment variables found');
 
   try {
     console.log('📥 Parsing request body...');
