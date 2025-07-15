@@ -36,12 +36,19 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
   }, [isOpen]);
 
   const fetchCategories = async () => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('content_categories')
       .select('*')
       .order('name');
     
-    if (data) {
+    if (error) {
+      console.error('Error fetching categories:', error);
+      toast({
+        title: "Error loading categories",
+        description: error.message,
+        variant: "destructive"
+      });
+    } else if (data) {
       setCategories(data);
     }
   };
