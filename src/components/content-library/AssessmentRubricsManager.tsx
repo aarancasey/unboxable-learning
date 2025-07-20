@@ -65,6 +65,7 @@ export const AssessmentRubricsManager: React.FC = () => {
 
   const fetchData = async () => {
     try {
+      console.log('Fetching rubrics data...');
       const [rubricsResponse, categoriesResponse, contentResponse] = await Promise.all([
         supabase
           .from('assessment_rubrics')
@@ -90,10 +91,24 @@ export const AssessmentRubricsManager: React.FC = () => {
           .order('title')
       ]);
 
-      if (rubricsResponse.error) throw rubricsResponse.error;
-      if (categoriesResponse.error) throw categoriesResponse.error;
-      if (contentResponse.error) throw contentResponse.error;
+      console.log('Rubrics response:', rubricsResponse);
+      console.log('Categories response:', categoriesResponse);
+      console.log('Content response:', contentResponse);
 
+      if (rubricsResponse.error) {
+        console.error('Rubrics error:', rubricsResponse.error);
+        throw rubricsResponse.error;
+      }
+      if (categoriesResponse.error) {
+        console.error('Categories error:', categoriesResponse.error);
+        throw categoriesResponse.error;
+      }
+      if (contentResponse.error) {
+        console.error('Content error:', contentResponse.error);
+        throw contentResponse.error;
+      }
+
+      console.log('Setting rubrics data:', rubricsResponse.data);
       setRubrics(rubricsResponse.data || []);
       setCategories(categoriesResponse.data || []);
       setContentItems(contentResponse.data || []);
