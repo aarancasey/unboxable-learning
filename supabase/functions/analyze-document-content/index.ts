@@ -99,18 +99,24 @@ serve(async (req) => {
 
     // First, analyze and create categories
     console.log('🧠 Step 1: Generating categories with OpenAI...');
-    const categoriesResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: `You are an expert in leadership assessment and organizational development. Analyze the provided document and extract 3-6 main categories that represent the key areas or framework sections for leadership assessment.
+    
+    const truncatedContent = extractedContent.substring(0, 8000); // Limit content to avoid token limits
+    console.log('📏 Using truncated content length:', truncatedContent.length, 'characters');
+    
+    let categoriesResponse;
+    try {
+      categoriesResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openAIApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            {
+              role: 'system',
+              content: `You are an expert in leadership assessment and organizational development. Analyze the provided document and extract 3-6 main categories that represent the key areas or framework sections for leadership assessment.
 
 Return your response as a JSON array of category objects, each with:
 - name: A concise category name (2-4 words)
@@ -118,22 +124,35 @@ Return your response as a JSON array of category objects, each with:
 - framework_section: The section/area of the leadership framework this relates to
 
 Focus on leadership competencies, skills, behaviors, or assessment areas mentioned in the document.`
-          },
-          {
-            role: 'user',
-            content: `Document Title: ${documentTitle}\n\nContent:\n${extractedContent}`
-          }
-        ],
-        temperature: 0.3,
-      }),
-    });
+            },
+            {
+              role: 'user',
+              content: `Document Title: ${documentTitle}\n\nContent:\n${truncatedContent}`
+            }
+          ],
+          temperature: 0.3,
+          max_tokens: 2000
+        }),
+      });
+    } catch (fetchError) {
+      console.error('❌ Network error calling OpenAI for categories:', fetchError);
+      return new Response(
+        JSON.stringify({ error: 'Network error calling OpenAI for categories', details: fetchError.message }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     if (!categoriesResponse.ok) {
       console.error('❌ OpenAI API error for categories:', categoriesResponse.status, categoriesResponse.statusText);
       const errorText = await categoriesResponse.text();
       console.error('Error details:', errorText);
       return new Response(
-        JSON.stringify({ error: 'OpenAI API error for categories' }),
+        JSON.stringify({ 
+          error: 'OpenAI API error for categories', 
+          status: categoriesResponse.status,
+          statusText: categoriesResponse.statusText,
+          details: errorText
+        }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
