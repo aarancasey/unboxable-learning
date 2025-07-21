@@ -1,12 +1,14 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Upload, BookOpen, Settings, Sparkles } from 'lucide-react';
+import { Plus, Upload, BookOpen, Settings, Sparkles, FileText } from 'lucide-react';
 import { ContentUploadModal } from './ContentUploadModal';
 import { ContentLibraryList } from './ContentLibraryList';
 import { ContentCategoriesManager } from './ContentCategoriesManager';
 import { AssessmentRubricsManager } from './AssessmentRubricsManager';
+import { ContentLibraryRubrics } from './ContentLibraryRubrics';
 import { AIKnowledgeChat } from '../ai/AIKnowledgeChat';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -115,13 +117,17 @@ export const ContentLibraryManager: React.FC = () => {
             <BookOpen className="h-4 w-4" />
             Content Library
           </TabsTrigger>
+          <TabsTrigger value="rubrics" className="flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            Assessment Rubrics
+          </TabsTrigger>
           <TabsTrigger value="categories" className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
             Categories
           </TabsTrigger>
-          <TabsTrigger value="rubrics" className="flex items-center gap-2">
+          <TabsTrigger value="legacy-rubrics" className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
-            Assessment Rubrics
+            Legacy Rubrics
           </TabsTrigger>
           <TabsTrigger value="ai-chat" className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
@@ -159,11 +165,15 @@ export const ContentLibraryManager: React.FC = () => {
           <ContentLibraryList />
         </TabsContent>
 
+        <TabsContent value="rubrics" className="space-y-4">
+          <ContentLibraryRubrics />
+        </TabsContent>
+
         <TabsContent value="categories" className="space-y-4">
           <ContentCategoriesManager />
         </TabsContent>
 
-        <TabsContent value="rubrics" className="space-y-4">
+        <TabsContent value="legacy-rubrics" className="space-y-4">
           <AssessmentRubricsManager />
         </TabsContent>
         

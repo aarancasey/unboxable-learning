@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,11 +13,19 @@ import { useToast } from '@/hooks/use-toast';
 
 interface RubricsGeneratorProps {
   onBack?: () => void;
+  initialRubric?: Partial<AssessmentRubric>;
+  onRubricCreated?: (rubric: AssessmentRubric) => void;
+  suggestedCategory?: string;
 }
 
-export const RubricsGenerator = ({ onBack }: RubricsGeneratorProps) => {
+export const RubricsGenerator = ({ 
+  onBack, 
+  initialRubric,
+  onRubricCreated,
+  suggestedCategory
+}: RubricsGeneratorProps) => {
   const [mode, setMode] = useState<RubricGenerationMode | null>(null);
-  const [currentRubric, setCurrentRubric] = useState<Partial<AssessmentRubric> | null>(null);
+  const [currentRubric, setCurrentRubric] = useState<Partial<AssessmentRubric> | null>(initialRubric || null);
   const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit');
   
   const { createRubric, updateRubric } = useRubrics();
@@ -25,7 +34,7 @@ export const RubricsGenerator = ({ onBack }: RubricsGeneratorProps) => {
   const handleTemplateSelect = (template: RubricTemplate) => {
     // Convert template to rubric format
     const rubric: Partial<AssessmentRubric> = {
-      name: template.name,
+      name: initialRubric?.name || template.name,
       description: template.description,
       criteria: template.criteria.map(criterion => ({
         id: crypto.randomUUID(),
@@ -34,7 +43,9 @@ export const RubricsGenerator = ({ onBack }: RubricsGeneratorProps) => {
       scoring_scale: {
         id: crypto.randomUUID(),
         ...template.scoring_scale
-      }
+      },
+      content_library_id: initialRubric?.content_library_id,
+      category_id: initialRubric?.category_id
     };
     
     setCurrentRubric(rubric);
@@ -43,25 +54,31 @@ export const RubricsGenerator = ({ onBack }: RubricsGeneratorProps) => {
   };
 
   const handleCreateFromScratch = () => {
-    setCurrentRubric({});
+    setCurrentRubric(initialRubric || {});
     setMode('manual');
     setActiveTab('edit');
   };
 
   const handleSaveRubric = async (rubricData: Omit<AssessmentRubric, 'id'>) => {
     try {
+      let savedRubric: AssessmentRubric;
+      
       if (currentRubric?.id) {
-        await updateRubric(currentRubric.id, rubricData);
+        savedRubric = await updateRubric(currentRubric.id, rubricData);
         toast({
           title: "Success",
           description: "Rubric updated successfully"
         });
       } else {
-        await createRubric(rubricData);
+        savedRubric = await createRubric(rubricData);
         toast({
           title: "Success", 
           description: "Rubric created successfully"
         });
+      }
+      
+      if (onRubricCreated) {
+        onRubricCreated(savedRubric);
       }
       
       // Reset to initial state
@@ -103,7 +120,10 @@ export const RubricsGenerator = ({ onBack }: RubricsGeneratorProps) => {
           <div>
             <h1 className="text-2xl font-bold">Create Assessment Rubric</h1>
             <p className="text-gray-600">
-              Choose a template to get started quickly or build a custom rubric from scratch
+              {initialRubric?.name 
+                ? `Creating rubric for "${initialRubric.name}"`
+                : "Choose a template to get started quickly or build a custom rubric from scratch"
+              }
             </p>
           </div>
         </div>
@@ -111,6 +131,7 @@ export const RubricsGenerator = ({ onBack }: RubricsGeneratorProps) => {
         <RubricTemplateSelector
           onTemplateSelect={handleTemplateSelect}
           onCreateFromScratch={handleCreateFromScratch}
+          suggestedCategory={suggestedCategory}
         />
       </div>
     );

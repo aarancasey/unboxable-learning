@@ -1,24 +1,36 @@
-import { useState } from 'react';
+
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { RubricTemplate } from '@/types/rubrics';
 import { getRubricTemplates } from '@/hooks/useRubrics';
-import { Search, FileText, Users, Briefcase, MessageSquare } from 'lucide-react';
+import { Search, FileText, Users, Briefcase, MessageSquare, Sparkles } from 'lucide-react';
 
 interface RubricTemplateSelectorProps {
   onTemplateSelect: (template: RubricTemplate) => void;
   onCreateFromScratch: () => void;
+  suggestedCategory?: string;
 }
 
-export const RubricTemplateSelector = ({ onTemplateSelect, onCreateFromScratch }: RubricTemplateSelectorProps) => {
+export const RubricTemplateSelector = ({ 
+  onTemplateSelect, 
+  onCreateFromScratch,
+  suggestedCategory
+}: RubricTemplateSelectorProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   
   const templates = getRubricTemplates();
   const categories = ['all', ...Array.from(new Set(templates.map(t => t.category)))];
+
+  // Auto-select suggested category if provided
+  useEffect(() => {
+    if (suggestedCategory && categories.includes(suggestedCategory)) {
+      setSelectedCategory(suggestedCategory);
+    }
+  }, [suggestedCategory, categories]);
 
   const filteredTemplates = templates.filter(template => {
     const matchesSearch = template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -39,6 +51,19 @@ export const RubricTemplateSelector = ({ onTemplateSelect, onCreateFromScratch }
 
   return (
     <div className="space-y-6">
+      {suggestedCategory && (
+        <Card className="border-unboxable-navy bg-unboxable-navy/5">
+          <CardContent className="py-4">
+            <div className="flex items-center gap-2 text-unboxable-navy">
+              <Sparkles className="w-4 h-4" />
+              <span className="text-sm font-medium">
+                Suggested category: {suggestedCategory}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -59,6 +84,7 @@ export const RubricTemplateSelector = ({ onTemplateSelect, onCreateFromScratch }
               onClick={() => setSelectedCategory(category)}
               className="capitalize"
             >
+              {category === suggestedCategory && <Sparkles className="w-3 h-3 mr-1" />}
               {category}
             </Button>
           ))}
@@ -90,13 +116,24 @@ export const RubricTemplateSelector = ({ onTemplateSelect, onCreateFromScratch }
 
         {/* Template options */}
         {filteredTemplates.map(template => (
-          <Card key={template.id} className="hover:shadow-lg transition-shadow cursor-pointer">
+          <Card 
+            key={template.id} 
+            className={`hover:shadow-lg transition-shadow cursor-pointer ${
+              template.category === suggestedCategory ? 'ring-2 ring-unboxable-navy ring-opacity-20' : ''
+            }`}
+          >
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
                 {getCategoryIcon(template.category)}
                 {template.name}
+                {template.category === suggestedCategory && (
+                  <Sparkles className="w-4 h-4 text-unboxable-navy" />
+                )}
               </CardTitle>
-              <Badge variant="secondary" className="w-fit">
+              <Badge 
+                variant={template.category === suggestedCategory ? "default" : "secondary"} 
+                className="w-fit"
+              >
                 {template.category}
               </Badge>
             </CardHeader>
@@ -133,6 +170,7 @@ export const RubricTemplateSelector = ({ onTemplateSelect, onCreateFromScratch }
               <Button 
                 className="w-full mt-4" 
                 onClick={() => onTemplateSelect(template)}
+                variant={template.category === suggestedCategory ? "default" : "outline"}
               >
                 Use Template
               </Button>
