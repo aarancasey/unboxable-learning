@@ -178,13 +178,8 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
         fileUrl = uploadData.path;
       }
 
-      // If auto-generate is enabled, analyze content first
-      if (autoGenerateRubrics && !isAnalyzing) {
-        await analyzeDocumentContent();
-      }
-
       // Save to content library
-      const { error } = await supabase
+      const { data: contentData, error } = await supabase
         .from('content_library')
         .insert({
           title: formData.title,
@@ -194,13 +189,42 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
           tags: formData.tags,
           file_url: fileUrl,
           original_filename: file?.name
-        });
+        })
+        .select()
+        .single();
 
       if (error) throw error;
 
+      // Extract knowledge from the document content
+      if (formData.extracted_content) {
+        try {
+          console.log('Processing document for knowledge extraction...');
+          const { error: knowledgeError } = await supabase.functions.invoke('process-document-knowledge', {
+            body: {
+              contentLibraryId: contentData.id,
+              extractedContent: formData.extracted_content,
+              title: formData.title
+            }
+          });
+          
+          if (knowledgeError) {
+            console.error('Failed to extract knowledge:', knowledgeError);
+          } else {
+            console.log('Knowledge extraction completed successfully');
+          }
+        } catch (knowledgeError) {
+          console.error('Error calling knowledge extraction:', knowledgeError);
+        }
+      }
+
+      // If auto-generate is enabled, analyze content for rubrics
+      if (autoGenerateRubrics && !isAnalyzing) {
+        await analyzeDocumentContent();
+      }
+
       const successMessage = autoGenerateRubrics 
-        ? "Content uploaded and assessment rubrics generated successfully"
-        : "Content uploaded successfully";
+        ? "Content uploaded, AI learning completed, and assessment rubrics generated successfully"
+        : "Content uploaded and processed by AI learning system";
 
       toast({
         title: "Upload completed",

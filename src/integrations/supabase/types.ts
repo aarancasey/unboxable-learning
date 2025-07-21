@@ -56,6 +56,62 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_conversations: {
+        Row: {
+          created_at: string
+          id: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ai_messages: {
+        Row: {
+          content: string
+          conversation_id: string | null
+          created_at: string
+          id: string
+          role: string
+          sources: Json | null
+        }
+        Insert: {
+          content: string
+          conversation_id?: string | null
+          created_at?: string
+          id?: string
+          role: string
+          sources?: Json | null
+        }
+        Update: {
+          content?: string
+          conversation_id?: string | null
+          created_at?: string
+          id?: string
+          role?: string
+          sources?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "ai_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       assessment_rubrics: {
         Row: {
           category_id: string | null
@@ -723,6 +779,53 @@ export type Database = {
         }
         Relationships: []
       }
+      knowledge_base: {
+        Row: {
+          confidence_score: number | null
+          content: string
+          content_library_id: string | null
+          created_at: string
+          id: string
+          keywords: string[] | null
+          knowledge_type: string
+          summary: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          confidence_score?: number | null
+          content: string
+          content_library_id?: string | null
+          created_at?: string
+          id?: string
+          keywords?: string[] | null
+          knowledge_type?: string
+          summary?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          confidence_score?: number | null
+          content?: string
+          content_library_id?: string | null
+          created_at?: string
+          id?: string
+          keywords?: string[] | null
+          knowledge_type?: string
+          summary?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "knowledge_base_content_library_id_fkey"
+            columns: ["content_library_id"]
+            isOneToOne: false
+            referencedRelation: "content_library"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       learners: {
         Row: {
           created_at: string | null
@@ -759,6 +862,36 @@ export type Database = {
           requires_password_change?: boolean | null
           status?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      learning_insights: {
+        Row: {
+          confidence: number | null
+          created_at: string
+          description: string
+          id: string
+          insight_type: string
+          related_documents: Json | null
+          title: string
+        }
+        Insert: {
+          confidence?: number | null
+          created_at?: string
+          description: string
+          id?: string
+          insight_type: string
+          related_documents?: Json | null
+          title: string
+        }
+        Update: {
+          confidence?: number | null
+          created_at?: string
+          description?: string
+          id?: string
+          insight_type?: string
+          related_documents?: Json | null
+          title?: string
         }
         Relationships: []
       }
