@@ -104,11 +104,11 @@ const SurveyReviewer = () => {
             <div className="flex items-center space-x-4 text-sm text-gray-600 mt-1">
               <div className="flex items-center space-x-1">
                 <User className="h-4 w-4" />
-                <span>{selectedSurvey.learner}</span>
+                <span>{selectedSurvey.learner_name || selectedSurvey.learner || 'Unknown User'}</span>
               </div>
               <div className="flex items-center space-x-1">
                 <Calendar className="h-4 w-4" />
-                <span>Submitted {selectedSurvey.submittedDate}</span>
+                <span>Submitted {selectedSurvey.submitted_at ? new Date(selectedSurvey.submitted_at).toLocaleDateString() : selectedSurvey.submittedDate}</span>
               </div>
               {getStatusBadge(selectedSurvey.status)}
             </div>
@@ -238,11 +238,11 @@ const SurveyReviewer = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-gray-600">
                     <div className="flex items-center space-x-2">
                       <User className="h-4 w-4" />
-                      <span>{survey.learner}</span>
+                      <span>{survey.learner_name || survey.learner || 'Unknown User'}</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Calendar className="h-4 w-4" />
-                      <span>Submitted {survey.submittedDate}</span>
+                      <span>Submitted {survey.submitted_at ? new Date(survey.submitted_at).toLocaleDateString() : survey.submittedDate}</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <span className="text-gray-500">Department:</span>
