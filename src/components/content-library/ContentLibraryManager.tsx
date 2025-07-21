@@ -9,7 +9,7 @@ import { ContentLibraryList } from './ContentLibraryList';
 import { ContentCategoriesManager } from './ContentCategoriesManager';
 import { AssessmentRubricsManager } from './AssessmentRubricsManager';
 import { ContentLibraryRubrics } from './ContentLibraryRubrics';
-import { AIKnowledgeChat } from '../ai/AIKnowledgeChat';
+
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -129,10 +129,6 @@ export const ContentLibraryManager: React.FC = () => {
             <Settings className="h-4 w-4" />
             Legacy Rubrics
           </TabsTrigger>
-          <TabsTrigger value="ai-chat" className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            AI Knowledge Chat
-          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="library" className="space-y-4">
@@ -177,9 +173,6 @@ export const ContentLibraryManager: React.FC = () => {
           <AssessmentRubricsManager />
         </TabsContent>
         
-        <TabsContent value="ai-chat" className="space-y-4">
-          <AIKnowledgeChat />
-        </TabsContent>
       </Tabs>
 
       <ContentUploadModal 
