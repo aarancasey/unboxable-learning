@@ -8,6 +8,8 @@ import ModulesSection from './ModulesSection';
 import SurveyPrerequisiteSection from './SurveyPrerequisiteSection';
 import PasswordChangeModal from './PasswordChangeModal';
 import { useAnalytics } from '@/hooks/useAnalytics';
+import { AIKnowledgeChat } from './ai/AIKnowledgeChat';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 
 interface LearnerDashboardProps {
@@ -231,6 +233,19 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
           modules={modules}
           onModuleClick={handleModuleClick}
         />
+
+        {/* AI Knowledge Chat Section */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Course Assistant</CardTitle>
+            <CardDescription>
+              Ask questions about the course content and get instant answers from our AI assistant
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <AIKnowledgeChat />
+          </CardContent>
+        </Card>
 
       </div>
 
