@@ -24,15 +24,29 @@ interface EditableAISummaryProps {
 }
 
 export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummaryProps) => {
+  // Provide default AI summary structure if none exists
+  const defaultSummary = {
+    currentLeadershipStyle: "Managing, but close to overload",
+    confidenceRating: "Developing Confidence (2.5–3.4)",
+    strongestArea: "Motivate and align your team",
+    focusArea: "Lead through complexity and ambiguity",
+    leadershipAspirations: ["Empowering and people-centred", "Strategic and future-focused", "Curious and adaptive"],
+    purposeRating: 4,
+    agilityLevel: "Achiever",
+    topStrengths: ["Action Orientation & Delivery", "Decision-Making Agility", "Empowering Others & Collaboration"],
+    developmentAreas: ["Navigating Change & Uncertainty", "Strategic Agility & Systems Thinking", "Learning Agility & Growth Mindset"],
+    overallAssessment: "This leader demonstrates strong operational capabilities with clear areas for strategic development. Focus on building confidence in navigating ambiguity while leveraging existing strengths in team motivation and decision-making."
+  };
+
   const [isEditing, setIsEditing] = useState(false);
-  const [editedSummary, setEditedSummary] = useState(survey.aiSummary || {});
+  const [editedSummary, setEditedSummary] = useState(survey.aiSummary || defaultSummary);
   const [isExporting, setIsExporting] = useState(false);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const { toast } = useToast();
 
   const handleEdit = () => {
     setIsEditing(true);
-    setEditedSummary({ ...survey.aiSummary });
+    setEditedSummary({ ...(survey.aiSummary || defaultSummary) });
   };
 
   const handleSave = () => {
@@ -61,7 +75,7 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
   };
 
   const handleCancel = () => {
-    setEditedSummary({ ...survey.aiSummary });
+    setEditedSummary({ ...(survey.aiSummary || defaultSummary) });
     setIsEditing(false);
   };
 
@@ -171,7 +185,7 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
     }
   };
 
-  const currentSummary = isEditing ? editedSummary : survey.aiSummary;
+  const currentSummary = isEditing ? editedSummary : (survey.aiSummary || defaultSummary);
 
   return (
     <Card className="border-2 border-unboxable-navy/20">
