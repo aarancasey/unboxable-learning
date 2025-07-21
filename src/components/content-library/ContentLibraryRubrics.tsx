@@ -140,7 +140,7 @@ export const ContentLibraryRubrics: React.FC<ContentLibraryRubricsProps> = ({
                   <div>
                     <h4 className="font-medium text-sm mb-2">Scoring Scale</h4>
                     <p className="text-xs text-gray-500">
-                      {rubric.scoring_scale.levels.length} levels • Max {rubric.scoring_scale.maxPoints} points
+                      {rubric.scoring_scale?.levels?.length || 0} levels • Max {rubric.scoring_scale?.maxPoints || 0} points
                     </p>
                   </div>
                 </div>
