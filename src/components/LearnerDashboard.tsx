@@ -230,17 +230,17 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
         />
 
         {/* Learning Modules and AI Assistant Side by Side */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          {/* Learning Modules - Takes 2/3 of the space */}
-          <div className="lg:col-span-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          {/* Learning Modules - Takes 1/2 of the space */}
+          <div>
             <ModulesSection
               modules={modules}
               onModuleClick={handleModuleClick}
             />
           </div>
 
-          {/* AI Knowledge Chat - Takes 1/3 of the space */}
-          <div className="lg:col-span-1">
+          {/* AI Knowledge Chat - Takes 1/2 of the space */}
+          <div>
             <Card className="h-fit">
               <CardHeader>
                 <CardTitle>Course Assistant</CardTitle>
