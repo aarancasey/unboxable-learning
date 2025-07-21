@@ -229,23 +229,31 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
           hasModules={modules.length > 0}
         />
 
-        <ModulesSection
-          modules={modules}
-          onModuleClick={handleModuleClick}
-        />
+        {/* Learning Modules and AI Assistant Side by Side */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+          {/* Learning Modules - Takes 2/3 of the space */}
+          <div className="lg:col-span-2">
+            <ModulesSection
+              modules={modules}
+              onModuleClick={handleModuleClick}
+            />
+          </div>
 
-        {/* AI Knowledge Chat Section */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>Course Assistant</CardTitle>
-            <CardDescription>
-              Ask questions about the course content and get instant answers from our AI assistant
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <AIKnowledgeChat />
-          </CardContent>
-        </Card>
+          {/* AI Knowledge Chat - Takes 1/3 of the space */}
+          <div className="lg:col-span-1">
+            <Card className="h-fit">
+              <CardHeader>
+                <CardTitle>Course Assistant</CardTitle>
+                <CardDescription>
+                  Ask questions about the course content and get instant answers from our AI assistant
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <AIKnowledgeChat />
+              </CardContent>
+            </Card>
+          </div>
+        </div>
 
       </div>
 
