@@ -77,7 +77,7 @@ const Index = () => {
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
               <Button 
                 onClick={() => setShowLearnerLogin(true)}
                 className="bg-unboxable-orange hover:bg-unboxable-orange/90 text-white font-semibold px-8 py-4 text-lg rounded-lg"
@@ -95,7 +95,7 @@ const Index = () => {
         </div>
 
         {/* Leadership Program Section */}
-        <div className="bg-white py-16 px-4 sm:px-6 lg:px-8">
+        <div className="bg-white py-8 px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-4xl sm:text-5xl font-black text-unboxable-navy mb-2 tracking-tight">
               LEADERSHIP PROGRAM
