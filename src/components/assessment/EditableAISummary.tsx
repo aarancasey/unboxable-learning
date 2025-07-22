@@ -481,6 +481,64 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
           </div>
         </section>
 
+        {/* Section 5: Assessment Rubric Scores */}
+        {currentSummary.rubricAssessments && currentSummary.rubricAssessments.length > 0 && (
+          <section className="border-l-4 border-purple-500 pl-6">
+            <h3 className="text-lg font-semibold text-unboxable-navy mb-6 flex items-center">
+              <span className="bg-purple-100 text-purple-800 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-3">5</span>
+              Assessment Rubric Scores
+            </h3>
+            <div className="space-y-6">
+              {currentSummary.rubricAssessments.map((rubric: any, index: number) => (
+                <div key={index} className="bg-purple-50 border border-purple-200 rounded-lg p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <h4 className="font-medium text-purple-800 text-lg">{rubric.rubricName}</h4>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm text-purple-600">Overall Score:</span>
+                      <span className="bg-purple-600 text-white px-3 py-1 rounded-full text-sm font-bold">
+                        {rubric.overallScore}/5
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* Criteria Scores */}
+                  <div className="mb-4">
+                    <h5 className="font-medium text-purple-700 mb-3">Criteria Assessment:</h5>
+                    <div className="space-y-3">
+                      {rubric.criteriaScores?.map((criteria: any, idx: number) => (
+                        <div key={idx} className="bg-white border border-purple-100 rounded-lg p-4">
+                          <div className="flex justify-between items-start mb-2">
+                            <span className="font-medium text-gray-800">{criteria.criterion}</span>
+                            <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-100">
+                              {criteria.score}/5
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-gray-600">{criteria.justification}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Recommendations */}
+                  {rubric.recommendations && rubric.recommendations.length > 0 && (
+                    <div>
+                      <h5 className="font-medium text-purple-700 mb-3">Recommendations:</h5>
+                      <ul className="space-y-2">
+                        {rubric.recommendations.map((recommendation: string, idx: number) => (
+                          <li key={idx} className="text-sm text-purple-700 flex items-start">
+                            <span className="w-2 h-2 bg-purple-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                            {recommendation}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+         )}
+
         {/* Action Buttons */}
         <section className="flex flex-wrap gap-3 pt-6 border-t border-gray-200">
           {!isEditing ? (

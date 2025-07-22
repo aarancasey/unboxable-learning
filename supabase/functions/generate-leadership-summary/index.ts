@@ -61,6 +61,50 @@ ${item.extracted_content}
   }
 }
 
+// Function to fetch assessment rubrics
+async function fetchAssessmentRubrics() {
+  try {
+    const { data: rubricsData, error } = await supabase
+      .from('assessment_rubrics')
+      .select('id, name, criteria, scoring_scale')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching assessment rubrics:', error);
+      return '';
+    }
+
+    if (!rubricsData || rubricsData.length === 0) {
+      return 'No assessment rubrics available.';
+    }
+
+    // Format rubrics for AI consumption
+    const formattedRubrics = rubricsData.map(rubric => {
+      const criteriaText = rubric.criteria.map((criterion: any) => 
+        `- ${criterion.criterion}: ${criterion.description}`
+      ).join('\n');
+      
+      const scaleText = rubric.scoring_scale.map((scale: any) => 
+        `Level ${scale.level} (${scale.descriptor}): ${scale.description}`
+      ).join('\n');
+
+      return `
+=== ${rubric.name} Assessment Rubric ===
+Assessment Criteria:
+${criteriaText}
+
+Scoring Scale:
+${scaleText}
+`;
+    }).join('\n');
+
+    return formattedRubrics;
+  } catch (error) {
+    console.error('Error in fetchAssessmentRubrics:', error);
+    return 'Assessment rubrics temporarily unavailable.';
+  }
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -70,17 +114,24 @@ serve(async (req) => {
   try {
     const { surveyResponses, surveyTitle } = await req.json();
 
-    // Fetch relevant content from the content library
-    const contentLibraryData = await fetchContentLibrary();
+    // Fetch relevant content from the content library and assessment rubrics
+    const [contentLibraryData, assessmentRubrics] = await Promise.all([
+      fetchContentLibrary(),
+      fetchAssessmentRubrics()
+    ]);
 
-    // Build comprehensive prompt enhanced with content library
+    // Build comprehensive prompt enhanced with content library and assessment rubrics
     const prompt = `As a professional leadership development expert, analyze the following survey responses and create a comprehensive leadership assessment summary following the LEADForward framework structure. The summary should be professional, personalized, and actionable.
 
-IMPORTANT: Use the provided content library below to enhance your analysis with specific frameworks, methodologies, and assessment criteria. Reference and apply the relevant content to make the assessment more accurate and valuable.
+IMPORTANT: Use the provided content library and assessment rubrics below to enhance your analysis with specific frameworks, methodologies, and assessment criteria. Reference and apply the relevant content to make the assessment more accurate and valuable.
 
 === CONTENT LIBRARY ===
 ${contentLibraryData}
 === END CONTENT LIBRARY ===
+
+=== ASSESSMENT RUBRICS ===
+${assessmentRubrics}
+=== END ASSESSMENT RUBRICS ===
 
 Survey Title: ${surveyTitle}
 Survey Responses:
@@ -127,6 +178,12 @@ Analyze their agility across six dimensions.
 ### Overall Assessment
 [Provide a comprehensive 2-3 sentence summary of their leadership profile and readiness for development]
 
+## Assessment Rubric Scores
+Based on the assessment rubrics provided, evaluate the person against each rubric and provide specific scores for each criterion. For each rubric, provide:
+- Overall rubric score (1-5 scale)
+- Individual criterion scores with brief justification
+- Specific recommendations for improvement
+
 Return your analysis as a JSON object with this structure:
 {
   "currentLeadershipStyle": "string",
@@ -138,7 +195,21 @@ Return your analysis as a JSON object with this structure:
   "agilityLevel": "Expert|Achiever|Catalyst|Co-Creator",
   "topStrengths": ["array", "of", "top", "strengths"],
   "developmentAreas": ["array", "of", "development", "areas"],
-  "overallAssessment": "string with comprehensive summary"
+  "overallAssessment": "string with comprehensive summary",
+  "rubricAssessments": [
+    {
+      "rubricName": "string",
+      "overallScore": "number 1-5",
+      "criteriaScores": [
+        {
+          "criterion": "string",
+          "score": "number 1-5",
+          "justification": "string explaining the score"
+        }
+      ],
+      "recommendations": ["array", "of", "specific", "recommendations"]
+    }
+  ]
 }
 
 Make the analysis personal, specific to their responses, and professionally written.`;
@@ -184,7 +255,21 @@ Make the analysis personal, specific to their responses, and professionally writ
         agilityLevel: "Achiever",
         topStrengths: ["Action Orientation & Delivery", "Decision-Making Agility", "Empowering Others & Collaboration"],
         developmentAreas: ["Navigating Change & Uncertainty", "Strategic Agility & Systems Thinking", "Learning Agility & Growth Mindset"],
-        overallAssessment: "This leader demonstrates strong operational capabilities with clear areas for strategic development. Focus on building confidence in navigating ambiguity while leveraging existing strengths in team motivation and decision-making."
+        overallAssessment: "This leader demonstrates strong operational capabilities with clear areas for strategic development. Focus on building confidence in navigating ambiguity while leveraging existing strengths in team motivation and decision-making.",
+        rubricAssessments: [
+          {
+            rubricName: "Strategic Thinking & Vision",
+            overallScore: 3,
+            criteriaScores: [
+              {
+                criterion: "Develops and communicates clear organizational vision",
+                score: 3,
+                justification: "Shows solid understanding of strategic direction with room for enhancement"
+              }
+            ],
+            recommendations: ["Develop more structured strategic planning processes", "Practice articulating vision more clearly"]
+          }
+        ]
       };
     }
 
