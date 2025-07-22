@@ -55,13 +55,13 @@ const Index = () => {
         {/* Hero Section */}
         <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">
           <div className="max-w-4xl mx-auto text-center">
-            {/* Star Icon */}
+            {/* Unboxable Logo */}
             <div className="mb-8">
-              <div className="w-16 h-16 bg-unboxable-orange rounded-full flex items-center justify-center mx-auto">
-                <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                </svg>
-              </div>
+              <img 
+                src="/lovable-uploads/72877e4c-8de7-499d-86f0-77c477293eeb.png" 
+                alt="Unboxable" 
+                className="h-16 w-auto mx-auto filter brightness-0 invert"
+              />
             </div>
             
             {/* Main Heading */}
