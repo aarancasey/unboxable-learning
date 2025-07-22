@@ -110,7 +110,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
           <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 h-auto p-1">
             <TabsTrigger value="overview" className="text-xs sm:text-sm px-2 py-2">Overview</TabsTrigger>
-            <TabsTrigger value="users" className="text-xs sm:text-sm px-2 py-2">Users</TabsTrigger>
+            <TabsTrigger value="users" className="text-xs sm:text-sm px-2 py-2">Learners</TabsTrigger>
             <TabsTrigger value="courses" className="text-xs sm:text-sm px-2 py-2">Courses</TabsTrigger>
             <TabsTrigger value="surveys" className="text-xs sm:text-sm px-2 py-2">Surveys</TabsTrigger>
             <TabsTrigger value="content-library" className="text-xs sm:text-sm px-2 py-2">Content Library</TabsTrigger>
