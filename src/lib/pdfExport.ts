@@ -2,14 +2,16 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
 export const exportToPDF = async (survey: any, filename: string = 'assessment') => {
-  console.log('Starting PDF export for survey:', survey?.learner || 'Unknown');
+  console.log('Starting PDF export for survey:', survey);
   
   // Add validation for required survey data
   if (!survey) {
     throw new Error('Survey data is required for PDF export');
   }
   
-  if (!survey.learner) {
+  // Handle both old (learner) and new (learner_name) field formats
+  const learnerName = survey.learner || survey.learner_name;
+  if (!learnerName) {
     throw new Error('Survey learner name is required for PDF export');
   }
   
@@ -55,10 +57,10 @@ export const exportToPDF = async (survey: any, filename: string = 'assessment') 
     pdf.setTextColor(43, 74, 124);
     addText('PARTICIPANT INFORMATION', 14, true);
     pdf.setTextColor(0, 0, 0);
-    addText(`Name: ${survey.learner || 'Not specified'}`);
+    addText(`Name: ${learnerName}`);
     addText(`Department: ${survey.department || 'Not specified'}`);
     addText(`Assessment: ${survey.title || 'Leadership Assessment'}`);
-    addText(`Completed: ${survey.submittedDate || new Date().toLocaleDateString()}`);
+    addText(`Completed: ${survey.submitted_at ? new Date(survey.submitted_at).toLocaleDateString() : new Date().toLocaleDateString()}`);
     
     yPosition += 5;
     
@@ -126,7 +128,7 @@ export const exportToPDF = async (survey: any, filename: string = 'assessment') 
     pdf.text('Confidential Leadership Assessment Report', margin, yPosition + 5);
     
     // Save the PDF
-    const pdfFilename = `${filename}-${survey.learner.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.pdf`;
+    const pdfFilename = `${filename}-${learnerName.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.pdf`;
     console.log('Saving PDF:', pdfFilename);
     pdf.save(pdfFilename);
     console.log('PDF export completed successfully');

@@ -113,13 +113,9 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
   };
 
   const handleExportPDF = async () => {
-    console.log('PDF export button clicked - survey data:', survey);
-    alert('PDF Export clicked - check console for details');
     setIsExporting(true);
     try {
-      console.log('Calling exportToPDF with survey:', survey.learner);
       await exportToPDF(survey, 'leadership-assessment');
-      console.log('exportToPDF completed successfully');
       toast({
         title: "Export Successful",
         description: "Leadership assessment has been exported to PDF.",
@@ -140,9 +136,10 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
   const handleSendEmail = async () => {
     setIsSendingEmail(true);
     try {
+      const learnerName = survey.learner || survey.learner_name;
       const { data, error } = await supabase.functions.invoke('send-assessment-summary', {
         body: {
-          learnerName: survey.learner,
+          learnerName: learnerName,
           learnerEmail: survey.email || 'learner@example.com',
           summary: survey.aiSummary,
           surveyTitle: survey.title
@@ -178,7 +175,8 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'Survey Responses');
       
-      const filename = `survey-responses-${survey.learner.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.csv`;
+      const learnerName = survey.learner || survey.learner_name || 'unknown';
+      const filename = `survey-responses-${learnerName.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.csv`;
       XLSX.writeFile(wb, filename, { bookType: 'csv' });
 
       toast({
@@ -206,7 +204,8 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'Survey Responses');
       
-      const filename = `survey-responses-${survey.learner.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.xlsx`;
+      const learnerName = survey.learner || survey.learner_name || 'unknown';
+      const filename = `survey-responses-${learnerName.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.xlsx`;
       XLSX.writeFile(wb, filename, { bookType: 'xlsx' });
 
       toast({
