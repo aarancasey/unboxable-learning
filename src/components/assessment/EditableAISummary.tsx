@@ -11,12 +11,21 @@ import {
   X,
   Download,
   Mail,
-  FileText
+  FileText,
+  TrendingUp,
+  Target,
+  Award,
+  BarChart3
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { exportToPDF } from '@/lib/pdfExport';
 import { supabase } from '@/integrations/supabase/client';
 import * as XLSX from 'xlsx';
+import { PurposeRatingGauge } from './charts/PurposeRatingGauge';
+import { RubricScoresRadar } from './charts/RubricScoresRadar';
+import { StrengthsComparisonChart } from './charts/StrengthsComparisonChart';
+import { ConfidenceLevelBar } from './charts/ConfidenceLevelBar';
+import { AgilityLevelIndicator } from './charts/AgilityLevelIndicator';
 
 interface EditableAISummaryProps {
   survey: any;
@@ -187,6 +196,15 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
 
   const currentSummary = isEditing ? editedSummary : (survey.aiSummary || defaultSummary);
 
+  // Prepare radar chart data for rubrics
+  const radarData = currentSummary.rubricAssessments?.length > 0 
+    ? currentSummary.rubricAssessments[0]?.criteriaScores?.map((criteria: any) => ({
+        criterion: criteria.criterion.length > 20 ? criteria.criterion.substring(0, 20) + '...' : criteria.criterion,
+        score: criteria.score,
+        fullMark: 5
+      })) || []
+    : [];
+
   return (
     <Card className="border-2 border-unboxable-navy/20">
       <CardHeader className="bg-gradient-to-r from-unboxable-navy/5 to-unboxable-orange/5 pb-6">
@@ -207,11 +225,75 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
               </p>
             </div>
           </div>
-          
         </div>
       </CardHeader>
       
       <CardContent className="space-y-8 pt-8">
+        {/* Visual Dashboard Overview */}
+        <section className="bg-gradient-to-r from-unboxable-navy/5 to-unboxable-orange/5 rounded-lg p-6 mb-8">
+          <h3 className="text-lg font-semibold text-unboxable-navy mb-6 flex items-center">
+            <BarChart3 className="h-5 w-5 text-unboxable-orange mr-3" />
+            Leadership Assessment Dashboard
+          </h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Purpose Rating Gauge */}
+            <Card className="border-unboxable-navy/20">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-unboxable-navy flex items-center">
+                  <Target className="h-4 w-4 mr-2 text-unboxable-orange" />
+                  Purpose Connection
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <PurposeRatingGauge rating={currentSummary.purposeRating || 4} />
+                <p className="text-xs text-center text-gray-600 mt-2">Connected & gaining clarity</p>
+              </CardContent>
+            </Card>
+
+            {/* Confidence Level */}
+            <Card className="border-unboxable-navy/20">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-unboxable-navy flex items-center">
+                  <TrendingUp className="h-4 w-4 mr-2 text-unboxable-orange" />
+                  Confidence Level
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ConfidenceLevelBar confidenceRating={currentSummary.confidenceRating || ''} />
+              </CardContent>
+            </Card>
+
+            {/* Agility Level */}
+            <Card className="border-unboxable-navy/20">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-unboxable-navy flex items-center">
+                  <Award className="h-4 w-4 mr-2 text-unboxable-orange" />
+                  Leadership Agility
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <AgilityLevelIndicator agilityLevel={currentSummary.agilityLevel || 'Achiever'} />
+              </CardContent>
+            </Card>
+
+            {/* Strengths vs Development */}
+            <Card className="border-unboxable-navy/20">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-unboxable-navy">
+                  Focus Areas Overview
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <StrengthsComparisonChart 
+                  strengths={currentSummary.topStrengths || []}
+                  developmentAreas={currentSummary.developmentAreas || []}
+                />
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
         {/* Section 1: Leadership Sentiment Snapshot */}
         <section className="border-l-4 border-unboxable-orange pl-6 pb-8 border-b border-gray-100">
           <h3 className="text-lg font-semibold text-unboxable-navy mb-6 flex items-center">
@@ -457,7 +539,7 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
         </section>
 
         {/* Section 4: Overall Assessment */}
-        <section className="border-l-4 border-gray-500 pl-6">
+        <section className="border-l-4 border-gray-500 pl-6 pb-8 border-b border-gray-100">
           <h3 className="text-lg font-semibold text-unboxable-navy mb-6 flex items-center">
             <span className="bg-gray-100 text-gray-800 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-3">4</span>
             Overall Assessment Summary
@@ -481,13 +563,30 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
           </div>
         </section>
 
-        {/* Section 5: Assessment Rubric Scores */}
+        {/* Section 5: Assessment Rubric Scores with Visualization */}
         {currentSummary.rubricAssessments && currentSummary.rubricAssessments.length > 0 && (
           <section className="border-l-4 border-purple-500 pl-6">
             <h3 className="text-lg font-semibold text-unboxable-navy mb-6 flex items-center">
               <span className="bg-purple-100 text-purple-800 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-3">5</span>
               Assessment Rubric Scores
             </h3>
+
+            {/* Radar Chart Visualization */}
+            {radarData.length > 0 && (
+              <div className="mb-8">
+                <Card className="border-unboxable-navy/20">
+                  <CardHeader>
+                    <CardTitle className="text-base text-unboxable-navy">
+                      Rubric Assessment Overview
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <RubricScoresRadar data={radarData} />
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
             <div className="space-y-6">
               {currentSummary.rubricAssessments.map((rubric: any, index: number) => (
                 <div key={index} className="bg-purple-50 border border-purple-200 rounded-lg p-6">
@@ -495,7 +594,7 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
                     <h4 className="font-medium text-purple-800 text-lg">{rubric.rubricName}</h4>
                     <div className="flex items-center space-x-2">
                       <span className="text-sm text-purple-600">Overall Score:</span>
-                      <span className="bg-purple-600 text-white px-3 py-1 rounded-full text-sm font-bold">
+                      <span className="bg-gradient-to-r from-unboxable-navy to-unboxable-orange text-white px-3 py-1 rounded-full text-sm font-bold">
                         {rubric.overallScore}/5
                       </span>
                     </div>
@@ -509,7 +608,7 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
                         <div key={idx} className="bg-white border border-purple-100 rounded-lg p-4">
                           <div className="flex justify-between items-start mb-2">
                             <span className="font-medium text-gray-800">{criteria.criterion}</span>
-                            <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-100">
+                            <Badge className="bg-gradient-to-r from-unboxable-navy to-unboxable-orange text-white hover:from-unboxable-navy hover:to-unboxable-orange">
                               {criteria.score}/5
                             </Badge>
                           </div>
@@ -526,7 +625,7 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
                       <ul className="space-y-2">
                         {rubric.recommendations.map((recommendation: string, idx: number) => (
                           <li key={idx} className="text-sm text-purple-700 flex items-start">
-                            <span className="w-2 h-2 bg-purple-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                            <span className="w-2 h-2 bg-unboxable-orange rounded-full mt-2 mr-3 flex-shrink-0"></span>
                             {recommendation}
                           </li>
                         ))}
@@ -543,23 +642,23 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
         <section className="flex flex-wrap gap-3 pt-6 border-t border-gray-200">
           {!isEditing ? (
             <>
-              <Button variant="outline" onClick={handleEdit}>
+              <Button variant="outline" onClick={handleEdit} className="border-unboxable-navy/20 hover:bg-unboxable-navy/5">
                 <Edit3 className="h-4 w-4 mr-2" />
                 Edit Summary
               </Button>
-              <Button variant="outline" onClick={handleExportPDF} disabled={isExporting}>
+              <Button variant="outline" onClick={handleExportPDF} disabled={isExporting} className="border-unboxable-navy/20 hover:bg-unboxable-navy/5">
                 <Download className="h-4 w-4 mr-2" />
                 {isExporting ? 'Exporting...' : 'Export PDF'}
               </Button>
-              <Button variant="outline" onClick={handleSendEmail} disabled={isSendingEmail}>
+              <Button variant="outline" onClick={handleSendEmail} disabled={isSendingEmail} className="border-unboxable-navy/20 hover:bg-unboxable-navy/5">
                 <Mail className="h-4 w-4 mr-2" />
                 {isSendingEmail ? 'Sending...' : 'Email to Learner'}
               </Button>
-              <Button variant="outline" onClick={handleExportCSV}>
+              <Button variant="outline" onClick={handleExportCSV} className="border-unboxable-navy/20 hover:bg-unboxable-navy/5">
                 <FileText className="h-4 w-4 mr-2" />
                 Export CSV
               </Button>
-              <Button variant="outline" onClick={handleExportXLS}>
+              <Button variant="outline" onClick={handleExportXLS} className="border-unboxable-navy/20 hover:bg-unboxable-navy/5">
                 <FileText className="h-4 w-4 mr-2" />
                 Export Excel
               </Button>
