@@ -236,65 +236,55 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
             Leadership Assessment Dashboard
           </h3>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             {/* Purpose Rating Gauge */}
-            <Card className="border-unboxable-navy/20">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-base font-medium text-unboxable-navy flex items-center">
-                  <Target className="h-5 w-5 mr-2 text-unboxable-orange" />
-                  Purpose Connection
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-4 pb-6">
-                <div className="flex justify-center">
-                  <PurposeRatingGauge rating={currentSummary.purposeRating || 4} />
-                </div>
-                <p className="text-sm text-center text-gray-600 mt-4">Connected & gaining clarity</p>
-              </CardContent>
-            </Card>
+            <div className="text-center">
+              <h4 className="text-base font-medium text-unboxable-navy flex items-center justify-center mb-6">
+                <Target className="h-5 w-5 mr-2 text-unboxable-orange" />
+                Purpose Connection
+              </h4>
+              <div className="flex justify-center mb-4">
+                <PurposeRatingGauge rating={currentSummary.purposeRating || 4} />
+              </div>
+              <p className="text-sm text-gray-600">Connected & gaining clarity</p>
+            </div>
 
             {/* Confidence Level */}
-            <Card className="border-unboxable-navy/20">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-base font-medium text-unboxable-navy flex items-center">
-                  <TrendingUp className="h-5 w-5 mr-2 text-unboxable-orange" />
-                  Confidence Level
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-4 pb-6">
+            <div>
+              <h4 className="text-base font-medium text-unboxable-navy flex items-center mb-6">
+                <TrendingUp className="h-5 w-5 mr-2 text-unboxable-orange" />
+                Confidence Level
+              </h4>
+              <div className="bg-white rounded-lg border border-unboxable-navy/10 p-6">
                 <ConfidenceLevelBar confidenceRating={currentSummary.confidenceRating || ''} />
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
             {/* Agility Level */}
-            <Card className="border-unboxable-navy/20">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-base font-medium text-unboxable-navy flex items-center">
-                  <Award className="h-5 w-5 mr-2 text-unboxable-orange" />
-                  Leadership Agility
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-4 pb-6">
+            <div>
+              <h4 className="text-base font-medium text-unboxable-navy flex items-center mb-6">
+                <Award className="h-5 w-5 mr-2 text-unboxable-orange" />
+                Leadership Agility
+              </h4>
+              <div className="bg-white rounded-lg border border-unboxable-navy/10 p-6">
                 <AgilityLevelIndicator agilityLevel={currentSummary.agilityLevel || 'Achiever'} />
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
             {/* Strengths vs Development */}
-            <Card className="border-unboxable-navy/20">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-base font-medium text-unboxable-navy">
-                  Focus Areas Overview
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-4 pb-6">
+            <div>
+              <h4 className="text-base font-medium text-unboxable-navy mb-6">
+                Focus Areas Overview
+              </h4>
+              <div className="bg-white rounded-lg border border-unboxable-navy/10 p-6">
                 <div className="h-64">
                   <StrengthsComparisonChart 
                     strengths={currentSummary.topStrengths || []}
                     developmentAreas={currentSummary.developmentAreas || []}
                   />
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -578,18 +568,14 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
             {/* Radar Chart Visualization */}
             {radarData.length > 0 && (
               <div className="mb-8">
-                <Card className="border-unboxable-navy/20">
-                  <CardHeader>
-                    <CardTitle className="text-base text-unboxable-navy">
-                      Rubric Assessment Overview
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-6 pb-8">
-                    <div className="h-80">
-                      <RubricScoresRadar data={radarData} />
-                    </div>
-                  </CardContent>
-                </Card>
+                <h4 className="text-base font-medium text-unboxable-navy mb-6">
+                  Rubric Assessment Overview
+                </h4>
+                <div className="bg-white rounded-lg border border-unboxable-navy/10 p-8">
+                  <div className="h-96">
+                    <RubricScoresRadar data={radarData} />
+                  </div>
+                </div>
               </div>
             )}
 
