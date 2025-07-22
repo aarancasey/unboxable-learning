@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Eye, Download, X } from 'lucide-react';
 import { exportToPDF } from '@/lib/pdfExport';
@@ -8,12 +8,12 @@ import { useToast } from '@/hooks/use-toast';
 interface PDFPreviewModalProps {
   survey: any;
   trigger?: React.ReactNode;
+  children: React.ReactNode; // The actual content to preview
 }
 
-export const PDFPreviewModal = ({ survey, trigger }: PDFPreviewModalProps) => {
+export const PDFPreviewModal = ({ survey, trigger, children }: PDFPreviewModalProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
-  const previewRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   const handleExportPDF = async () => {
@@ -37,23 +37,6 @@ export const PDFPreviewModal = ({ survey, trigger }: PDFPreviewModalProps) => {
     }
   };
 
-  // Clone the original element content for preview
-  useEffect(() => {
-    if (isOpen && previewRef.current) {
-      const originalElement = document.querySelector('[data-pdf-export]');
-      if (originalElement) {
-        // Clone the content but with a different background for preview
-        previewRef.current.innerHTML = originalElement.innerHTML;
-        
-        // Hide action buttons in preview
-        const actionButtons = previewRef.current.querySelector('.border-t.border-border');
-        if (actionButtons) {
-          (actionButtons as HTMLElement).style.display = 'none';
-        }
-      }
-    }
-  }, [isOpen]);
-
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -70,6 +53,9 @@ export const PDFPreviewModal = ({ survey, trigger }: PDFPreviewModalProps) => {
             <Eye className="h-5 w-5" />
             PDF Preview
           </DialogTitle>
+          <DialogDescription>
+            This is how your PDF will look when downloaded
+          </DialogDescription>
         </DialogHeader>
         
         <div className="flex-1 overflow-auto">
@@ -78,24 +64,26 @@ export const PDFPreviewModal = ({ survey, trigger }: PDFPreviewModalProps) => {
             <div className="bg-white shadow-lg mx-auto" style={{ width: '210mm', minHeight: '297mm' }}>
               {/* This simulates A4 dimensions */}
               <div 
-                ref={previewRef}
-                className="w-full p-6 text-sm"
+                className="w-full p-6 text-sm overflow-hidden"
                 style={{ 
                   transform: 'scale(0.7)', 
                   transformOrigin: 'top left',
                   width: '142.8%' // Compensate for scale
                 }}
               >
-                {/* Content will be populated by useEffect */}
+                {/* Render the actual content without action buttons */}
+                <div style={{ 
+                  filter: 'none', // Ensure no filters affect rendering
+                  WebkitPrintColorAdjust: 'exact' // Preserve colors
+                }}>
+                  {children}
+                </div>
               </div>
             </div>
           </div>
         </div>
         
         <div className="flex-shrink-0 flex justify-between items-center pt-4 border-t">
-          <p className="text-sm text-muted-foreground">
-            This is how your PDF will look when downloaded
-          </p>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => setIsOpen(false)}>
               <X className="h-4 w-4 mr-2" />

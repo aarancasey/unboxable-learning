@@ -28,6 +28,7 @@ import { exportToPDF } from '@/lib/pdfExport';
 import { supabase } from '@/integrations/supabase/client';
 import * as XLSX from 'xlsx';
 import { PDFPreviewModal } from './PDFPreviewModal';
+import { PDFPreviewContent } from './PDFPreviewContent';
 import { PurposeRatingGauge } from './charts/PurposeRatingGauge';
 import { RubricScoresRadar } from './charts/RubricScoresRadar';
 import { StrengthsComparisonChart } from './charts/StrengthsComparisonChart';
@@ -679,7 +680,9 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
                 <Edit3 className="h-4 w-4 mr-1" />
                 Edit
               </Button>
-              <PDFPreviewModal survey={survey} />
+              <PDFPreviewModal survey={survey}>
+                <PDFPreviewContent survey={survey} currentSummary={currentSummary} />
+              </PDFPreviewModal>
               <Button onClick={handleExportPDF} disabled={isExporting} size="sm">
                 <Download className="h-4 w-4 mr-1" />
                 PDF
