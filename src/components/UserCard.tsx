@@ -67,13 +67,48 @@ const UserCard = ({ learner, onActivate, onDelete, onResendInvite, onEdit }: Use
     }
   };
 
+  // Generate a consistent color based on email hash
+  const getAvatarColor = (email: string) => {
+    const colors = [
+      'bg-red-500',
+      'bg-orange-500', 
+      'bg-amber-500',
+      'bg-yellow-500',
+      'bg-lime-500',
+      'bg-green-500',
+      'bg-emerald-500',
+      'bg-teal-500',
+      'bg-cyan-500',
+      'bg-sky-500',
+      'bg-blue-500',
+      'bg-indigo-500',
+      'bg-violet-500',
+      'bg-purple-500',
+      'bg-fuchsia-500',
+      'bg-pink-500',
+      'bg-rose-500'
+    ];
+    
+    let hash = 0;
+    for (let i = 0; i < email.length; i++) {
+      hash = email.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    
+    const index = Math.abs(hash) % colors.length;
+    return colors[index];
+  };
+
+  const getInitial = (email: string) => {
+    return email.charAt(0).toUpperCase();
+  };
+
   return (
     <div className="p-4 sm:p-6 hover:bg-gray-50">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-3 sm:space-y-0">
         <div className="flex items-center space-x-3 sm:space-x-4">
           <div className="flex-shrink-0">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-unboxable-navy rounded-full flex items-center justify-center text-white font-medium text-sm">
-              {learner.name.charAt(0).toUpperCase()}
+            <div className={`w-8 h-8 sm:w-10 sm:h-10 ${getAvatarColor(learner.email)} rounded-full flex items-center justify-center text-white font-medium text-sm`}>
+              {getInitial(learner.email)}
             </div>
           </div>
           <div className="min-w-0 flex-1">
