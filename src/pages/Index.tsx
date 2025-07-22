@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { GraduationCap, Users } from 'lucide-react';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import LoginForm from '@/components/login/LoginForm';
+import unboxableLogo from '@/assets/unboxable-logo-white.png';
 
 const Index = () => {
   const [userRole, setUserRole] = useState<'learner' | 'admin' | null>(null);
@@ -51,16 +52,16 @@ const Index = () => {
         onBack={() => setShowLearnerLogin(false)} 
       />
     ) : (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-indigo-800 to-blue-800 flex flex-col font-montserrat">
+      <div className="min-h-screen bg-unboxable-navy flex flex-col font-montserrat">
         {/* Hero Section */}
         <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">
           <div className="max-w-4xl mx-auto text-center">
             {/* Unboxable Logo */}
             <div className="mb-8">
               <img 
-                src="/lovable-uploads/72877e4c-8de7-499d-86f0-77c477293eeb.png" 
+                src={unboxableLogo} 
                 alt="Unboxable" 
-                className="h-16 w-auto mx-auto filter brightness-0 invert"
+                className="h-16 w-auto mx-auto"
               />
             </div>
             
