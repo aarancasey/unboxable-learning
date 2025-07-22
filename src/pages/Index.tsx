@@ -51,48 +51,60 @@ const Index = () => {
         onBack={() => setShowLearnerLogin(false)} 
       />
     ) : (
-      <div className="min-h-screen bg-unboxable-navy flex flex-col font-montserrat">
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 flex flex-col font-montserrat">
         {/* Hero Section */}
-        <div className="flex-1 flex items-center p-4 sm:p-6 lg:p-8">
-          <div className="max-w-[1200px] mx-auto w-full">
-            <div className="max-w-2xl mx-auto lg:mx-0">
-              {/* Logo */}
-              <div className="mb-6 sm:mb-8 text-center lg:text-left">
-                <img 
-                  src="/lovable-uploads/72877e4c-8de7-499d-86f0-77c477293eeb.png" 
-                  alt="Unboxable" 
-                  className="h-10 sm:h-12 w-auto mx-auto lg:mx-0"
-                />
-              </div>
-              
-              {/* Heading and subheading */}
-              <div className="space-y-4 sm:space-y-6 mb-8 sm:mb-12 text-center lg:text-left">
-                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-montserrat-black font-black text-white leading-tight">
-                  Sparking the shift<br className="hidden sm:block" />
-                  <span className="sm:hidden"> </span>Inspiring action<span className="text-unboxable-orange">.</span>
-                </h1>
-                <p className="text-lg sm:text-xl text-white/90 font-montserrat-black font-black">
-                  Learning to help you move forward
-                </p>
-              </div>
-
-              {/* Learner Access - positioned under heading */}
-              <div className="max-w-sm mx-auto lg:mx-0">
-                <Card className="bg-white border-0 shadow-xl">
-                  <CardContent className="p-6 sm:p-8 text-center">
-                    <GraduationCap className="mx-auto h-12 sm:h-16 w-12 sm:w-16 text-unboxable-navy mb-3 sm:mb-4" />
-                    <h3 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-3 text-unboxable-navy">Learner Access</h3>
-                    <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">Access your courses and complete surveys</p>
-                    <Button 
-                      onClick={() => setShowLearnerLogin(true)}
-                      className="w-full bg-unboxable-navy text-white hover:bg-unboxable-navy/90 font-semibold py-2.5 sm:py-3 text-sm sm:text-base"
-                    >
-                      Get Started
-                    </Button>
-                  </CardContent>
-                </Card>
+        <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+          <div className="max-w-4xl mx-auto text-center">
+            {/* Star Icon */}
+            <div className="mb-8">
+              <div className="w-16 h-16 bg-unboxable-orange rounded-full flex items-center justify-center mx-auto">
+                <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                </svg>
               </div>
             </div>
+            
+            {/* Main Heading */}
+            <div className="space-y-6 mb-12">
+              <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white leading-tight tracking-tight">
+                LEAD<br />
+                FORWARD<span className="text-unboxable-orange">.</span>
+              </h1>
+              <p className="text-xl sm:text-2xl text-white/90 max-w-3xl mx-auto leading-relaxed font-medium">
+                Leadership is evolving. What worked yesterday won't always work tomorrow. The future demands more than competence - it calls for clarity, adaptability, and forward-thinking.
+              </p>
+            </div>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Button 
+                onClick={() => setShowLearnerLogin(true)}
+                className="bg-unboxable-orange hover:bg-unboxable-orange/90 text-white font-semibold px-8 py-4 text-lg rounded-lg"
+              >
+                Start Your Journey →
+              </Button>
+              <Button 
+                variant="outline"
+                className="border-2 border-white text-white hover:bg-white hover:text-purple-900 font-semibold px-8 py-4 text-lg rounded-lg bg-transparent"
+              >
+                Learn More
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Leadership Program Section */}
+        <div className="bg-white py-16 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-4xl sm:text-5xl font-black text-unboxable-navy mb-2 tracking-tight">
+              LEADERSHIP PROGRAM
+            </h2>
+            <h3 className="text-2xl sm:text-3xl font-black text-unboxable-orange mb-8">
+              DOUGLAS PHARMACEUTICALS
+            </h3>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+              This isn't about reinventing yourself. It's about rethinking how you lead - using your existing strengths with a sharper focus, a wider lens, and a stronger impact.
+            </p>
           </div>
         </div>
 
