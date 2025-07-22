@@ -19,118 +19,77 @@ export const exportToPDF = async (survey: any, filename: string = 'assessment') 
     console.log('Capturing visual layout for PDF...');
     
     // Find the AI summary container element
-    const summaryElement = document.querySelector('[data-pdf-export]') || 
-                          document.querySelector('.max-w-5xl') ||
-                          document.body;
+    const summaryElement = document.querySelector('[data-pdf-export]') as HTMLElement;
     
     if (!summaryElement) {
       throw new Error('Could not find summary element to export');
     }
 
-    // Create canvas from the visual element
-    const canvas = await html2canvas(summaryElement as HTMLElement, {
-      scale: 2, // Higher resolution
+    // Temporarily hide action buttons during capture
+    const actionButtons = summaryElement.querySelector('.border-t.border-border');
+    if (actionButtons) {
+      (actionButtons as HTMLElement).style.display = 'none';
+    }
+
+    // Create canvas from the visual element with better options
+    const canvas = await html2canvas(summaryElement, {
+      scale: 1.5, // Good balance of quality and performance
       useCORS: true,
-      allowTaint: true,
+      allowTaint: false,
       backgroundColor: '#ffffff',
-      width: summaryElement.scrollWidth,
-      height: summaryElement.scrollHeight,
-      scrollX: 0,
-      scrollY: 0
+      logging: false,
+      width: summaryElement.offsetWidth,
+      height: summaryElement.offsetHeight,
+      windowWidth: summaryElement.offsetWidth,
+      windowHeight: summaryElement.offsetHeight,
+      x: 0,
+      y: 0
     });
+
+    // Restore action buttons
+    if (actionButtons) {
+      (actionButtons as HTMLElement).style.display = '';
+    }
     
     // Create PDF with appropriate dimensions
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF('p', 'mm', 'a4');
+    const imgData = canvas.toDataURL('image/png', 0.95);
+    
+    // Use A4 landscape if content is wide, portrait if tall
+    const isWide = canvas.width > canvas.height;
+    const pdf = new jsPDF(isWide ? 'l' : 'p', 'mm', 'a4');
     
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
-    const margin = 10;
+    const margin = 15;
     
-    // Calculate image dimensions to fit page
-    const imgWidth = pageWidth - (margin * 2);
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    // Calculate dimensions to fit the content properly
+    const maxWidth = pageWidth - (margin * 2);
+    const maxHeight = pageHeight - (margin * 2);
     
-    // Add header with logo and title
-    pdf.setFillColor(240, 248, 255); // Light blue background
-    pdf.rect(0, 0, pageWidth, 40, 'F');
+    const widthRatio = maxWidth / canvas.width;
+    const heightRatio = maxHeight / canvas.height;
+    const scale = Math.min(widthRatio, heightRatio);
     
-    // Add logo area (placeholder for now)
-    pdf.setFontSize(16);
-    pdf.setTextColor(43, 74, 124); // Unboxable navy
-    pdf.setFont(undefined, 'bold');
-    pdf.text('unboxable.', margin, 20);
+    const imgWidth = canvas.width * scale;
+    const imgHeight = canvas.height * scale;
     
-    pdf.setFontSize(12);
-    pdf.setFont(undefined, 'normal');
-    pdf.text('AI Leadership Assessment Summary', margin, 30);
+    // Center the image on the page
+    const xOffset = (pageWidth - imgWidth) / 2;
+    const yOffset = (pageHeight - imgHeight) / 2;
     
-    // Add learner name and date
-    pdf.setFontSize(10);
+    // Add the image to PDF
+    pdf.addImage(imgData, 'PNG', xOffset, yOffset, imgWidth, imgHeight);
+    
+    // Add header text overlay
+    pdf.setFontSize(8);
     pdf.setTextColor(100, 100, 100);
-    pdf.text(`Learner: ${learnerName}`, pageWidth - 80, 20);
-    pdf.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth - 80, 30);
+    pdf.text(`${learnerName} - Leadership Assessment`, margin, 10);
+    pdf.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth - 60, 10);
     
-    let currentY = 50;
-    
-    // If the image is too tall for one page, split it
-    if (imgHeight > pageHeight - currentY - margin) {
-      // Calculate how much of the image fits on first page
-      const availableHeight = pageHeight - currentY - margin;
-      const firstPageImgHeight = availableHeight;
-      const firstPageCanvasHeight = (firstPageImgHeight * canvas.width) / imgWidth;
-      
-      // Create canvas for first page
-      const firstPageCanvas = document.createElement('canvas');
-      firstPageCanvas.width = canvas.width;
-      firstPageCanvas.height = firstPageCanvasHeight;
-      const firstPageCtx = firstPageCanvas.getContext('2d');
-      
-      if (firstPageCtx) {
-        firstPageCtx.drawImage(canvas, 0, 0, canvas.width, firstPageCanvasHeight, 0, 0, canvas.width, firstPageCanvasHeight);
-        const firstPageImgData = firstPageCanvas.toDataURL('image/png');
-        pdf.addImage(firstPageImgData, 'PNG', margin, currentY, imgWidth, firstPageImgHeight);
-      }
-      
-      // Add remaining content on new pages
-      let remainingHeight = canvas.height - firstPageCanvasHeight;
-      let sourceY = firstPageCanvasHeight;
-      
-      while (remainingHeight > 0) {
-        pdf.addPage();
-        
-        const pageAvailableHeight = pageHeight - (margin * 2);
-        const currentPageHeight = Math.min(remainingHeight, (pageAvailableHeight * canvas.width) / imgWidth);
-        
-        const pageCanvas = document.createElement('canvas');
-        pageCanvas.width = canvas.width;
-        pageCanvas.height = currentPageHeight;
-        const pageCtx = pageCanvas.getContext('2d');
-        
-        if (pageCtx) {
-          pageCtx.drawImage(canvas, 0, sourceY, canvas.width, currentPageHeight, 0, 0, canvas.width, currentPageHeight);
-          const pageImgData = pageCanvas.toDataURL('image/png');
-          const pageImgHeight = (currentPageHeight * imgWidth) / canvas.width;
-          pdf.addImage(pageImgData, 'PNG', margin, margin, imgWidth, pageImgHeight);
-        }
-        
-        remainingHeight -= currentPageHeight;
-        sourceY += currentPageHeight;
-      }
-    } else {
-      // Image fits on single page
-      pdf.addImage(imgData, 'PNG', margin, currentY, imgWidth, imgHeight);
-    }
-    
-    // Add footer to all pages
-    const totalPages = pdf.getNumberOfPages();
-    for (let i = 1; i <= totalPages; i++) {
-      pdf.setPage(i);
-      pdf.setFontSize(8);
-      pdf.setTextColor(150, 150, 150);
-      pdf.text('Confidential Leadership Assessment Report', margin, pageHeight - 10);
-      pdf.text(`Page ${i} of ${totalPages}`, pageWidth - 30, pageHeight - 10);
-    }
+    // Add footer
+    pdf.setFontSize(8);
+    pdf.setTextColor(150, 150, 150);
+    pdf.text('Confidential Leadership Assessment Report', margin, pageHeight - 5);
     
     // Save the PDF
     const pdfFilename = `${filename}-${learnerName.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.pdf`;
