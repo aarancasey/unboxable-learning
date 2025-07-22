@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { GraduationCap, Users } from 'lucide-react';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import LoginForm from '@/components/login/LoginForm';
-import unboxableLogo from '@/assets/unboxable-logo-white.png';
+
 
 const Index = () => {
   const [userRole, setUserRole] = useState<'learner' | 'admin' | null>(null);
@@ -59,7 +59,7 @@ const Index = () => {
             {/* Unboxable Logo */}
             <div className="mb-8">
               <img 
-                src={unboxableLogo} 
+                src="/lovable-uploads/fffe52f8-e9ca-4713-9638-169e09e23f57.png" 
                 alt="Unboxable" 
                 className="h-16 w-auto mx-auto"
               />
