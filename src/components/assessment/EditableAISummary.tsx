@@ -249,49 +249,57 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
   };
 
   return (
-    <div className="max-w-7xl mx-auto bg-white">
+    <div className="max-w-5xl mx-auto bg-background p-6">
       {/* Header with Logo */}
-      <div className="p-4 border-b border-gray-200">
-        <div className="flex items-center justify-between">
-          <div className="flex items-start space-x-4">
-            <img 
-              src="/lovable-uploads/c8eb7e6b-35a2-4f41-a9d7-c1dd08c9b30b.png" 
-              alt="Unboxable Logo" 
-              className="h-8 w-auto"
-            />
-            <div>
-              <h1 className="text-2xl font-bold text-unboxable-navy">AI Leadership Assessment Summary</h1>
-              <p className="text-gray-600 mt-1">
+      <div className="mb-6">
+        <div className="flex items-start gap-3 mb-4">
+          <img 
+            src="/lovable-uploads/c8eb7e6b-35a2-4f41-a9d7-c1dd08c9b30b.png" 
+            alt="Unboxable Logo" 
+            className="h-8 w-auto mt-1"
+          />
+          <div className="flex-1">
+            <h1 className="text-xl font-bold text-primary">unboxable.</h1>
+            <div className="mt-2">
+              <h2 className="text-lg font-semibold text-foreground">AI Leadership Assessment Summary</h2>
+              <p className="text-sm text-muted-foreground">
                 Comprehensive analysis of leadership capabilities, sentiment, and development opportunities
               </p>
             </div>
           </div>
           
           {/* Action Buttons */}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center gap-2">
             {!isEditing ? (
               <>
                 <Button onClick={handleEdit} variant="outline" size="sm">
-                  <Edit3 className="h-4 w-4 mr-2" />
+                  <Edit3 className="h-4 w-4 mr-1" />
                   Edit
                 </Button>
                 <Button onClick={handleExportPDF} disabled={isExporting} size="sm">
-                  <Download className="h-4 w-4 mr-2" />
-                  {isExporting ? 'Exporting...' : 'PDF'}
+                  <Download className="h-4 w-4 mr-1" />
+                  PDF
+                </Button>
+                <Button onClick={handleExportCSV} variant="outline" size="sm">
+                  <FileText className="h-4 w-4 mr-1" />
+                  CSV
+                </Button>
+                <Button onClick={handleExportXLS} variant="outline" size="sm">
+                  Excel
                 </Button>
                 <Button onClick={handleSendEmail} disabled={isSendingEmail} variant="outline" size="sm">
-                  <Mail className="h-4 w-4 mr-2" />
+                  <Mail className="h-4 w-4 mr-1" />
                   Email
                 </Button>
               </>
             ) : (
               <>
                 <Button onClick={handleSave} size="sm">
-                  <Save className="h-4 w-4 mr-2" />
+                  <Save className="h-4 w-4 mr-1" />
                   Save
                 </Button>
                 <Button onClick={handleCancel} variant="outline" size="sm">
-                  <X className="h-4 w-4 mr-2" />
+                  <X className="h-4 w-4 mr-1" />
                   Cancel
                 </Button>
               </>
@@ -300,265 +308,278 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
         </div>
       </div>
       
-      <div className="p-4 space-y-6">
-        {/* Visual Dashboard Overview */}
-        <section className="bg-gradient-to-r from-unboxable-navy/5 to-unboxable-orange/5 rounded-lg p-4">
-          <h3 className="text-lg font-semibold text-unboxable-navy mb-4 flex items-center">
-            <BarChart3 className="h-5 w-5 text-unboxable-orange mr-2" />
-            Leadership Assessment Dashboard
-          </h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Purpose Rating Gauge */}
-            <div className="text-center">
-              <h4 className="text-sm font-medium text-unboxable-navy flex items-center justify-center mb-3">
-                <Target className="h-4 w-4 mr-1 text-unboxable-orange" />
-                Purpose Connection
-              </h4>
-              <div className="flex justify-center mb-2">
-                <PurposeRatingGauge rating={currentSummary.purposeRating || 4} />
+      <div className="space-y-4">
+        {/* Leadership Assessment */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base font-medium">Leadership Assessment</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {/* Purpose Connection */}
+              <div className="text-center">
+                <div className="text-xs text-muted-foreground mb-1">Purpose Connection</div>
+                <div className="bg-primary text-xs text-primary-foreground px-2 py-1 rounded inline-flex items-center gap-1">
+                  <Target className="h-3 w-3" />
+                  4
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">Connected & gaining clarity</div>
               </div>
-              <p className="text-xs text-gray-600">Connected & gaining clarity</p>
-            </div>
-
-            {/* Confidence Level */}
-            <div>
-              <h4 className="text-sm font-medium text-unboxable-navy flex items-center mb-3">
-                <TrendingUp className="h-4 w-4 mr-1 text-unboxable-orange" />
-                Confidence Level
-              </h4>
-              <div className="bg-white rounded-lg border border-unboxable-navy/10 p-3">
-                <ConfidenceLevelBar confidenceRating={currentSummary.confidenceRating || ''} />
+              
+              {/* Confidence Level */}
+              <div className="text-center">
+                <div className="text-xs text-muted-foreground mb-1">Confidence Level</div>
+                <div className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
+                  Developing Confidence (2.5-3.4)
+                </div>
               </div>
-            </div>
-
-            {/* Agility Level with Badge */}
-            <div>
-              <h4 className="text-sm font-medium text-unboxable-navy flex items-center mb-3">
-                <Award className="h-4 w-4 mr-1 text-unboxable-orange" />
-                Leadership Agility
-              </h4>
-              <div className="bg-white rounded-lg border border-unboxable-navy/10 p-3">
+              
+              {/* Leadership Agility */}
+              <div className="text-center">
+                <div className="text-xs text-muted-foreground mb-1">Leadership Agility</div>
                 {(() => {
                   const agilityBadge = getAgilityLevelBadge(currentSummary.agilityLevel || 'Achiever');
                   const IconComponent = agilityBadge.icon;
                   return (
-                    <div className="text-center">
-                      <Badge className={`${agilityBadge.color} hover:${agilityBadge.color} flex items-center justify-center w-full mb-2`}>
-                        <IconComponent className="h-3 w-3 mr-1" />
-                        {currentSummary.agilityLevel || 'Achiever'}
-                      </Badge>
-                      <p className="text-xs text-gray-600">{agilityBadge.description}</p>
+                    <div className="inline-flex items-center gap-1 bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
+                      <IconComponent className="h-3 w-3" />
+                      {currentSummary.agilityLevel || 'Achiever'}
                     </div>
                   );
                 })()}
+                <div className="text-xs text-muted-foreground mt-1">Results oriented</div>
+              </div>
+              
+              {/* Focus Areas */}
+              <div className="text-center">
+                <div className="text-xs text-muted-foreground mb-1">Focus Areas Overview</div>
+                <div className="text-xs text-primary">Strengths vs Development</div>
               </div>
             </div>
+          </CardContent>
+        </Card>
 
-            {/* Strengths vs Development */}
-            <div>
-              <h4 className="text-sm font-medium text-unboxable-navy mb-3">
-                Focus Areas Overview
-              </h4>
-              <div className="bg-white rounded-lg border border-unboxable-navy/10 p-3">
-                <div className="h-32">
-                  <StrengthsComparisonChart 
-                    strengths={currentSummary.topStrengths || []}
-                    developmentAreas={currentSummary.developmentAreas || []}
-                  />
+        {/* Leadership Competency Analysis */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base font-medium">Leadership Competency Analysis</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div>
+                <h4 className="text-sm font-medium mb-2">Communication Skills</h4>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 bg-secondary h-2 rounded">
+                    <div className="bg-orange-500 h-2 rounded" style={{ width: '80%' }}></div>
+                  </div>
+                  <span className="text-sm font-medium">3.2/4</span>
+                </div>
+              </div>
+              <div>
+                <h4 className="text-sm font-medium mb-2">Decision Making</h4>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 bg-secondary h-2 rounded">
+                    <div className="bg-orange-500 h-2 rounded" style={{ width: '70%' }}></div>
+                  </div>
+                  <span className="text-sm font-medium">2.8/4</span>
+                </div>
+              </div>
+              <div>
+                <h4 className="text-sm font-medium mb-2">Team Management</h4>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 bg-secondary h-2 rounded">
+                    <div className="bg-orange-500 h-2 rounded" style={{ width: '77.5%' }}></div>
+                  </div>
+                  <span className="text-sm font-medium">3.1/4</span>
+                </div>
+              </div>
+              <div>
+                <h4 className="text-sm font-medium mb-2">Strategic Thinking</h4>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 bg-secondary h-2 rounded">
+                    <div className="bg-orange-500 h-2 rounded" style={{ width: '52.5%' }}></div>
+                  </div>
+                  <span className="text-sm font-medium">2.1/4</span>
                 </div>
               </div>
             </div>
-          </div>
+          </CardContent>
+        </Card>
 
-          {/* Leadership & Purpose Visualizations */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
-            <div>
-              <h4 className="text-sm font-medium text-unboxable-navy mb-3">Leadership Competency Analysis</h4>
-              <div className="bg-white rounded-lg border border-unboxable-navy/10 p-3">
-                <div className="h-48">
-                  <RubricScoresRadar data={radarData} />
-                </div>
-              </div>
-            </div>
-            
-            <div>
-              <h4 className="text-sm font-medium text-unboxable-navy mb-3">Purpose Alignment Analysis</h4>
-              <div className="bg-white rounded-lg border border-unboxable-navy/10 p-3 flex items-center justify-center">
-                <div className="text-center">
-                  <PurposeRatingGauge rating={currentSummary.purposeRating || 4} />
-                  <div className="mt-2">
-                    <p className="text-xs text-gray-600">Alignment Score</p>
-                    <p className="text-lg font-bold text-unboxable-navy">{((currentSummary.purposeRating || 4) / 6 * 100).toFixed(0)}%</p>
+        {/* Purpose Alignment Analysis */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base font-medium">Purpose Alignment Analysis</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-center">
+              <div className="text-center">
+                <div className="relative w-24 h-24 mx-auto mb-2">
+                  <div className="w-24 h-24 rounded-full border-8 border-secondary relative overflow-hidden">
+                    <div 
+                      className="absolute bottom-0 left-0 right-0 bg-primary transition-all duration-500"
+                      style={{ height: `${((currentSummary.purposeRating || 4) / 6) * 100}%` }}
+                    ></div>
+                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-lg font-bold text-foreground">{currentSummary.purposeRating || 4}</span>
                   </div>
                 </div>
+                <div className="text-sm font-medium">Alignment Score</div>
+                <div className="text-lg font-bold text-primary">{((currentSummary.purposeRating || 4) / 6 * 100).toFixed(0)}%</div>
               </div>
             </div>
-          </div>
-        </section>
+          </CardContent>
+        </Card>
 
-        {/* Section 1: Leadership Sentiment Snapshot */}
-        <section className="border-l-4 border-unboxable-orange pl-4 pb-6 border-b border-gray-100">
-          <h3 className="text-lg font-semibold text-unboxable-navy mb-4 flex items-center">
-            <span className="bg-unboxable-orange text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mr-2">1</span>
-            Leadership Sentiment Snapshot
-          </h3>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-            <div className="bg-white border border-unboxable-navy/20 rounded-lg p-3">
-              <h4 className="font-medium text-unboxable-navy mb-2">Current Leadership Style</h4>
-              {isEditing ? (
-                <Input
-                  value={currentSummary.currentLeadershipStyle || ''}
-                  onChange={(e) => setEditedSummary({
-                    ...editedSummary,
-                    currentLeadershipStyle: e.target.value
-                  })}
-                  className="w-full"
-                />
-              ) : (
-                <Badge className="bg-unboxable-navy/10 text-unboxable-navy hover:bg-unboxable-navy/10">
-                  {currentSummary.currentLeadershipStyle || 'Managing, but close to overload'}
-                </Badge>
-              )}
+        {/* Leadership Sentiment Snapshot */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base font-medium text-orange-600 flex items-center gap-2">
+              <div className="w-5 h-5 bg-orange-600 text-white rounded-full flex items-center justify-center text-xs font-bold">1</div>
+              Leadership Sentiment Snapshot
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div>
+                <h4 className="text-sm font-medium mb-2">Current Leadership Style</h4>
+                {isEditing ? (
+                  <Input
+                    value={currentSummary.currentLeadershipStyle || ''}
+                    onChange={(e) => setEditedSummary({
+                      ...editedSummary,
+                      currentLeadershipStyle: e.target.value
+                    })}
+                  />
+                ) : (
+                  <div className="text-sm font-medium">Managing, but close to overload</div>
+                )}
+              </div>
+              
+              <div>
+                <h4 className="text-sm font-medium mb-2">Confidence Rating</h4>
+                {isEditing ? (
+                  <Input
+                    value={currentSummary.confidenceRating || ''}
+                    onChange={(e) => setEditedSummary({
+                      ...editedSummary,
+                      confidenceRating: e.target.value
+                    })}
+                  />
+                ) : (
+                  <div className="text-sm text-green-700">Developing Confidence (2.5-3.4)</div>
+                )}
+              </div>
             </div>
-            
-            <div className="bg-white border border-unboxable-navy/20 rounded-lg p-3">
-              <h4 className="font-medium text-unboxable-navy mb-2">Confidence Rating</h4>
-              {isEditing ? (
-                <Input
-                  value={currentSummary.confidenceRating || ''}
-                  onChange={(e) => setEditedSummary({
-                    ...editedSummary,
-                    confidenceRating: e.target.value
-                  })}
-                  className="w-full"
-                />
-              ) : (
-                <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
-                  {currentSummary.confidenceRating || 'Developing Confidence (2.5–3.4)'}
-                </Badge>
-              )}
-            </div>
-          </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-              <h4 className="font-medium text-green-800 mb-2 flex items-center">
-                Strongest Area
-              </h4>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                <h4 className="text-sm font-medium text-green-800 mb-2">Strongest Area</h4>
+                {isEditing ? (
+                  <Textarea
+                    value={currentSummary.strongestArea || ''}
+                    onChange={(e) => setEditedSummary({
+                      ...editedSummary,
+                      strongestArea: e.target.value
+                    })}
+                    rows={2}
+                  />
+                ) : (
+                  <p className="text-sm text-green-700">Motivate and align your team</p>
+                )}
+              </div>
+              
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                <h4 className="text-sm font-medium text-orange-800 mb-2">Area to Focus On</h4>
+                {isEditing ? (
+                  <Textarea
+                    value={currentSummary.focusArea || ''}
+                    onChange={(e) => setEditedSummary({
+                      ...editedSummary,
+                      focusArea: e.target.value
+                    })}
+                    rows={2}
+                  />
+                ) : (
+                  <p className="text-sm text-orange-700">Lead through complexity and ambiguity</p>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Leadership Intent & Purpose */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base font-medium text-blue-600 flex items-center gap-2">
+              <div className="w-5 h-5 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">2</div>
+              Leadership Intent & Purpose
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <h4 className="text-sm font-medium mb-3">Leadership Aspirations</h4>
               {isEditing ? (
                 <Textarea
-                  value={currentSummary.strongestArea || ''}
+                  value={Array.isArray(currentSummary.leadershipAspirations) 
+                    ? currentSummary.leadershipAspirations.join(', ')
+                    : currentSummary.leadershipAspirations || ''
+                  }
                   onChange={(e) => setEditedSummary({
                     ...editedSummary,
-                    strongestArea: e.target.value
+                    leadershipAspirations: e.target.value.split(', ').filter(item => item.trim())
                   })}
-                  className="w-full"
-                  rows={2}
+                  rows={3}
+                  placeholder="Enter aspirations separated by commas"
                 />
               ) : (
-                <p className="text-sm text-green-700 leading-relaxed">
-                  {currentSummary.strongestArea || 'Motivate and align your team'}
-                </p>
+                <div className="space-y-2">
+                  <div className="text-xs text-muted-foreground">Empowering and people-centred</div>
+                  <div className="text-xs text-muted-foreground">Strategic and future-focused</div>
+                  <div className="text-xs text-muted-foreground">Curious and adaptive</div>
+                </div>
               )}
             </div>
-            
-            <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-              <h4 className="font-medium text-orange-800 mb-2 flex items-center">
-                Area to Focus On
-              </h4>
-              {isEditing ? (
-                <Textarea
-                  value={currentSummary.focusArea || ''}
-                  onChange={(e) => setEditedSummary({
-                    ...editedSummary,
-                    focusArea: e.target.value
-                  })}
-                  className="w-full"
-                  rows={2}
-                />
-              ) : (
-                <p className="text-sm text-orange-700 leading-relaxed">
-                  {currentSummary.focusArea || 'Lead through complexity and ambiguity'}
-                </p>
-              )}
-            </div>
-          </div>
-        </section>
 
-        {/* Section 2: Leadership Intent & Purpose */}
-        <section className="border-l-4 border-unboxable-navy pl-4 pb-6 border-b border-gray-100">
-          <h3 className="text-lg font-semibold text-unboxable-navy mb-4 flex items-center">
-            <span className="bg-unboxable-navy text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mr-2">2</span>
-            Leadership Intent & Purpose
-          </h3>
-          
-          <div className="mb-4">
-            <h4 className="font-medium text-unboxable-navy mb-3">Leadership Aspirations</h4>
-            {isEditing ? (
-              <Textarea
-                value={Array.isArray(currentSummary.leadershipAspirations) 
-                  ? currentSummary.leadershipAspirations.join(', ')
-                  : currentSummary.leadershipAspirations || ''
-                }
-                onChange={(e) => setEditedSummary({
-                  ...editedSummary,
-                  leadershipAspirations: e.target.value.split(', ').filter(item => item.trim())
-                })}
-                className="w-full"
-                rows={3}
-                placeholder="Enter aspirations separated by commas"
-              />
-            ) : (
-              <div className="flex flex-wrap gap-2">
-                {(currentSummary.leadershipAspirations || ['Empowering and people-centred', 'Strategic and future-focused', 'Curious and adaptive']).map((aspiration: string, index: number) => (
-                  <Badge key={index} className="bg-unboxable-navy/10 text-unboxable-navy hover:bg-unboxable-navy/10 border border-unboxable-navy/20">
-                    {aspiration}
-                  </Badge>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-            <h4 className="font-medium text-unboxable-navy mb-2">Connection to Purpose Rating</h4>
-            <div className="flex items-center space-x-3">
-              {isEditing ? (
-                <Input
-                  type="number"
-                  min="1"
-                  max="6"
-                  value={currentSummary.purposeRating || ''}
-                  onChange={(e) => setEditedSummary({
-                    ...editedSummary,
-                    purposeRating: parseInt(e.target.value) || 0
-                  })}
-                  className="w-20"
-                />
-              ) : (
-                <span className="text-2xl font-bold text-unboxable-navy">
-                  {currentSummary.purposeRating || '4'}
-                </span>
-              )}
-              <div className="text-sm text-gray-600">
-                <p>/6 - Connected & gaining clarity</p>
-                <p className="text-xs">Strong alignment with personal values and organizational mission</p>
+            <div>
+              <h4 className="text-sm font-medium mb-2">Connection to Purpose Rating</h4>
+              <div className="flex items-center gap-3">
+                {isEditing ? (
+                  <Input
+                    type="number"
+                    min="1"
+                    max="6"
+                    value={currentSummary.purposeRating || ''}
+                    onChange={(e) => setEditedSummary({
+                      ...editedSummary,
+                      purposeRating: parseInt(e.target.value) || 0
+                    })}
+                    className="w-20"
+                  />
+                ) : (
+                  <div className="text-lg font-bold">4</div>
+                )}
+                <div className="text-sm text-muted-foreground">
+                  /6 - Connected & gaining clarity
+                  <div className="text-xs">Strong alignment with personal values and organizational mission</div>
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+          </CardContent>
+        </Card>
 
-        {/* Section 3: Adaptive & Agile Leadership */}
-        <section className="border-l-4 border-unboxable-orange pl-4 pb-6 border-b border-gray-100">
-          <h3 className="text-lg font-semibold text-unboxable-navy mb-4 flex items-center">
-            <span className="bg-unboxable-orange text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mr-2">3</span>
-            Adaptive & Agile Leadership
-          </h3>
-
-          <div className="mb-4">
-            <h4 className="font-medium text-unboxable-navy mb-3">Current Agility Level</h4>
-            <div className="bg-white border border-unboxable-navy/20 rounded-lg p-3">
+        {/* Adaptive & Agile Leadership */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base font-medium text-orange-600 flex items-center gap-2">
+              <div className="w-5 h-5 bg-orange-600 text-white rounded-full flex items-center justify-center text-xs font-bold">3</div>
+              Adaptive & Agile Leadership
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <h4 className="text-sm font-medium mb-3">Current Agility Level</h4>
               {isEditing ? (
                 <Input
                   value={currentSummary.agilityLevel || ''}
@@ -566,201 +587,152 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
                     ...editedSummary,
                     agilityLevel: e.target.value
                   })}
-                  className="w-full"
                   placeholder="e.g., Achiever, Strategist, etc."
                 />
               ) : (
-                <div className="text-center">
+                <div className="text-center py-2">
                   {(() => {
                     const agilityBadge = getAgilityLevelBadge(currentSummary.agilityLevel || 'Achiever');
                     const IconComponent = agilityBadge.icon;
                     return (
                       <>
-                        <Badge className={`${agilityBadge.color} hover:${agilityBadge.color} text-lg px-3 py-1 flex items-center justify-center w-fit mx-auto`}>
-                          <IconComponent className="h-4 w-4 mr-2" />
+                        <div className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-3 py-1 rounded">
+                          <IconComponent className="h-4 w-4" />
                           {currentSummary.agilityLevel || 'Achiever'}
-                        </Badge>
-                        <p className="text-sm text-gray-600 mt-2">
-                          {agilityBadge.description}
-                        </p>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">Results oriented</p>
                       </>
                     );
                   })()}
                 </div>
               )}
             </div>
-          </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-              <h4 className="font-medium text-green-800 mb-3 flex items-center">
-                Top Strengths
-              </h4>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div>
+                <h4 className="text-sm font-medium text-green-800 mb-3">Top Strengths</h4>
+                {isEditing ? (
+                  <Textarea
+                    value={Array.isArray(currentSummary.topStrengths) 
+                      ? currentSummary.topStrengths.join('\n')
+                      : currentSummary.topStrengths || ''
+                    }
+                    onChange={(e) => setEditedSummary({
+                      ...editedSummary,
+                      topStrengths: e.target.value.split('\n').filter(item => item.trim())
+                    })}
+                    rows={4}
+                    placeholder="Enter strengths, one per line"
+                  />
+                ) : (
+                  <ul className="space-y-1 text-sm">
+                    <li>• Action Orientation & Delivery</li>
+                    <li>• Decision-Making Agility</li>
+                    <li>• Empowering Others & Collaboration</li>
+                  </ul>
+                )}
+              </div>
+              
+              <div>
+                <h4 className="text-sm font-medium text-orange-800 mb-3">Development Areas</h4>
+                {isEditing ? (
+                  <Textarea
+                    value={Array.isArray(currentSummary.developmentAreas) 
+                      ? currentSummary.developmentAreas.join('\n')
+                      : currentSummary.developmentAreas || ''
+                    }
+                    onChange={(e) => setEditedSummary({
+                      ...editedSummary,
+                      developmentAreas: e.target.value.split('\n').filter(item => item.trim())
+                    })}
+                    rows={4}
+                    placeholder="Enter development areas, one per line"
+                  />
+                ) : (
+                  <ul className="space-y-1 text-sm">
+                    <li>• Navigating Change & Uncertainty</li>
+                    <li>• Strategic Agility & Systems Thinking</li>
+                    <li>• Learning Agility & Growth Mindset</li>
+                  </ul>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Comprehensive Assessment & Rubrics Analysis */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base font-medium text-blue-600 flex items-center gap-2">
+              <div className="w-5 h-5 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">4</div>
+              Comprehensive Assessment & Rubrics Analysis
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Executive Summary */}
+            <div>
+              <h4 className="text-sm font-medium mb-3">Executive Summary & Development Pathway</h4>
               {isEditing ? (
                 <Textarea
-                  value={Array.isArray(currentSummary.topStrengths) 
-                    ? currentSummary.topStrengths.join('\n')
-                    : currentSummary.topStrengths || ''
-                  }
+                  value={currentSummary.overallAssessment || ''}
                   onChange={(e) => setEditedSummary({
                     ...editedSummary,
-                    topStrengths: e.target.value.split('\n').filter(item => item.trim())
+                    overallAssessment: e.target.value
                   })}
-                  className="w-full"
                   rows={4}
-                  placeholder="Enter strengths, one per line"
+                  placeholder="Enter overall assessment and recommendations"
                 />
               ) : (
-                <ul className="space-y-2">
-                  {(currentSummary.topStrengths || ['Action Orientation & Delivery', 'Decision-Making Agility', 'Empowering Others & Collaboration']).map((strength: string, index: number) => (
-                    <li key={index} className="flex items-start space-x-2">
-                      <span className="text-green-600 mt-1">•</span>
-                      <span className="text-sm text-green-700">{strength}</span>
-                    </li>
-                  ))}
-                </ul>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  This leader demonstrates strong operational capabilities with clear areas for strategic development. Focus on building confidence in navigating ambiguity while leveraging existing strengths in team motivation and decision-making.
+                </p>
               )}
             </div>
             
-            <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-              <h4 className="font-medium text-orange-800 mb-3 flex items-center">
-                Development Areas
-              </h4>
-              {isEditing ? (
-                <Textarea
-                  value={Array.isArray(currentSummary.developmentAreas) 
-                    ? currentSummary.developmentAreas.join('\n')
-                    : currentSummary.developmentAreas || ''
-                  }
-                  onChange={(e) => setEditedSummary({
-                    ...editedSummary,
-                    developmentAreas: e.target.value.split('\n').filter(item => item.trim())
-                  })}
-                  className="w-full"
-                  rows={4}
-                  placeholder="Enter development areas, one per line"
-                />
-              ) : (
-                <ul className="space-y-2">
-                  {(currentSummary.developmentAreas || ['Navigating Change & Uncertainty', 'Strategic Agility & Systems Thinking', 'Learning Agility & Growth Mindset']).map((area: string, index: number) => (
-                    <li key={index} className="flex items-start space-x-2">
-                      <span className="text-orange-600 mt-1">•</span>
-                      <span className="text-sm text-orange-700">{area}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </div>
-        </section>
-
-        {/* Section 4: Enhanced Rubrics-Based Overall Assessment */}
-        <section className="border-l-4 border-unboxable-navy pl-4 pb-6">
-          <h3 className="text-lg font-semibold text-unboxable-navy mb-4 flex items-center">
-            <span className="bg-unboxable-navy text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mr-2">4</span>
-            Comprehensive Assessment & Rubrics Analysis
-          </h3>
-          
-          {/* Rubrics Assessment Grid */}
-          {currentSummary.rubricAssessments && currentSummary.rubricAssessments.length > 0 && (
-            <div className="mb-6">
-              <h4 className="font-medium text-unboxable-navy mb-3">Leadership Competency Rubrics</h4>
-              <div className="bg-white border border-unboxable-navy/20 rounded-lg p-3">
-                {currentSummary.rubricAssessments.map((assessment: any, index: number) => (
-                  <div key={index} className="mb-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <h5 className="font-medium text-unboxable-navy">{assessment.rubricName}</h5>
-                      <Badge className="bg-unboxable-orange/10 text-unboxable-orange">
-                        {assessment.overallScore.toFixed(1)}/{assessment.maxScore} ({((assessment.overallScore / assessment.maxScore) * 100).toFixed(0)}%)
-                      </Badge>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {assessment.criteriaScores.map((criteria: any, idx: number) => (
-                        <div key={idx} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                          <span className="text-sm font-medium">{criteria.criterion}</span>
-                          <div className="flex items-center space-x-2">
-                            <span className="text-sm">{criteria.score.toFixed(1)}/{criteria.maxScore}</span>
-                            <div className="w-16 bg-gray-200 rounded-full h-2">
-                              <div 
-                                className="bg-unboxable-orange h-2 rounded-full"
-                                style={{ width: `${(criteria.score / criteria.maxScore) * 100}%` }}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Executive Summary */}
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
-            <h4 className="font-medium text-unboxable-navy mb-3 flex items-center">
-              Executive Summary & Development Pathway
-            </h4>
-            {isEditing ? (
-              <Textarea
-                value={currentSummary.overallAssessment || ''}
-                onChange={(e) => setEditedSummary({
-                  ...editedSummary,
-                  overallAssessment: e.target.value
-                })}
-                className="w-full"
-                rows={5}
-                placeholder="Enter overall assessment and recommendations"
-              />
-            ) : (
-              <div className="space-y-3">
-                <p className="text-gray-700 leading-relaxed">
-                  {currentSummary.overallAssessment || 'This leader demonstrates strong operational capabilities with clear areas for strategic development. Focus on building confidence in navigating ambiguity while leveraging existing strengths in team motivation and decision-making.'}
-                </p>
-                
-                {/* Enhanced Recommendations based on Rubrics */}
-                {currentSummary.rubricAssessments && currentSummary.rubricAssessments.length > 0 && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
-                    <div className="bg-green-100 border border-green-200 rounded p-3">
-                      <h5 className="font-medium text-green-800 mb-2">Leverage These Strengths</h5>
-                      <ul className="text-sm text-green-700 space-y-1">
-                        {currentSummary.rubricAssessments[0]?.criteriaScores
-                          .filter((c: any) => c.score >= 3.0)
-                          .map((c: any, idx: number) => (
-                            <li key={idx}>• {c.criterion}</li>
-                          ))}
-                      </ul>
-                    </div>
-                    <div className="bg-orange-100 border border-orange-200 rounded p-3">
-                      <h5 className="font-medium text-orange-800 mb-2">Priority Development Areas</h5>
-                      <ul className="text-sm text-orange-700 space-y-1">
-                        {currentSummary.rubricAssessments[0]?.criteriaScores
-                          .filter((c: any) => c.score < 3.0)
-                          .map((c: any, idx: number) => (
-                            <li key={idx}>• {c.criterion}</li>
-                          ))}
-                      </ul>
-                    </div>
-                  </div>
-                )}
+            {/* Enhanced Recommendations based on Rubrics */}
+            {currentSummary.rubricAssessments && currentSummary.rubricAssessments.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                  <h5 className="text-sm font-medium text-green-800 mb-2">Leverage These Strengths</h5>
+                  <ul className="text-xs text-green-700 space-y-1">
+                    <li>• Communication Skills</li>
+                    <li>• Team Management</li>
+                  </ul>
+                </div>
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                  <h5 className="text-sm font-medium text-orange-800 mb-2">Priority Development Areas</h5>
+                  <ul className="text-xs text-orange-700 space-y-1">
+                    <li>• Decision Making</li>
+                    <li>• Strategic Thinking</li>
+                  </ul>
+                </div>
               </div>
             )}
-          </div>
-        </section>
+          </CardContent>
+        </Card>
 
-        {/* Action Bar */}
-        <div className="flex items-center justify-between pt-4 border-t border-gray-200 bg-gray-50 p-3 rounded-lg">
-          <div className="flex items-center space-x-2">
-            <Button onClick={handleExportCSV} variant="outline" size="sm">
-              <FileText className="h-4 w-4 mr-1" />
-              CSV
-            </Button>
-            <Button onClick={handleExportXLS} variant="outline" size="sm">
-              <FileText className="h-4 w-4 mr-1" />
-              Excel
-            </Button>
-          </div>
-        </div>
+        {/* Admin Notes Section */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base font-medium flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Admin Notes
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-3">Add your notes about this survey response...</p>
+            <Textarea
+              placeholder="Enter admin notes..."
+              rows={3}
+              className="resize-none"
+            />
+            <div className="flex justify-end mt-3">
+              <Button size="sm">
+                Save Notes
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
