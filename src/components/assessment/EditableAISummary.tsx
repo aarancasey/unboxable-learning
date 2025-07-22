@@ -248,7 +248,7 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
   };
 
   return (
-    <div className="max-w-5xl mx-auto bg-background p-6">
+    <div className="max-w-5xl mx-auto bg-background p-6" data-pdf-export>
       {/* Header with Logo */}
       <div className="mb-6">
         <div className="text-center mb-6">

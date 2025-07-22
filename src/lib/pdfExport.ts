@@ -14,118 +14,123 @@ export const exportToPDF = async (survey: any, filename: string = 'assessment') 
   if (!learnerName) {
     throw new Error('Survey learner name is required for PDF export');
   }
-  
+
   try {
-    console.log('Creating text-based PDF...');
+    console.log('Capturing visual layout for PDF...');
     
-    // Create PDF directly with text instead of html2canvas approach
+    // Find the AI summary container element
+    const summaryElement = document.querySelector('[data-pdf-export]') || 
+                          document.querySelector('.max-w-5xl') ||
+                          document.body;
+    
+    if (!summaryElement) {
+      throw new Error('Could not find summary element to export');
+    }
+
+    // Create canvas from the visual element
+    const canvas = await html2canvas(summaryElement as HTMLElement, {
+      scale: 2, // Higher resolution
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ffffff',
+      width: summaryElement.scrollWidth,
+      height: summaryElement.scrollHeight,
+      scrollX: 0,
+      scrollY: 0
+    });
+    
+    // Create PDF with appropriate dimensions
+    const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p', 'mm', 'a4');
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const margin = 20;
-    const lineHeight = 7;
-    let yPosition = margin;
     
-    // Helper function to add text with word wrapping
-    const addText = (text: string, fontSize: number = 11, isBold: boolean = false) => {
-      pdf.setFontSize(fontSize);
-      if (isBold) {
-        pdf.setFont(undefined, 'bold');
-      } else {
-        pdf.setFont(undefined, 'normal');
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const margin = 10;
+    
+    // Calculate image dimensions to fit page
+    const imgWidth = pageWidth - (margin * 2);
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    
+    // Add header with logo and title
+    pdf.setFillColor(240, 248, 255); // Light blue background
+    pdf.rect(0, 0, pageWidth, 40, 'F');
+    
+    // Add logo area (placeholder for now)
+    pdf.setFontSize(16);
+    pdf.setTextColor(43, 74, 124); // Unboxable navy
+    pdf.setFont(undefined, 'bold');
+    pdf.text('unboxable.', margin, 20);
+    
+    pdf.setFontSize(12);
+    pdf.setFont(undefined, 'normal');
+    pdf.text('AI Leadership Assessment Summary', margin, 30);
+    
+    // Add learner name and date
+    pdf.setFontSize(10);
+    pdf.setTextColor(100, 100, 100);
+    pdf.text(`Learner: ${learnerName}`, pageWidth - 80, 20);
+    pdf.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth - 80, 30);
+    
+    let currentY = 50;
+    
+    // If the image is too tall for one page, split it
+    if (imgHeight > pageHeight - currentY - margin) {
+      // Calculate how much of the image fits on first page
+      const availableHeight = pageHeight - currentY - margin;
+      const firstPageImgHeight = availableHeight;
+      const firstPageCanvasHeight = (firstPageImgHeight * canvas.width) / imgWidth;
+      
+      // Create canvas for first page
+      const firstPageCanvas = document.createElement('canvas');
+      firstPageCanvas.width = canvas.width;
+      firstPageCanvas.height = firstPageCanvasHeight;
+      const firstPageCtx = firstPageCanvas.getContext('2d');
+      
+      if (firstPageCtx) {
+        firstPageCtx.drawImage(canvas, 0, 0, canvas.width, firstPageCanvasHeight, 0, 0, canvas.width, firstPageCanvasHeight);
+        const firstPageImgData = firstPageCanvas.toDataURL('image/png');
+        pdf.addImage(firstPageImgData, 'PNG', margin, currentY, imgWidth, firstPageImgHeight);
       }
       
-      const textLines = pdf.splitTextToSize(text, pageWidth - 2 * margin);
-      textLines.forEach((line: string) => {
-        if (yPosition > pdf.internal.pageSize.getHeight() - margin) {
-          pdf.addPage();
-          yPosition = margin;
+      // Add remaining content on new pages
+      let remainingHeight = canvas.height - firstPageCanvasHeight;
+      let sourceY = firstPageCanvasHeight;
+      
+      while (remainingHeight > 0) {
+        pdf.addPage();
+        
+        const pageAvailableHeight = pageHeight - (margin * 2);
+        const currentPageHeight = Math.min(remainingHeight, (pageAvailableHeight * canvas.width) / imgWidth);
+        
+        const pageCanvas = document.createElement('canvas');
+        pageCanvas.width = canvas.width;
+        pageCanvas.height = currentPageHeight;
+        const pageCtx = pageCanvas.getContext('2d');
+        
+        if (pageCtx) {
+          pageCtx.drawImage(canvas, 0, sourceY, canvas.width, currentPageHeight, 0, 0, canvas.width, currentPageHeight);
+          const pageImgData = pageCanvas.toDataURL('image/png');
+          const pageImgHeight = (currentPageHeight * imgWidth) / canvas.width;
+          pdf.addImage(pageImgData, 'PNG', margin, margin, imgWidth, pageImgHeight);
         }
-        pdf.text(line, margin, yPosition);
-        yPosition += lineHeight;
-      });
-      yPosition += 3; // Extra space after each section
-    };
+        
+        remainingHeight -= currentPageHeight;
+        sourceY += currentPageHeight;
+      }
+    } else {
+      // Image fits on single page
+      pdf.addImage(imgData, 'PNG', margin, currentY, imgWidth, imgHeight);
+    }
     
-    // Title
-    pdf.setTextColor(43, 74, 124); // Unboxable Navy
-    addText('UNBOXABLE - Leadership Assessment Summary', 18, true);
-    addText('Comprehensive analysis of leadership capabilities and development opportunities', 12);
-    
-    yPosition += 5;
-    
-    // Participant Information
-    pdf.setTextColor(43, 74, 124);
-    addText('PARTICIPANT INFORMATION', 14, true);
-    pdf.setTextColor(0, 0, 0);
-    addText(`Name: ${learnerName}`);
-    addText(`Department: ${survey.department || 'Not specified'}`);
-    addText(`Assessment: ${survey.title || 'Leadership Assessment'}`);
-    addText(`Completed: ${survey.submitted_at ? new Date(survey.submitted_at).toLocaleDateString() : new Date().toLocaleDateString()}`);
-    
-    yPosition += 5;
-    
-    // Section 1: Leadership Sentiment Snapshot
-    pdf.setTextColor(43, 74, 124);
-    addText('1. LEADERSHIP SENTIMENT SNAPSHOT', 14, true);
-    pdf.setTextColor(0, 0, 0);
-    
-    addText(`Current Leadership Style: ${survey.aiSummary?.currentLeadershipStyle || 'Managing, but close to overload'}`);
-    addText(`Confidence Rating: ${survey.aiSummary?.confidenceRating || 'Developing Confidence (2.5–3.4)'}`);
-    addText(`Strongest Area: ${survey.aiSummary?.strongestArea || 'Motivate and align your team'}`);
-    addText(`Focus Area: ${survey.aiSummary?.focusArea || 'Lead through complexity and ambiguity'}`);
-    
-    yPosition += 5;
-    
-    // Section 2: Leadership Intent & Purpose
-    pdf.setTextColor(43, 74, 124);
-    addText('2. LEADERSHIP INTENT & PURPOSE', 14, true);
-    pdf.setTextColor(0, 0, 0);
-    
-    const aspirations = survey.aiSummary?.leadershipAspirations || ['Empowering and people-centred', 'Strategic and future-focused', 'Curious and adaptive'];
-    addText('Leadership Aspirations:', 12, true);
-    aspirations.forEach((aspiration: string) => {
-      addText(`• ${aspiration}`);
-    });
-    
-    addText(`Connection to Purpose Rating: ${survey.aiSummary?.purposeRating || 4}/6 - Connected and gaining clarity`);
-    
-    yPosition += 5;
-    
-    // Section 3: Adaptive & Agile Leadership
-    pdf.setTextColor(43, 74, 124);
-    addText('3. ADAPTIVE & AGILE LEADERSHIP SNAPSHOT', 14, true);
-    pdf.setTextColor(0, 0, 0);
-    
-    addText(`Leadership Agility Level: ${survey.aiSummary?.agilityLevel || 'Achiever'}`);
-    
-    const strengths = survey.aiSummary?.topStrengths || ['Action Orientation & Delivery', 'Decision-Making Agility', 'Empowering Others & Collaboration'];
-    addText('Notable Strengths (Top 3):', 12, true);
-    strengths.forEach((strength: string) => {
-      addText(`• ${strength}`);
-    });
-    
-    const developmentAreas = survey.aiSummary?.developmentAreas || ['Navigating Change & Uncertainty', 'Strategic Agility & Systems Thinking', 'Learning Agility & Growth Mindset'];
-    addText('Development Areas:', 12, true);
-    developmentAreas.forEach((area: string) => {
-      addText(`• ${area}`);
-    });
-    
-    yPosition += 5;
-    
-    // Section 4: Overall Assessment
-    pdf.setTextColor(43, 74, 124);
-    addText('4. OVERALL ASSESSMENT SUMMARY', 14, true);
-    pdf.setTextColor(0, 0, 0);
-    
-    const overallAssessment = survey.aiSummary?.overallAssessment || 'This leader demonstrates strong operational capabilities with clear areas for strategic development. Focus on building confidence in navigating ambiguity while leveraging existing strengths in team motivation and decision-making.';
-    addText(overallAssessment);
-    
-    // Footer
-    yPosition = pdf.internal.pageSize.getHeight() - 20;
-    pdf.setTextColor(102, 102, 102);
-    pdf.setFontSize(10);
-    pdf.text(`Generated by Unboxable Learning Platform | ${new Date().toLocaleDateString()}`, margin, yPosition);
-    pdf.text('Confidential Leadership Assessment Report', margin, yPosition + 5);
+    // Add footer to all pages
+    const totalPages = pdf.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      pdf.setPage(i);
+      pdf.setFontSize(8);
+      pdf.setTextColor(150, 150, 150);
+      pdf.text('Confidential Leadership Assessment Report', margin, pageHeight - 10);
+      pdf.text(`Page ${i} of ${totalPages}`, pageWidth - 30, pageHeight - 10);
+    }
     
     // Save the PDF
     const pdfFilename = `${filename}-${learnerName.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.pdf`;
