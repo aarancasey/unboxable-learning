@@ -252,59 +252,16 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
     <div className="max-w-5xl mx-auto bg-background p-6">
       {/* Header with Logo */}
       <div className="mb-6">
-        <div className="flex items-start gap-3 mb-4">
+        <div className="text-center mb-6">
           <img 
             src="/lovable-uploads/c8eb7e6b-35a2-4f41-a9d7-c1dd08c9b30b.png" 
             alt="Unboxable Logo" 
-            className="h-8 w-auto mt-1"
+            className="h-4 w-auto mx-auto mb-2"
           />
-          <div className="flex-1">
-            <h1 className="text-xl font-bold text-primary">unboxable.</h1>
-            <div className="mt-2">
-              <h2 className="text-lg font-semibold text-foreground">AI Leadership Assessment Summary</h2>
-              <p className="text-sm text-muted-foreground">
-                Comprehensive analysis of leadership capabilities, sentiment, and development opportunities
-              </p>
-            </div>
-          </div>
-          
-          {/* Action Buttons */}
-          <div className="flex items-center gap-2">
-            {!isEditing ? (
-              <>
-                <Button onClick={handleEdit} variant="outline" size="sm">
-                  <Edit3 className="h-4 w-4 mr-1" />
-                  Edit
-                </Button>
-                <Button onClick={handleExportPDF} disabled={isExporting} size="sm">
-                  <Download className="h-4 w-4 mr-1" />
-                  PDF
-                </Button>
-                <Button onClick={handleExportCSV} variant="outline" size="sm">
-                  <FileText className="h-4 w-4 mr-1" />
-                  CSV
-                </Button>
-                <Button onClick={handleExportXLS} variant="outline" size="sm">
-                  Excel
-                </Button>
-                <Button onClick={handleSendEmail} disabled={isSendingEmail} variant="outline" size="sm">
-                  <Mail className="h-4 w-4 mr-1" />
-                  Email
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button onClick={handleSave} size="sm">
-                  <Save className="h-4 w-4 mr-1" />
-                  Save
-                </Button>
-                <Button onClick={handleCancel} variant="outline" size="sm">
-                  <X className="h-4 w-4 mr-1" />
-                  Cancel
-                </Button>
-              </>
-            )}
-          </div>
+          <h1 className="text-lg font-bold text-primary mb-1">AI Leadership Assessment Summary</h1>
+          <p className="text-sm text-muted-foreground">
+            Comprehensive analysis of leadership capabilities, sentiment, and development opportunities
+          </p>
         </div>
       </div>
       
@@ -711,28 +668,46 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
           </CardContent>
         </Card>
 
-        {/* Admin Notes Section */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base font-medium flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              Admin Notes
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-3">Add your notes about this survey response...</p>
-            <Textarea
-              placeholder="Enter admin notes..."
-              rows={3}
-              className="resize-none"
-            />
-            <div className="flex justify-end mt-3">
-              <Button size="sm">
-                Save Notes
+      </div>
+      
+      {/* Action Buttons at Bottom */}
+      <div className="mt-8 pt-4 border-t border-border">
+        <div className="flex items-center justify-center gap-2">
+          {!isEditing ? (
+            <>
+              <Button onClick={handleEdit} variant="outline" size="sm">
+                <Edit3 className="h-4 w-4 mr-1" />
+                Edit
               </Button>
-            </div>
-          </CardContent>
-        </Card>
+              <Button onClick={handleExportPDF} disabled={isExporting} size="sm">
+                <Download className="h-4 w-4 mr-1" />
+                PDF
+              </Button>
+              <Button onClick={handleExportCSV} variant="outline" size="sm">
+                <FileText className="h-4 w-4 mr-1" />
+                CSV
+              </Button>
+              <Button onClick={handleExportXLS} variant="outline" size="sm">
+                Excel
+              </Button>
+              <Button onClick={handleSendEmail} disabled={isSendingEmail} variant="outline" size="sm">
+                <Mail className="h-4 w-4 mr-1" />
+                Email
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button onClick={handleSave} size="sm">
+                <Save className="h-4 w-4 mr-1" />
+                Save
+              </Button>
+              <Button onClick={handleCancel} variant="outline" size="sm">
+                <X className="h-4 w-4 mr-1" />
+                Cancel
+              </Button>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
