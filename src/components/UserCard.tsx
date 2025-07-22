@@ -15,7 +15,8 @@ import {
   UserCheck,
   MoreHorizontal,
   Trash2,
-  Send
+  Send,
+  Edit2
 } from 'lucide-react';
 
 interface Learner {
@@ -32,9 +33,10 @@ interface UserCardProps {
   onActivate: (learnerId: number) => void;
   onDelete: (learnerId: number) => void;
   onResendInvite: (learnerId: number) => void;
+  onEdit: (learner: Learner) => void;
 }
 
-const UserCard = ({ learner, onActivate, onDelete, onResendInvite }: UserCardProps) => {
+const UserCard = ({ learner, onActivate, onDelete, onResendInvite, onEdit }: UserCardProps) => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'active':
@@ -107,6 +109,10 @@ const UserCard = ({ learner, onActivate, onDelete, onResendInvite }: UserCardPro
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40 sm:w-48 bg-white border shadow-lg z-50">
+                <DropdownMenuItem onClick={() => onEdit(learner)}>
+                  <Edit2 className="h-4 w-4 mr-2" />
+                  Edit Details
+                </DropdownMenuItem>
                 {learner.status === 'invited' && (
                   <DropdownMenuItem onClick={() => onResendInvite(learner.id)}>
                     <Send className="h-4 w-4 mr-2" />

@@ -9,12 +9,15 @@ import UsersList from './UsersList';
 import AddLearnerForm from './AddLearnerForm';
 import SendInvitesModal from './SendInvitesModal';
 import BulkUploadModal from './bulk-upload/BulkUploadModal';
+import EditLearnerModal from './EditLearnerModal';
 
 const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddLearnerOpen, setIsAddLearnerOpen] = useState(false);
   const [isSendInvitesOpen, setIsSendInvitesOpen] = useState(false);
   const [isBulkUploadOpen, setIsBulkUploadOpen] = useState(false);
+  const [isEditLearnerOpen, setIsEditLearnerOpen] = useState(false);
+  const [editingLearner, setEditingLearner] = useState<any>(null);
   const [learners, setLearners] = useState<any[]>([]);
   const { toast } = useToast();
 
@@ -105,6 +108,26 @@ const UserManagement = () => {
     }
   };
 
+  const handleEditLearner = (learner: any) => {
+    setEditingLearner(learner);
+    setIsEditLearnerOpen(true);
+  };
+
+  const handleSaveEditedLearner = async (updatedLearner: any) => {
+    await DataService.updateLearner(updatedLearner.id, {
+      name: updatedLearner.name,
+      email: updatedLearner.email,
+      department: updatedLearner.department,
+      mobile: updatedLearner.mobile
+    });
+    
+    setLearners(prev => prev.map(learner => 
+      learner.id === updatedLearner.id 
+        ? { ...learner, ...updatedLearner }
+        : learner
+    ));
+  };
+
   // Load learners from Supabase on component mount
   useEffect(() => {
     const loadLearners = async () => {
@@ -142,6 +165,7 @@ const UserManagement = () => {
         onActivateLearner={handleActivateLearner}
         onDeleteLearner={handleDeleteLearner}
         onResendInvite={handleResendInvite}
+        onEditLearner={handleEditLearner}
       />
 
       <AddLearnerForm
@@ -162,6 +186,16 @@ const UserManagement = () => {
         onClose={() => setIsBulkUploadOpen(false)}
         onBulkImport={handleBulkImport}
         existingEmails={existingEmails}
+      />
+
+      <EditLearnerModal
+        learner={editingLearner}
+        isOpen={isEditLearnerOpen}
+        onClose={() => {
+          setIsEditLearnerOpen(false);
+          setEditingLearner(null);
+        }}
+        onSave={handleSaveEditedLearner}
       />
     </div>
   );

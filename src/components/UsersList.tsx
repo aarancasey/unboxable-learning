@@ -19,9 +19,10 @@ interface UsersListProps {
   onActivateLearner: (learnerId: number) => void;
   onDeleteLearner: (learnerId: number) => void;
   onResendInvite: (learnerId: number) => void;
+  onEditLearner: (learner: Learner) => void;
 }
 
-const UsersList = ({ learners, filteredUsers, onAddLearner, onActivateLearner, onDeleteLearner, onResendInvite }: UsersListProps) => {
+const UsersList = ({ learners, filteredUsers, onAddLearner, onActivateLearner, onDeleteLearner, onResendInvite, onEditLearner }: UsersListProps) => {
   return (
     <Card>
       <CardHeader>
@@ -44,6 +45,7 @@ const UsersList = ({ learners, filteredUsers, onAddLearner, onActivateLearner, o
                 onActivate={onActivateLearner}
                 onDelete={onDeleteLearner}
                 onResendInvite={onResendInvite}
+                onEdit={onEditLearner}
               />
             ))}
           </div>
