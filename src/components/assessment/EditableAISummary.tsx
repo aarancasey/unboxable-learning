@@ -89,9 +89,13 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
   };
 
   const handleExportPDF = async () => {
+    console.log('PDF export button clicked - survey data:', survey);
+    alert('PDF Export clicked - check console for details');
     setIsExporting(true);
     try {
+      console.log('Calling exportToPDF with survey:', survey.learner);
       await exportToPDF(survey, 'leadership-assessment');
+      console.log('exportToPDF completed successfully');
       toast({
         title: "Export Successful",
         description: "Leadership assessment has been exported to PDF.",
@@ -104,6 +108,7 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
         variant: "destructive",
       });
     } finally {
+      console.log('Setting isExporting to false');
       setIsExporting(false);
     }
   };

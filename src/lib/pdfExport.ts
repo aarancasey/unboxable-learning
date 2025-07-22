@@ -2,6 +2,7 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
 export const exportToPDF = async (survey: any, filename: string = 'assessment') => {
+  console.log('Starting PDF export for survey:', survey.learner);
   try {
     // Create a temporary container for the PDF content
     const tempDiv = document.createElement('div');
@@ -130,8 +131,10 @@ export const exportToPDF = async (survey: any, filename: string = 'assessment') 
       </div>
     `;
 
+    console.log('Adding temp div to document');
     document.body.appendChild(tempDiv);
 
+    console.log('Converting to canvas...');
     // Convert to canvas
     const canvas = await html2canvas(tempDiv, {
       scale: 2,
@@ -140,12 +143,15 @@ export const exportToPDF = async (survey: any, filename: string = 'assessment') 
       backgroundColor: '#ffffff'
     });
 
+    console.log('Canvas created, removing temp div');
     document.body.removeChild(tempDiv);
 
+    console.log('Creating PDF from canvas...');
     // Create PDF
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p', 'mm', 'a4');
     
+    console.log('PDF created, calculating dimensions...');
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
     const imgWidth = canvas.width;
@@ -154,10 +160,16 @@ export const exportToPDF = async (survey: any, filename: string = 'assessment') 
     const imgX = (pdfWidth - imgWidth * ratio) / 2;
     const imgY = 0;
 
+    console.log('Adding image to PDF...');
     pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
     
+    console.log('Saving PDF...');
+    const pdfFilename = `${filename}-${survey.learner.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.pdf`;
+    console.log('PDF filename:', pdfFilename);
+    
     // Save the PDF
-    pdf.save(`${filename}-${survey.learner.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.pdf`);
+    pdf.save(pdfFilename);
+    console.log('PDF export completed successfully');
     
   } catch (error) {
     console.error('PDF export error:', error);
