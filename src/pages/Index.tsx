@@ -2,20 +2,25 @@ import { useState } from 'react';
 import LearnerDashboard from '@/components/LearnerDashboard';
 import AdminDashboard from '@/components/AdminDashboard';
 import LoginPage from '@/components/LoginPage';
+import AuthPage from '@/components/auth/AuthPage';
+import { AuthProvider, useAuth } from '@/components/auth/AuthProvider';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { GraduationCap, Users } from 'lucide-react';
+import { GraduationCap, Users, LogOut } from 'lucide-react';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import LoginForm from '@/components/login/LoginForm';
+import { User, Session } from '@supabase/supabase-js';
 
 
-const Index = () => {
+const AppContent = () => {
   const [userRole, setUserRole] = useState<'learner' | 'admin' | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [learnerData, setLearnerData] = useState<any>(null);
   const [showLearnerLogin, setShowLearnerLogin] = useState(false);
+  const [showSupabaseAuth, setShowSupabaseAuth] = useState(false);
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
+  const { user, session, signOut, isLoading } = useAuth();
   const { trackUserLogin, trackPageView } = useAnalytics();
 
   const handleLearnerLogin = (userData?: any) => {
@@ -37,12 +42,37 @@ const Index = () => {
     setIsAdminModalOpen(false);
   };
 
-  const handleLogout = () => {
+  const handleSupabaseAuthSuccess = (authUser: User, authSession: Session) => {
+    setUserRole('admin');
+    setIsAuthenticated(true);
+    trackUserLogin('supabase-admin');
+    trackPageView('/dashboard');
+    setShowSupabaseAuth(false);
+    console.log('Supabase auth successful:', authUser);
+  };
+
+  const handleLogout = async () => {
+    if (user) {
+      await signOut();
+    }
     setUserRole(null);
     setIsAuthenticated(false);
     setLearnerData(null);
     setShowLearnerLogin(false);
+    setShowSupabaseAuth(false);
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-unboxable-navy">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-unboxable-orange"></div>
+      </div>
+    );
+  }
+
+  if (showSupabaseAuth) {
+    return <AuthPage onAuthSuccess={handleSupabaseAuthSuccess} />;
+  }
 
   if (!isAuthenticated) {
     return showLearnerLogin ? (
@@ -56,6 +86,20 @@ const Index = () => {
         {/* Hero Section */}
         <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">
           <div className="max-w-4xl mx-auto text-center">
+            {/* Sign out button for authenticated users */}
+            {user && (
+              <div className="absolute top-4 right-4">
+                <Button 
+                  variant="outline" 
+                  onClick={handleLogout} 
+                  className="bg-white/10 border-white/20 text-white hover:bg-white/20 flex items-center gap-2"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Sign Out
+                </Button>
+              </div>
+            )}
+            
             {/* Unboxable Logo */}
             <div className="mb-8">
               <img 
@@ -64,6 +108,15 @@ const Index = () => {
                 className="h-16 w-auto mx-auto"
               />
             </div>
+            
+            {/* Welcome message for authenticated users */}
+            {user && (
+              <div className="mb-6 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+                <p className="text-white/90 text-lg">
+                  Welcome back, {user.email}! You now have full access to admin features including the content library.
+                </p>
+              </div>
+            )}
             
             {/* Main Heading */}
             <div className="space-y-6 mb-12">
@@ -139,7 +192,30 @@ const Index = () => {
                   <div className="text-center">
                     <Users className="mx-auto h-12 w-12 text-unboxable-orange mb-3" />
                   </div>
-                  <LoginForm role="admin" onLogin={handleAdminLogin} />
+                  {user ? (
+                    <Button 
+                      className="w-full bg-unboxable-orange hover:bg-unboxable-orange/90" 
+                      onClick={handleAdminLogin}
+                    >
+                      Access Admin Dashboard
+                    </Button>
+                  ) : (
+                    <>
+                      <LoginForm role="admin" onLogin={handleAdminLogin} />
+                      <div className="text-center mt-2">
+                        <Button 
+                          variant="link" 
+                          onClick={() => {
+                            setIsAdminModalOpen(false);
+                            setShowSupabaseAuth(true);
+                          }}
+                          className="text-sm text-unboxable-navy"
+                        >
+                          Or sign in with Supabase Auth
+                        </Button>
+                      </div>
+                    </>
+                  )}
                 </div>
               </DialogContent>
             </Dialog>
@@ -157,6 +233,14 @@ const Index = () => {
         <AdminDashboard onLogout={handleLogout} />
       )}
     </div>
+  );
+};
+
+const Index = () => {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 };
 
