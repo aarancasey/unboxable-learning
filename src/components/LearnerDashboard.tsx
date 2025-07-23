@@ -189,6 +189,7 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
           // Refresh modules after survey submission to unlock them
           window.location.reload();
         }}
+        learnerData={currentLearner || learnerData}
       />
     );
   }

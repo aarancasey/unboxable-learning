@@ -11,9 +11,10 @@ import { supabase } from '@/integrations/supabase/client';
 interface SurveyFormProps {
   onBack: () => void;
   onSubmit: () => void;
+  learnerData?: any;
 }
 
-const SurveyForm = ({ onBack, onSubmit }: SurveyFormProps) => {
+const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
   const survey = useSurveyData();
   const {
     currentSection,
@@ -123,7 +124,7 @@ const SurveyForm = ({ onBack, onSubmit }: SurveyFormProps) => {
         try {
           const { DataService } = await import('@/services/dataService');
           const surveySubmissionForDB = {
-            learner_name: "Current User",
+            learner_name: learnerData?.name || "Current User",
             responses,
             status: "completed"
           };
