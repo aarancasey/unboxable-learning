@@ -9,7 +9,7 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 // Configure basename for subdirectory deployment
-const basename = import.meta.env.PROD ? '/learning' : '';
+const basename = '';
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
