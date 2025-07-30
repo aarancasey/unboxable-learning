@@ -148,7 +148,7 @@ export const VisualizationConfigurator = ({ visualizations, onChange }: Visualiz
                       <div className="space-y-2">
                         <Label>Chart Type</Label>
                         <Select
-                          value={chart.config?.type || 'competency'}
+                          value={(chart.config as any)?.type || 'competency'}
                           onValueChange={(value) => 
                             handleConfigChange(chart.configKey, { type: value })
                           }
@@ -172,7 +172,7 @@ export const VisualizationConfigurator = ({ visualizations, onChange }: Visualiz
                       <div className="space-y-2">
                         <Label>Chart Style</Label>
                         <Select
-                          value={chart.config?.type || 'bar'}
+                          value={(chart.config as any)?.type || 'bar'}
                           onValueChange={(value) => 
                             handleConfigChange(chart.configKey, { type: value })
                           }
@@ -197,7 +197,7 @@ export const VisualizationConfigurator = ({ visualizations, onChange }: Visualiz
                         <Label>Maximum Rating Scale</Label>
                         <div className="flex items-center gap-4">
                           <Slider
-                            value={[chart.config?.maxRating || 6]}
+                            value={[(chart.config as any)?.maxRating || 6]}
                             onValueChange={(value) => 
                               handleConfigChange(chart.configKey, { maxRating: value[0] })
                             }
@@ -207,11 +207,11 @@ export const VisualizationConfigurator = ({ visualizations, onChange }: Visualiz
                             className="flex-1"
                           />
                           <Badge variant="outline">
-                            {chart.config?.maxRating || 6}
+                            {(chart.config as any)?.maxRating || 6}
                           </Badge>
                         </div>
                         <p className="text-xs text-muted-foreground">
-                          Scale from 1 to {chart.config?.maxRating || 6}
+                          Scale from 1 to {(chart.config as any)?.maxRating || 6}
                         </p>
                       </div>
                     </div>
