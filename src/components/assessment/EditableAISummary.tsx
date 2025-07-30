@@ -35,6 +35,7 @@ import { StrengthsComparisonChart } from './charts/StrengthsComparisonChart';
 import { ConfidenceLevelBar } from './charts/ConfidenceLevelBar';
 import { AgilityLevelIndicator } from './charts/AgilityLevelIndicator';
 import { getRubricTemplates } from '@/hooks/useRubrics';
+import { AISummaryEditorModal } from './AISummaryEditorModal';
 
 interface EditableAISummaryProps {
   survey: any;
@@ -77,6 +78,7 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
   const [editedSummary, setEditedSummary] = useState(survey.aiSummary || defaultSummary);
   const [isExporting, setIsExporting] = useState(false);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [showEditorModal, setShowEditorModal] = useState(false);
   const { toast } = useToast();
 
   const handleEdit = () => {
@@ -680,6 +682,10 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
                 <Edit3 className="h-4 w-4 mr-1" />
                 Edit
               </Button>
+              <Button onClick={() => setShowEditorModal(true)} variant="default" size="sm">
+                <Brain className="h-4 w-4 mr-1" />
+                Edit AI Summary
+              </Button>
               <PDFPreviewModal survey={survey}>
                 <PDFPreviewContent survey={survey} currentSummary={currentSummary} />
               </PDFPreviewModal>
@@ -713,6 +719,29 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
           )}
         </div>
       </div>
+
+      {/* AI Summary Editor Modal */}
+      <AISummaryEditorModal
+        survey={survey}
+        isOpen={showEditorModal}
+        onClose={() => setShowEditorModal(false)}
+        onSave={(updatedSummary) => {
+          const updatedSurvey = { ...survey, aiSummary: updatedSummary };
+          
+          // Update in localStorage
+          const savedSurveys = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
+          const updatedSurveys = savedSurveys.map((s: any) => 
+            s.id === survey.id ? updatedSurvey : s
+          );
+          localStorage.setItem('surveySubmissions', JSON.stringify(updatedSurveys));
+          
+          if (onSummaryUpdate) {
+            onSummaryUpdate(updatedSummary);
+          }
+          
+          setShowEditorModal(false);
+        }}
+      />
     </div>
   );
 };
