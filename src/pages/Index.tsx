@@ -74,6 +74,17 @@ const AppContent = () => {
     return <AuthPage onAuthSuccess={handleSupabaseAuthSuccess} />;
   }
 
+  // If user is authenticated with Supabase but not locally, set admin role
+  if (user && session && !isAuthenticated) {
+    setUserRole('admin');
+    setIsAuthenticated(true);
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-unboxable-navy">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-unboxable-orange"></div>
+      </div>
+    );
+  }
+
   if (!isAuthenticated) {
     return showLearnerLogin ? (
       <LoginPage 
