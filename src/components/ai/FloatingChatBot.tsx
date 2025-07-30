@@ -8,9 +8,33 @@ import { MessageCircle, X, Minimize2, Maximize2 } from 'lucide-react';
 export const FloatingChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
-  const [position, setPosition] = useState({ x: 20, y: 20 });
+  const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const dragRef = useRef<{ offsetX: number; offsetY: number }>({ offsetX: 0, offsetY: 0 });
+
+  // Calculate initial position above the chat button
+  const calculateInitialPosition = () => {
+    const chatWidth = isMinimized ? 300 : 400;
+    const chatHeight = isMinimized ? 100 : 600;
+    const buttonSize = 56; // h-14 w-14 = 56px
+    const margin = 24; // bottom-6 right-6 = 24px
+    
+    // Position above and slightly to the left of the chat button
+    const x = window.innerWidth - chatWidth - margin;
+    const y = window.innerHeight - chatHeight - buttonSize - margin - 8; // 8px gap above button
+    
+    // Ensure it doesn't go off-screen
+    const finalX = Math.max(20, Math.min(x, window.innerWidth - chatWidth - 20));
+    const finalY = Math.max(20, y);
+    
+    return { x: finalX, y: finalY };
+  };
+
+  const handleOpenChat = () => {
+    const initialPos = calculateInitialPosition();
+    setPosition(initialPos);
+    setIsOpen(true);
+  };
 
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true);
@@ -51,7 +75,7 @@ export const FloatingChatBot = () => {
   if (!isOpen) {
     return (
       <Button
-        onClick={() => setIsOpen(true)}
+        onClick={handleOpenChat}
         className="fixed bottom-6 right-6 h-14 w-14 rounded-full bg-primary hover:bg-primary/90 shadow-lg z-50"
         size="sm"
       >
