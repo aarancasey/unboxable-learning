@@ -3,13 +3,11 @@ import ModuleViewer from './ModuleViewer';
 import SurveyForm from './SurveyForm';
 import LearnerHeader from './LearnerHeader';
 import LearnerWelcomeSection from './LearnerWelcomeSection';
-import ProgressOverview from './ProgressOverview';
 import ModulesSection from './ModulesSection';
-import SurveyPrerequisiteSection from './SurveyPrerequisiteSection';
 import PasswordChangeModal from './PasswordChangeModal';
 import { useAnalytics } from '@/hooks/useAnalytics';
-import { AIKnowledgeChat } from './ai/AIKnowledgeChat';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { FloatingChatBot } from './ai/FloatingChatBot';
+import { AssessmentCard } from './AssessmentCard';
 
 
 interface LearnerDashboardProps {
@@ -210,53 +208,31 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
           surveyStatus={surveyStatus}
         />
 
-        {/* Survey Pre-requisite Section */}
-        {surveyModules.length > 0 && (
-          <SurveyPrerequisiteSection
-            surveys={surveyModules}
-            surveyStatus={surveyStatus}
-            onStartSurvey={() => setActiveView('survey')}
-            onStartPostSurvey={() => setActiveView('survey')}
-            hasCompletedModules={displayData.completedModules > 0}
-          />
-        )}
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+          {/* Assessment Card - Takes 1/3 of the space */}
+          <div className="lg:col-span-1">
+            <AssessmentCard
+              surveyStatus={surveyStatus}
+              onStartSurvey={() => setActiveView('survey')}
+              onStartPostSurvey={() => setActiveView('survey')}
+              hasCompletedModules={displayData.completedModules > 0}
+              courseName={currentCourse?.title}
+            />
+          </div>
 
-        <ProgressOverview
-          progress={displayData.progress}
-          completedModules={displayData.completedModules}
-          totalModules={modules.length}
-          nextSurvey={displayData.nextSurvey}
-          onStartSurvey={() => setActiveView('survey')}
-          hasModules={modules.length > 0}
-        />
-
-        {/* Learning Modules and AI Assistant Side by Side */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {/* Learning Modules - Takes 1/2 of the space */}
-          <div>
+          {/* Learning Modules - Takes 2/3 of the space */}
+          <div className="lg:col-span-2">
             <ModulesSection
               modules={modules}
               onModuleClick={handleModuleClick}
             />
           </div>
-
-          {/* AI Knowledge Chat - Takes 1/2 of the space */}
-          <div>
-            <Card className="h-fit">
-              <CardHeader>
-                <CardTitle>Course Assistant</CardTitle>
-                <CardDescription>
-                  Ask questions about the course content and get instant answers from our AI assistant
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <AIKnowledgeChat />
-              </CardContent>
-            </Card>
-          </div>
         </div>
-
       </div>
+
+      {/* Floating AI Chat Bot */}
+      <FloatingChatBot />
 
       {/* Password Change Modal */}
       <PasswordChangeModal
