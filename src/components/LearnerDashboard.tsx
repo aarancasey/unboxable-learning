@@ -32,6 +32,9 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
       setShowPasswordModal(true);
     }
 
+    // Get admin approval status first
+    const adminApproval = localStorage.getItem('surveyApproved') === 'true';
+
     // Check survey status from database
     const checkSurveyStatus = async () => {
       try {
@@ -62,7 +65,6 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
       }
     };
 
-    const adminApproval = localStorage.getItem('surveyApproved') === 'true';
     checkSurveyStatus();
 
     // Load available courses from DataService (Supabase)
