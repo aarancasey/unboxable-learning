@@ -284,18 +284,18 @@ export const VisualizationConfigurator = ({ visualizations, onChange }: Visualiz
                 key={theme.name}
                 variant="outline"
                 size="sm"
-                className="flex flex-col items-center gap-1 h-auto p-2 text-xs"
+                className="flex flex-col items-center gap-1 h-auto p-2 text-xs min-w-0 overflow-hidden"
               >
                 <div className="flex gap-0.5">
                   {theme.colors.map((color, index) => (
                     <div
                       key={index}
-                      className="w-3 h-3 rounded-sm"
+                      className="w-2.5 h-2.5 rounded-sm flex-shrink-0"
                       style={{ backgroundColor: color }}
                     />
                   ))}
                 </div>
-                <span className="text-xs leading-tight">{theme.name}</span>
+                <span className="text-xs leading-tight truncate w-full text-center">{theme.name}</span>
               </Button>
             ))}
           </div>
