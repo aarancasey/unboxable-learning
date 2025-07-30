@@ -273,7 +273,7 @@ export const VisualizationConfigurator = ({ visualizations, onChange }: Visualiz
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
             {[
               { name: 'Professional', colors: ['#1f2937', '#3b82f6', '#10b981'] },
               { name: 'Vibrant', colors: ['#7c3aed', '#f59e0b', '#ef4444'] },
@@ -283,18 +283,19 @@ export const VisualizationConfigurator = ({ visualizations, onChange }: Visualiz
               <Button
                 key={theme.name}
                 variant="outline"
-                className="flex flex-col items-center gap-2 h-auto p-3"
+                size="sm"
+                className="flex flex-col items-center gap-1 h-auto p-2 text-xs"
               >
-                <div className="flex gap-1">
+                <div className="flex gap-0.5">
                   {theme.colors.map((color, index) => (
                     <div
                       key={index}
-                      className="w-4 h-4 rounded"
+                      className="w-3 h-3 rounded-sm"
                       style={{ backgroundColor: color }}
                     />
                   ))}
                 </div>
-                <span className="text-xs">{theme.name}</span>
+                <span className="text-xs leading-tight">{theme.name}</span>
               </Button>
             ))}
           </div>
