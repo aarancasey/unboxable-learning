@@ -7,7 +7,6 @@ import { Plus, Upload, BookOpen, Settings, Sparkles, FileText } from 'lucide-rea
 import { ContentUploadModal } from './ContentUploadModal';
 import { ContentLibraryList } from './ContentLibraryList';
 import { ContentCategoriesManager } from './ContentCategoriesManager';
-import { AssessmentRubricsManager } from './AssessmentRubricsManager';
 import { ContentLibraryRubrics } from './ContentLibraryRubrics';
 
 import { supabase } from '@/integrations/supabase/client';
@@ -125,10 +124,6 @@ export const ContentLibraryManager: React.FC = () => {
             <Settings className="h-4 w-4" />
             Categories
           </TabsTrigger>
-          <TabsTrigger value="legacy-rubrics" className="flex items-center gap-2">
-            <Settings className="h-4 w-4" />
-            Legacy Rubrics
-          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="library" className="space-y-4">
@@ -162,15 +157,11 @@ export const ContentLibraryManager: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="rubrics" className="space-y-4">
-          <ContentLibraryRubrics />
+          <ContentLibraryRubrics showAllRubrics={true} />
         </TabsContent>
 
         <TabsContent value="categories" className="space-y-4">
           <ContentCategoriesManager />
-        </TabsContent>
-
-        <TabsContent value="legacy-rubrics" className="space-y-4">
-          <AssessmentRubricsManager />
         </TabsContent>
         
       </Tabs>

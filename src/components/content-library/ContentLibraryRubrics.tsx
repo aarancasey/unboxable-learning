@@ -12,21 +12,25 @@ import { useToast } from '@/hooks/use-toast';
 interface ContentLibraryRubricsProps {
   contentLibraryId?: string;
   onRubricGenerated?: (rubric: AssessmentRubric) => void;
+  showAllRubrics?: boolean; // New prop to show all rubrics, not just content-linked ones
 }
 
 export const ContentLibraryRubrics: React.FC<ContentLibraryRubricsProps> = ({
   contentLibraryId,
-  onRubricGenerated
+  onRubricGenerated,
+  showAllRubrics = false
 }) => {
   const [showGenerator, setShowGenerator] = useState(false);
   const [editingRubric, setEditingRubric] = useState<AssessmentRubric | null>(null);
   const { rubrics, loading, deleteRubric } = useRubrics();
   const { toast } = useToast();
 
-  // Filter rubrics for this content library item if provided
-  const filteredRubrics = contentLibraryId 
-    ? rubrics.filter(r => r.content_library_id === contentLibraryId)
-    : rubrics;
+  // Filter rubrics based on props
+  const filteredRubrics = showAllRubrics 
+    ? rubrics // Show all rubrics when consolidating legacy system
+    : contentLibraryId 
+      ? rubrics.filter(r => r.content_library_id === contentLibraryId)
+      : rubrics;
 
   const handleDeleteRubric = async (id: string) => {
     try {
@@ -67,11 +71,21 @@ export const ContentLibraryRubrics: React.FC<ContentLibraryRubricsProps> = ({
         <div>
           <h2 className="text-xl font-semibold">Assessment Rubrics</h2>
           <p className="text-sm text-gray-600">
-            {contentLibraryId 
-              ? "Generate and manage rubrics for this content"
-              : "Create assessment rubrics from templates or build custom ones"
+            {showAllRubrics
+              ? "Manage all assessment rubrics including legacy rubrics and content-linked ones"
+              : contentLibraryId 
+                ? "Generate and manage rubrics for this content"
+                : "Create assessment rubrics from templates or build custom ones"
             }
           </p>
+          {showAllRubrics && (
+            <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
+              <p className="text-sm text-blue-800">
+                <strong>Consolidated View:</strong> This interface now manages all rubrics in one place. 
+                Legacy rubrics are marked with a special indicator.
+              </p>
+            </div>
+          )}
         </div>
         <Button onClick={() => setShowGenerator(true)}>
           <Plus className="w-4 h-4 mr-2" />
@@ -105,18 +119,27 @@ export const ContentLibraryRubrics: React.FC<ContentLibraryRubricsProps> = ({
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredRubrics.map((rubric) => (
-            <Card key={rubric.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-lg">{rubric.name}</CardTitle>
-                    {rubric.description && (
-                      <p className="text-sm text-gray-600 mt-1">{rubric.description}</p>
-                    )}
+          {filteredRubrics.map((rubric) => {
+            const isLegacyRubric = !rubric.content_library_id;
+            return (
+              <Card key={rubric.id} className={`hover:shadow-lg transition-shadow ${isLegacyRubric ? 'border-l-4 border-l-amber-500' : ''}`}>
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <CardTitle className="text-lg">{rubric.name}</CardTitle>
+                        {isLegacyRubric && (
+                          <Badge variant="outline" className="text-xs bg-amber-50 text-amber-700 border-amber-300">
+                            Legacy
+                          </Badge>
+                        )}
+                      </div>
+                      {rubric.description && (
+                        <p className="text-sm text-gray-600 mt-1">{rubric.description}</p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </CardHeader>
+                </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   <div>
@@ -168,7 +191,7 @@ export const ContentLibraryRubrics: React.FC<ContentLibraryRubricsProps> = ({
                 </div>
               </CardContent>
             </Card>
-          ))}
+          )})}
         </div>
       )}
     </div>
