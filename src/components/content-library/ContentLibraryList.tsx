@@ -74,7 +74,7 @@ export const ContentLibraryList: React.FC = () => {
       filtered = filtered.filter(item => 
         item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.extracted_content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+        (item.tags && item.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase())))
       );
     }
 
@@ -242,7 +242,7 @@ export const ContentLibraryList: React.FC = () => {
                 {item.extracted_content}
               </p>
 
-              {item.tags.length > 0 && (
+              {item.tags && item.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1">
                   {item.tags.slice(0, 3).map((tag) => (
                     <Badge key={tag} variant="secondary" className="text-xs">
