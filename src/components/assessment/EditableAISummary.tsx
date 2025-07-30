@@ -21,9 +21,11 @@ import {
   Zap,
   Circle,
   Users,
-  Lightbulb
+  Lightbulb,
+  MoreHorizontal
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { exportToPDF } from '@/lib/pdfExport';
 import { supabase } from '@/integrations/supabase/client';
 import * as XLSX from 'xlsx';
@@ -675,20 +677,14 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
       
       {/* Action Buttons at Bottom */}
       <div className="mt-8 pt-4 border-t border-border">
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-center gap-2 flex-wrap">
           {!isEditing ? (
             <>
-              <Button onClick={handleEdit} variant="outline" size="sm">
-                <Edit3 className="h-4 w-4 mr-1" />
-                Edit
-              </Button>
+              {/* Main Actions - Always Visible */}
               <Button onClick={() => setShowEditorModal(true)} variant="default" size="sm">
                 <Brain className="h-4 w-4 mr-1" />
                 Edit AI Summary
               </Button>
-              <PDFPreviewModal survey={survey}>
-                <PDFPreviewContent survey={survey} currentSummary={currentSummary} />
-              </PDFPreviewModal>
               <Button onClick={handleExportPDF} disabled={isExporting} size="sm">
                 <Download className="h-4 w-4 mr-1" />
                 PDF
@@ -700,10 +696,25 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
               <Button onClick={handleExportXLS} variant="outline" size="sm">
                 Excel
               </Button>
-              <Button onClick={handleSendEmail} disabled={isSendingEmail} variant="outline" size="sm">
-                <Mail className="h-4 w-4 mr-1" />
-                Email
-              </Button>
+              
+              {/* Additional Actions - Dropdown Menu */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-40">
+                  <DropdownMenuItem onClick={handleEdit}>
+                    <Edit3 className="h-4 w-4 mr-2" />
+                    Quick Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleSendEmail} disabled={isSendingEmail}>
+                    <Mail className="h-4 w-4 mr-2" />
+                    Send Email
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </>
           ) : (
             <>
