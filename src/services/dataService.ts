@@ -284,6 +284,37 @@ export class DataService {
     }
   }
 
+  static async updateSurveySubmission(id: number, updates: any) {
+    try {
+      const { data, error } = await supabase
+        .from('survey_submissions')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Also update localStorage as backup
+      const localSubmissions = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
+      const updatedSubmissions = localSubmissions.map((submission: any) => 
+        submission.id === id ? { ...submission, ...updates } : submission
+      );
+      localStorage.setItem('surveySubmissions', JSON.stringify(updatedSubmissions));
+
+      return data;
+    } catch (error) {
+      console.error('Error updating survey submission:', error);
+      // Fallback to localStorage
+      const localSubmissions = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
+      const updatedSubmissions = localSubmissions.map((submission: any) => 
+        submission.id === id ? { ...submission, ...updates } : submission
+      );
+      localStorage.setItem('surveySubmissions', JSON.stringify(updatedSubmissions));
+      return updatedSubmissions.find((s: any) => s.id === id);
+    }
+  }
+
   // Migration helpers
   private static async migrateLearners(localLearners: any[]) {
     try {

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { EditableAISummary } from '@/components/assessment/EditableAISummary';
+import { useToast } from '@/hooks/use-toast';
 import { 
   FileText, 
   Clock, 
@@ -24,6 +25,7 @@ const SurveyReviewer = () => {
   const [selectedSurvey, setSelectedSurvey] = useState<any>(null);
   const [filter, setFilter] = useState('all');
   const [storedSurveys, setStoredSurveys] = useState<any[]>([]);
+  const { toast } = useToast();
 
   // Load surveys from Supabase database on component mount
   useEffect(() => {
@@ -42,6 +44,44 @@ const SurveyReviewer = () => {
     
     loadSurveys();
   }, []);
+
+  const handleApproveSurvey = async (survey: any) => {
+    try {
+      // Update survey status to approved
+      const updatedSurvey = { ...survey, status: 'approved' };
+      
+      // Update in database
+      const { DataService } = await import('@/services/dataService');
+      await DataService.updateSurveySubmission(survey.id, { status: 'approved' });
+      
+      // Update localStorage for backward compatibility
+      const savedSurveys = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
+      const updatedSurveys = savedSurveys.map((s: any) => 
+        s.id === survey.id ? updatedSurvey : s
+      );
+      localStorage.setItem('surveySubmissions', JSON.stringify(updatedSurveys));
+      
+      // Set global approval flag that learners check
+      localStorage.setItem('surveyApproved', 'true');
+      
+      // Update state
+      setStoredSurveys(updatedSurveys);
+      setSelectedSurvey(updatedSurvey);
+      
+      toast({
+        title: "Survey Approved",
+        description: `${survey.learner_name || survey.learner}'s survey has been approved. Learning modules are now unlocked.`,
+      });
+      
+    } catch (error) {
+      console.error('Failed to approve survey:', error);
+      toast({
+        title: "Error",
+        description: "Failed to approve survey. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -119,7 +159,10 @@ const SurveyReviewer = () => {
               <ThumbsDown className="h-4 w-4 mr-2" />
               Request Revision
             </Button>
-            <Button className="bg-green-600 hover:bg-green-700">
+            <Button 
+              className="bg-green-600 hover:bg-green-700"
+              onClick={() => handleApproveSurvey(selectedSurvey)}
+            >
               <ThumbsUp className="h-4 w-4 mr-2" />
               Approve & Unlock Next Module
             </Button>
