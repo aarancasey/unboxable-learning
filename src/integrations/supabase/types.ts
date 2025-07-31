@@ -362,15 +362,7 @@ export type Database = {
           suggested_merge_candidates?: string[] | null
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "content_categories_source_document_id_fkey"
-            columns: ["source_document_id"]
-            isOneToOne: false
-            referencedRelation: "content_library"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       content_library: {
         Row: {
