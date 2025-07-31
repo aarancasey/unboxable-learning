@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import LearnerDashboard from '@/components/LearnerDashboard';
 import AdminDashboard from '@/components/AdminDashboard';
 import LoginPage from '@/components/LoginPage';
@@ -22,6 +22,14 @@ const AppContent = () => {
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
   const { user, session, signOut, isLoading } = useAuth();
   const { trackUserLogin, trackPageView } = useAnalytics();
+
+  // Handle Supabase authentication state changes
+  useEffect(() => {
+    if (user && session && !isAuthenticated) {
+      setUserRole('admin');
+      setIsAuthenticated(true);
+    }
+  }, [user, session, isAuthenticated]);
 
   const handleLearnerLogin = (userData?: any) => {
     setUserRole('learner');
@@ -74,16 +82,6 @@ const AppContent = () => {
     return <AuthPage onAuthSuccess={handleSupabaseAuthSuccess} />;
   }
 
-  // If user is authenticated with Supabase but not locally, set admin role
-  if (user && session && !isAuthenticated) {
-    setUserRole('admin');
-    setIsAuthenticated(true);
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-unboxable-navy">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-unboxable-orange"></div>
-      </div>
-    );
-  }
 
   if (!isAuthenticated) {
     return showLearnerLogin ? (
