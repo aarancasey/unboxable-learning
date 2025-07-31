@@ -36,9 +36,7 @@ const SurveyReviewer = () => {
         setStoredSurveys(surveys);
       } catch (error) {
         console.error('Failed to load surveys:', error);
-        // Fallback to localStorage
-        const savedSurveys = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
-        setStoredSurveys(savedSurveys);
+        setStoredSurveys([]);
       }
     };
     
@@ -47,24 +45,15 @@ const SurveyReviewer = () => {
 
   const handleApproveSurvey = async (survey: any) => {
     try {
-      // Update survey status to approved
-      const updatedSurvey = { ...survey, status: 'approved' };
-      
-      // Update in database
+      // Update survey status to approved in Supabase
       const { DataService } = await import('@/services/dataService');
       await DataService.updateSurveySubmission(survey.id, { status: 'approved' });
       
-      // Update localStorage for backward compatibility
-      const savedSurveys = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
-      const updatedSurveys = savedSurveys.map((s: any) => 
+      // Update state immediately
+      const updatedSurvey = { ...survey, status: 'approved' };
+      const updatedSurveys = storedSurveys.map((s: any) => 
         s.id === survey.id ? updatedSurvey : s
       );
-      localStorage.setItem('surveySubmissions', JSON.stringify(updatedSurveys));
-      
-      // Set global approval flag that learners check
-      localStorage.setItem('surveyApproved', 'true');
-      
-      // Update state
       setStoredSurveys(updatedSurveys);
       setSelectedSurvey(updatedSurvey);
       
@@ -83,6 +72,34 @@ const SurveyReviewer = () => {
     }
   };
 
+  const handleRejectSurvey = async (survey: any) => {
+    try {
+      const { DataService } = await import('@/services/dataService');
+      await DataService.updateSurveySubmission(survey.id, { status: 'needs_revision' });
+      
+      const updatedSurvey = { ...survey, status: 'needs_revision' };
+      const updatedSurveys = storedSurveys.map((s: any) => 
+        s.id === survey.id ? updatedSurvey : s
+      );
+      setStoredSurveys(updatedSurveys);
+      setSelectedSurvey(updatedSurvey);
+      
+      toast({
+        title: "Revision Requested",
+        description: `${survey.learner_name || survey.learner} will be notified to revise their survey.`,
+        variant: "destructive",
+      });
+      
+    } catch (error) {
+      console.error('Failed to request revision:', error);
+      toast({
+        title: "Error", 
+        description: "Failed to request revision. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
@@ -91,6 +108,8 @@ const SurveyReviewer = () => {
         return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">Reviewed</Badge>;
       case 'approved':
         return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Approved</Badge>;
+      case 'needs_revision':
+        return <Badge className="bg-red-100 text-red-800 hover:bg-red-100">Needs Revision</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -104,30 +123,42 @@ const SurveyReviewer = () => {
         return <Eye className="h-4 w-4 text-blue-500" />;
       case 'approved':
         return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case 'needs_revision':
+        return <AlertCircle className="h-4 w-4 text-red-500" />;
       default:
         return <AlertCircle className="h-4 w-4 text-gray-500" />;
     }
   };
 
-  // Sort surveys by priority
+  // Sort surveys by priority and add statistics
   const allSurveys = [...storedSurveys].sort((a, b) => {
-    // Priority order: pending first, then reviewed, then approved
+    // Priority order: pending first, needs_revision, then reviewed, then approved
     const statusPriority: { [key: string]: number } = {
       'pending': 1,
-      'reviewed': 2,
-      'approved': 3
+      'needs_revision': 2, 
+      'reviewed': 3,
+      'approved': 4
     };
     
-    const priorityA = statusPriority[a.status] || 4;
-    const priorityB = statusPriority[b.status] || 4;
+    const priorityA = statusPriority[a.status] || 5;
+    const priorityB = statusPriority[b.status] || 5;
     
     if (priorityA !== priorityB) {
       return priorityA - priorityB;
     }
     
     // If same status, sort by submitted date (newest first)
-    return new Date(b.submittedDate).getTime() - new Date(a.submittedDate).getTime();
+    return new Date(b.submitted_at || b.submittedDate).getTime() - new Date(a.submitted_at || a.submittedDate).getTime();
   });
+
+  // Calculate statistics
+  const stats = {
+    total: allSurveys.length,
+    pending: allSurveys.filter(s => s.status === 'pending').length,
+    needsRevision: allSurveys.filter(s => s.status === 'needs_revision').length,
+    approved: allSurveys.filter(s => s.status === 'approved').length,
+    reviewed: allSurveys.filter(s => s.status === 'reviewed').length,
+  };
   
   const filteredSurveys = filter === 'all' ? allSurveys : allSurveys.filter(survey => survey.status === filter);
 
@@ -155,16 +186,21 @@ const SurveyReviewer = () => {
           </div>
           
           <div className="flex space-x-3">
-            <Button variant="outline">
+            <Button 
+              variant="outline" 
+              onClick={() => handleRejectSurvey(selectedSurvey)}
+              disabled={selectedSurvey.status === 'needs_revision'}
+            >
               <ThumbsDown className="h-4 w-4 mr-2" />
               Request Revision
             </Button>
             <Button 
               className="bg-green-600 hover:bg-green-700"
               onClick={() => handleApproveSurvey(selectedSurvey)}
+              disabled={selectedSurvey.status === 'approved'}
             >
               <ThumbsUp className="h-4 w-4 mr-2" />
-              Approve & Unlock Next Module
+              Approve & Unlock Modules
             </Button>
           </div>
         </div>
@@ -229,34 +265,83 @@ const SurveyReviewer = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+      {/* Header with Statistics */}
+      <div className="flex flex-col space-y-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Survey Reviews</h2>
-          <p className="text-gray-600">Review learner survey responses and AI-generated insights</p>
+          <h2 className="text-2xl font-bold text-gray-900">Survey Management</h2>
+          <p className="text-gray-600">Review learner survey responses and manage approvals</p>
         </div>
         
-        <div className="flex space-x-3">
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <Card>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-gray-900">{stats.total}</div>
+              <div className="text-sm text-gray-600">Total Surveys</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
+              <div className="text-sm text-gray-600">Pending Review</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-red-600">{stats.needsRevision}</div>
+              <div className="text-sm text-gray-600">Needs Revision</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-blue-600">{stats.reviewed}</div>
+              <div className="text-sm text-gray-600">Reviewed</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-green-600">{stats.approved}</div>
+              <div className="text-sm text-gray-600">Approved</div>
+            </CardContent>
+          </Card>
+        </div>
+        
+        {/* Filter Buttons */}
+        <div className="flex flex-wrap gap-2">
           <Button 
             variant={filter === 'all' ? 'default' : 'outline'} 
             size="sm"
             onClick={() => setFilter('all')}
           >
-            All
+            All ({stats.total})
           </Button>
           <Button 
             variant={filter === 'pending' ? 'default' : 'outline'} 
             size="sm"
             onClick={() => setFilter('pending')}
           >
-            Pending
+            Pending ({stats.pending})
+          </Button>
+          <Button 
+            variant={filter === 'needs_revision' ? 'default' : 'outline'} 
+            size="sm"
+            onClick={() => setFilter('needs_revision')}
+          >
+            Needs Revision ({stats.needsRevision})
           </Button>
           <Button 
             variant={filter === 'reviewed' ? 'default' : 'outline'} 
             size="sm"
             onClick={() => setFilter('reviewed')}
           >
-            Reviewed
+            Reviewed ({stats.reviewed})
+          </Button>
+          <Button 
+            variant={filter === 'approved' ? 'default' : 'outline'} 
+            size="sm"
+            onClick={() => setFilter('approved')}
+          >
+            Approved ({stats.approved})
           </Button>
         </div>
       </div>

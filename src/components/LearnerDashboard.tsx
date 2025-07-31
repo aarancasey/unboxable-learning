@@ -32,36 +32,33 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
       setShowPasswordModal(true);
     }
 
-    // Get admin approval status first
-    const adminApproval = localStorage.getItem('surveyApproved') === 'true';
-
     // Check survey status from database
     const checkSurveyStatus = async () => {
       try {
         const { DataService } = await import('@/services/dataService');
         const surveySubmissions = await DataService.getSurveySubmissions();
-        const hasSurveyCompleted = surveySubmissions.length > 0;
+        
+        // Find surveys for this learner (you might need learner identification)
+        const learnerSurveys = surveySubmissions.filter((submission: any) => 
+          submission.learner_name === learnerData?.name || 
+          submission.learner_email === learnerData?.email
+        );
         
         let currentSurveyStatus: 'not_started' | 'completed' | 'approved' = 'not_started';
-        if (hasSurveyCompleted && adminApproval) {
-          currentSurveyStatus = 'approved';
-        } else if (hasSurveyCompleted) {
-          currentSurveyStatus = 'completed';
+        
+        if (learnerSurveys.length > 0) {
+          const latestSurvey = learnerSurveys[0]; // Assuming most recent
+          if (latestSurvey.status === 'approved') {
+            currentSurveyStatus = 'approved';
+          } else if (['pending', 'completed', 'reviewed', 'needs_revision'].includes(latestSurvey.status)) {
+            currentSurveyStatus = 'completed';
+          }
         }
+        
         setSurveyStatus(currentSurveyStatus);
       } catch (error) {
         console.error('Failed to check survey status:', error);
-        // Fallback to localStorage
-        const surveySubmissions = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
-        const hasSurveyCompleted = surveySubmissions.length > 0;
-        
-        let currentSurveyStatus: 'not_started' | 'completed' | 'approved' = 'not_started';
-        if (hasSurveyCompleted && adminApproval) {
-          currentSurveyStatus = 'approved';
-        } else if (hasSurveyCompleted) {
-          currentSurveyStatus = 'completed';
-        }
-        setSurveyStatus(currentSurveyStatus);
+        setSurveyStatus('not_started');
       }
     };
 
