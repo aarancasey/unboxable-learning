@@ -80,7 +80,7 @@ serve(async (req) => {
 
   try {
     console.log('📥 Parsing request body...');
-    const { extractedContent, documentTitle }: AnalysisRequest = await req.json();
+    const { extractedContent, documentTitle, contentLibraryId }: AnalysisRequest & { contentLibraryId?: string } = await req.json();
     
     if (!extractedContent) {
       console.error('❌ Missing extractedContent in request');
@@ -121,9 +121,10 @@ serve(async (req) => {
 Return your response as a JSON array of category objects, each with:
 - name: A concise category name (2-4 words)
 - description: Brief description of what this category covers
-- framework_section: The section/area of the leadership framework this relates to
+- framework_section: Choose the most appropriate from: "sentiment", "purpose", "agility", "development", "assessment"
+- confidence_score: A decimal between 0.0 and 1.0 indicating how confident you are this category is relevant (higher = more confident)
 
-Focus on leadership competencies, skills, behaviors, or assessment areas mentioned in the document.`
+Focus on leadership competencies, skills, behaviors, or assessment areas mentioned in the document. Prioritize categories that are clearly defined and actionable for leadership development.`
             },
             {
               role: 'user',
@@ -198,12 +199,28 @@ Focus on leadership competencies, skills, behaviors, or assessment areas mention
       const category = categories[i];
       console.log(`📝 Inserting category ${i + 1}/${categories.length}:`, category.name);
       
+      // Check for duplicate categories before inserting
+      const { data: existingCategory } = await supabase
+        .from('content_categories')
+        .select('id, name')
+        .ilike('name', category.name)
+        .single();
+
+      if (existingCategory) {
+        console.log(`📋 Category "${category.name}" already exists, skipping insertion`);
+        insertedCategories.push(existingCategory);
+        continue;
+      }
+
       const { data, error } = await supabase
         .from('content_categories')
         .insert({
           name: category.name,
           description: category.description,
-          framework_section: category.framework_section
+          framework_section: category.framework_section,
+          ai_generated: true,
+          source_document_id: contentLibraryId || null,
+          confidence_score: category.confidence_score || 0.8
         })
         .select()
         .single();

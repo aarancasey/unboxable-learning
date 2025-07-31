@@ -6,9 +6,10 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Bot, Star, AlertCircle, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { CategorySuggestionDialog } from './CategorySuggestionDialog';
 
 interface Category {
   id: string;
@@ -16,6 +17,10 @@ interface Category {
   description: string | null;
   framework_section: string | null;
   created_at: string;
+  ai_generated?: boolean;
+  source_document_id?: string;
+  confidence_score?: number;
+  suggested_merge_candidates?: string[];
 }
 
 export const ContentCategoriesManager: React.FC = () => {
@@ -27,6 +32,7 @@ export const ContentCategoriesManager: React.FC = () => {
     framework_section: ''
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -246,10 +252,25 @@ export const ContentCategoriesManager: React.FC = () => {
       {/* Categories List */}
       <Card>
         <CardHeader>
-          <CardTitle>Existing Categories</CardTitle>
-          <CardDescription>
-            Manage your content categories
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Existing Categories</CardTitle>
+              <CardDescription>
+                Manage your content categories
+              </CardDescription>
+            </div>
+            {categories.some(cat => cat.ai_generated) && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowSuggestions(true)}
+                className="flex items-center gap-2"
+              >
+                <Sparkles className="h-4 w-4" />
+                AI Suggestions
+              </Button>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -259,16 +280,41 @@ export const ContentCategoriesManager: React.FC = () => {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="font-medium">{category.name}</h3>
+                      {category.ai_generated && (
+                        <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
+                          <Bot className="h-3 w-3 mr-1" />
+                          AI Generated
+                        </Badge>
+                      )}
                       {getFrameworkSectionBadge(category.framework_section)}
+                      {category.confidence_score && category.confidence_score >= 0.9 && (
+                        <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200">
+                          <Star className="h-3 w-3 mr-1" />
+                          High Confidence
+                        </Badge>
+                      )}
                     </div>
                     {category.description && (
                       <p className="text-sm text-muted-foreground">
                         {category.description}
                       </p>
                     )}
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Created {new Date(category.created_at).toLocaleDateString()}
-                    </p>
+                    <div className="flex items-center justify-between mt-2">
+                      <p className="text-xs text-muted-foreground">
+                        Created {new Date(category.created_at).toLocaleDateString()}
+                        {category.ai_generated && category.confidence_score && (
+                          <span className="ml-2">
+                            • Confidence: {Math.round(category.confidence_score * 100)}%
+                          </span>
+                        )}
+                      </p>
+                      {category.suggested_merge_candidates && category.suggested_merge_candidates.length > 0 && (
+                        <Badge variant="outline" className="text-orange-600 border-orange-200">
+                          <AlertCircle className="h-3 w-3 mr-1" />
+                          Merge Suggested
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                   <div className="flex gap-1">
                     <Button
@@ -298,6 +344,16 @@ export const ContentCategoriesManager: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+
+      <CategorySuggestionDialog
+        isOpen={showSuggestions}
+        onClose={() => setShowSuggestions(false)}
+        categories={categories}
+        onCategoriesUpdate={() => {
+          fetchCategories();
+          setShowSuggestions(false);
+        }}
+      />
     </div>
   );
 };

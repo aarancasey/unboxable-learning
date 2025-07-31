@@ -104,7 +104,7 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
     }));
   };
 
-  const analyzeDocumentContent = async () => {
+  const analyzeDocumentContent = async (contentLibraryId?: string) => {
     if (!formData.extracted_content) {
       toast({
         title: "No content to analyze",
@@ -120,7 +120,8 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
       const { data, error } = await supabase.functions.invoke('analyze-document-content', {
         body: {
           extractedContent: formData.extracted_content,
-          documentTitle: formData.title || 'Leadership Assessment Document'
+          documentTitle: formData.title || 'Leadership Assessment Document',
+          contentLibraryId: contentLibraryId
         }
       });
 
@@ -219,7 +220,7 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
 
       // If auto-generate is enabled, analyze content for rubrics
       if (autoGenerateRubrics && !isAnalyzing) {
-        await analyzeDocumentContent();
+        await analyzeDocumentContent(contentData.id);
       }
 
       const successMessage = autoGenerateRubrics 
@@ -370,7 +371,7 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={analyzeDocumentContent}
+                    onClick={() => analyzeDocumentContent()}
                     disabled={isAnalyzing}
                     className="w-full"
                   >

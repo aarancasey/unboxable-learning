@@ -327,30 +327,50 @@ export type Database = {
       }
       content_categories: {
         Row: {
+          ai_generated: boolean | null
+          confidence_score: number | null
           created_at: string
           description: string | null
           framework_section: string | null
           id: string
           name: string
+          source_document_id: string | null
+          suggested_merge_candidates: string[] | null
           updated_at: string
         }
         Insert: {
+          ai_generated?: boolean | null
+          confidence_score?: number | null
           created_at?: string
           description?: string | null
           framework_section?: string | null
           id?: string
           name: string
+          source_document_id?: string | null
+          suggested_merge_candidates?: string[] | null
           updated_at?: string
         }
         Update: {
+          ai_generated?: boolean | null
+          confidence_score?: number | null
           created_at?: string
           description?: string | null
           framework_section?: string | null
           id?: string
           name?: string
+          source_document_id?: string | null
+          suggested_merge_candidates?: string[] | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "content_categories_source_document_id_fkey"
+            columns: ["source_document_id"]
+            isOneToOne: false
+            referencedRelation: "content_library"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       content_library: {
         Row: {
