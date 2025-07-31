@@ -11,6 +11,7 @@ import { ContentLibraryRubrics } from './ContentLibraryRubrics';
 
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { LandingPageSettings } from './LandingPageSettings';
 
 export const ContentLibraryManager: React.FC = () => {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
@@ -124,6 +125,10 @@ export const ContentLibraryManager: React.FC = () => {
             <Settings className="h-4 w-4" />
             Categories
           </TabsTrigger>
+          <TabsTrigger value="landing" className="flex items-center gap-2">
+            <Settings className="h-4 w-4" />
+            Landing Page
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="library" className="space-y-4">
@@ -162,6 +167,10 @@ export const ContentLibraryManager: React.FC = () => {
 
         <TabsContent value="categories" className="space-y-4">
           <ContentCategoriesManager />
+        </TabsContent>
+
+        <TabsContent value="landing" className="space-y-4">
+          <LandingPageSettings />
         </TabsContent>
         
       </Tabs>

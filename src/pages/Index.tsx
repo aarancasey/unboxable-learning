@@ -11,6 +11,7 @@ import { GraduationCap, Users, LogOut } from 'lucide-react';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import LoginForm from '@/components/login/LoginForm';
 import { User, Session } from '@supabase/supabase-js';
+import { SettingsService } from '@/services/settingsService';
 
 
 const AppContent = () => {
@@ -20,6 +21,12 @@ const AppContent = () => {
   const [showLearnerLogin, setShowLearnerLogin] = useState(false);
   const [showSupabaseAuth, setShowSupabaseAuth] = useState(false);
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
+  const [learnMoreSettings, setLearnMoreSettings] = useState({
+    enabled: false,
+    title: 'Learn More About Our Program',
+    content: ''
+  });
+  const [isLearnMoreModalOpen, setIsLearnMoreModalOpen] = useState(false);
   const { user, session, signOut, isLoading } = useAuth();
   const { trackUserLogin, trackPageView } = useAnalytics();
 
@@ -30,6 +37,19 @@ const AppContent = () => {
       setIsAuthenticated(true);
     }
   }, [user, session, isAuthenticated]);
+
+  // Load Learn More settings
+  useEffect(() => {
+    const loadLearnMoreSettings = async () => {
+      try {
+        const settings = await SettingsService.getLearnMoreSettings();
+        setLearnMoreSettings(settings);
+      } catch (error) {
+        console.error('Error loading learn more settings:', error);
+      }
+    };
+    loadLearnMoreSettings();
+  }, []);
 
   const handleLearnerLogin = (userData?: any) => {
     setUserRole('learner');
@@ -146,12 +166,15 @@ const AppContent = () => {
               >
                 Start Your Journey →
               </Button>
-              <Button 
-                variant="outline"
-                className="border-2 border-white text-white hover:bg-white hover:text-purple-900 font-semibold px-8 py-4 text-lg rounded-lg bg-transparent"
-              >
-                Learn More
-              </Button>
+              {learnMoreSettings.enabled && learnMoreSettings.content && (
+                <Button 
+                  variant="outline"
+                  onClick={() => setIsLearnMoreModalOpen(true)}
+                  className="border-2 border-white text-white hover:bg-white hover:text-purple-900 font-semibold px-8 py-4 text-lg rounded-lg bg-transparent"
+                >
+                  Learn More
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -170,6 +193,22 @@ const AppContent = () => {
             </p>
           </div>
         </div>
+
+        {/* Learn More Modal */}
+        <Dialog open={isLearnMoreModalOpen} onOpenChange={setIsLearnMoreModalOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-center text-unboxable-navy">
+                {learnMoreSettings.title}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="py-4">
+              <p className="text-muted-foreground leading-relaxed">
+                {learnMoreSettings.content}
+              </p>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Footer */}
         <footer className="bg-unboxable-navy/50 backdrop-blur-sm border-t border-white/10 p-4 sm:p-6">
