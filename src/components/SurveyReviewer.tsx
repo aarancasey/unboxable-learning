@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { EditableAISummary } from '@/components/assessment/EditableAISummary';
 import { useToast } from '@/hooks/use-toast';
 import { 
@@ -18,29 +19,37 @@ import {
   MessageSquare,
   Eye,
   ThumbsUp,
-  ThumbsDown
+  ThumbsDown,
+  Filter,
+  Download,
+  Search
 } from 'lucide-react';
 
 const SurveyReviewer = () => {
   const [selectedSurvey, setSelectedSurvey] = useState<any>(null);
   const [filter, setFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('newest');
+  const [searchTerm, setSearchTerm] = useState('');
   const [storedSurveys, setStoredSurveys] = useState<any[]>([]);
   const { toast } = useToast();
 
-  // Load surveys from Supabase database on component mount
+  // Load ALL surveys from Supabase database on component mount
   useEffect(() => {
-    const loadSurveys = async () => {
+    const loadAllSurveys = async () => {
       try {
         const { DataService } = await import('@/services/dataService');
         const surveys = await DataService.getSurveySubmissions();
-        setStoredSurveys(surveys);
+        
+        // Ensure we're getting ALL surveys including historical ones
+        console.log('Loaded surveys:', surveys);
+        setStoredSurveys(surveys || []);
       } catch (error) {
         console.error('Failed to load surveys:', error);
         setStoredSurveys([]);
       }
     };
     
-    loadSurveys();
+    loadAllSurveys();
   }, []);
 
   const handleApproveSurvey = async (survey: any) => {
@@ -130,37 +139,52 @@ const SurveyReviewer = () => {
     }
   };
 
-  // Sort surveys by priority and add statistics
-  const allSurveys = [...storedSurveys].sort((a, b) => {
-    // Priority order: pending first, needs_revision, then reviewed, then approved
-    const statusPriority: { [key: string]: number } = {
-      'pending': 1,
-      'needs_revision': 2, 
-      'reviewed': 3,
-      'approved': 4
-    };
+  // Sort and filter surveys
+  let processedSurveys = [...storedSurveys];
+
+  // Apply search filter
+  if (searchTerm) {
+    processedSurveys = processedSurveys.filter(survey =>
+      (survey.learner_name || survey.learner || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (survey.department || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (survey.title || '').toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }
+
+  // Apply status filter
+  if (filter !== 'all') {
+    processedSurveys = processedSurveys.filter(survey => survey.status === filter);
+  }
+
+  // Apply sorting
+  processedSurveys.sort((a, b) => {
+    const dateA = new Date(a.submitted_at || a.submittedDate).getTime();
+    const dateB = new Date(b.submitted_at || b.submittedDate).getTime();
     
-    const priorityA = statusPriority[a.status] || 5;
-    const priorityB = statusPriority[b.status] || 5;
-    
-    if (priorityA !== priorityB) {
-      return priorityA - priorityB;
+    switch (sortBy) {
+      case 'oldest':
+        return dateA - dateB;
+      case 'name':
+        return (a.learner_name || a.learner || '').localeCompare(b.learner_name || b.learner || '');
+      case 'status':
+        return (a.status || '').localeCompare(b.status || '');
+      case 'newest':
+      default:
+        return dateB - dateA;
     }
-    
-    // If same status, sort by submitted date (newest first)
-    return new Date(b.submitted_at || b.submittedDate).getTime() - new Date(a.submitted_at || a.submittedDate).getTime();
   });
 
-  // Calculate statistics
+  // Calculate comprehensive statistics
   const stats = {
-    total: allSurveys.length,
-    pending: allSurveys.filter(s => s.status === 'pending').length,
-    needsRevision: allSurveys.filter(s => s.status === 'needs_revision').length,
-    approved: allSurveys.filter(s => s.status === 'approved').length,
-    reviewed: allSurveys.filter(s => s.status === 'reviewed').length,
+    total: storedSurveys.length,
+    pending: storedSurveys.filter(s => s.status === 'pending').length,
+    needsRevision: storedSurveys.filter(s => s.status === 'needs_revision').length,
+    approved: storedSurveys.filter(s => s.status === 'approved').length,
+    reviewed: storedSurveys.filter(s => s.status === 'reviewed').length,
+    completed: storedSurveys.filter(s => s.status === 'completed').length,
   };
   
-  const filteredSurveys = filter === 'all' ? allSurveys : allSurveys.filter(survey => survey.status === filter);
+  const filteredSurveys = processedSurveys;
 
   if (selectedSurvey) {
     return (
@@ -273,7 +297,7 @@ const SurveyReviewer = () => {
         </div>
         
         {/* Statistics Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
           <Card>
             <CardContent className="p-4 text-center">
               <div className="text-2xl font-bold text-gray-900">{stats.total}</div>
@@ -304,6 +328,48 @@ const SurveyReviewer = () => {
               <div className="text-sm text-gray-600">Approved</div>
             </CardContent>
           </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-purple-600">{stats.completed}</div>
+              <div className="text-sm text-gray-600">Completed</div>
+            </CardContent>
+          </Card>
+        </div>
+        
+        {/* Search and Controls */}
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+          <div className="flex flex-col sm:flex-row gap-4 flex-1">
+            {/* Search */}
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search by learner name, department, or title..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            
+            {/* Sort */}
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Sort by..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">Newest First</SelectItem>
+                <SelectItem value="oldest">Oldest First</SelectItem>
+                <SelectItem value="name">Learner Name</SelectItem>
+                <SelectItem value="status">Status</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          {/* Export Button */}
+          <Button variant="outline" size="sm">
+            <Download className="h-4 w-4 mr-2" />
+            Export All
+          </Button>
         </div>
         
         {/* Filter Buttons */}
@@ -342,6 +408,13 @@ const SurveyReviewer = () => {
             onClick={() => setFilter('approved')}
           >
             Approved ({stats.approved})
+          </Button>
+          <Button 
+            variant={filter === 'completed' ? 'default' : 'outline'} 
+            size="sm"
+            onClick={() => setFilter('completed')}
+          >
+            Completed ({stats.completed})
           </Button>
         </div>
       </div>
