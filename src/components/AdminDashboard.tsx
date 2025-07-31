@@ -37,7 +37,6 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [adminData, setAdminData] = useState({
     totalLearners: 0,
-    activeCourses: 0,
     pendingSurveys: 0,
     completionRate: 0,
     recentActivity: [],
@@ -57,7 +56,6 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
       setAdminData(prev => ({
         ...prev,
         totalLearners: learners.length,
-        activeCourses: savedSurveys.length > 0 ? 1 : 0,
         pendingSurveys: savedSurveys.filter(survey => survey.status === 'pending').length,
         completionRate
       }));
@@ -121,7 +119,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
 
           <TabsContent value="overview" className="space-y-4 sm:space-y-6">
             {/* Key Metrics */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-gray-600 flex items-center">
@@ -135,20 +133,6 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600 flex items-center">
-                    <BookOpen className="h-4 w-4 mr-2 text-unboxable-navy" />
-                    Active Courses
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-unboxable-navy">{adminData.activeCourses}</div>
-                  <p className="text-xs text-gray-600 mt-1">
-                    {adminData.activeCourses === 0 ? 'Complete surveys to unlock courses' : 'Module 2 available'}
-                  </p>
-                </CardContent>
-              </Card>
 
               <Card>
                 <CardHeader className="pb-2">
