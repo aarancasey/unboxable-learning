@@ -91,9 +91,6 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
             </div>
             
             <div className="flex items-center space-x-2 sm:space-x-4">
-              <div className="hidden sm:block">
-                <EmailTestModal />
-              </div>
               <span className="text-xs sm:text-sm text-gray-600 hidden md:block">Administrator</span>
               <Button variant="ghost" size="sm" onClick={onLogout} className="hover:bg-slate-100">
                 <LogOut className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
