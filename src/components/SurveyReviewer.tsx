@@ -22,7 +22,10 @@ import {
   ThumbsDown,
   Filter,
   Download,
-  Search
+  Search,
+  ChevronDown,
+  ChevronUp,
+  Settings
 } from 'lucide-react';
 
 const SurveyReviewer = () => {
@@ -31,6 +34,7 @@ const SurveyReviewer = () => {
   const [sortBy, setSortBy] = useState('newest');
   const [searchTerm, setSearchTerm] = useState('');
   const [storedSurveys, setStoredSurveys] = useState<any[]>([]);
+  const [showTestingTools, setShowTestingTools] = useState(false);
   const { toast } = useToast();
 
   // Load ALL surveys from Supabase database on component mount
@@ -327,18 +331,34 @@ const SurveyReviewer = () => {
 
   return (
     <div className="space-y-6">
-      {/* Quick Reset Section for Testing */}
+      {/* Collapsible Testing Tools Section */}
       <Card className="border-orange-200 bg-orange-50">
-        <CardHeader>
-          <CardTitle className="text-orange-800 flex items-center">
-            <AlertCircle className="h-5 w-5 mr-2" />
-            Testing Tools
+        <CardHeader 
+          className="cursor-pointer hover:bg-orange-100 transition-colors"
+          onClick={() => setShowTestingTools(!showTestingTools)}
+        >
+          <CardTitle className="text-orange-800 flex items-center justify-between">
+            <div className="flex items-center">
+              <Settings className="h-5 w-5 mr-2" />
+              Admin Testing Tools
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-xs text-orange-600 font-normal">
+                {showTestingTools ? 'Click to hide' : 'Click to expand'}
+              </span>
+              {showTestingTools ? (
+                <ChevronUp className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
+            </div>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm text-orange-700">
-            Quick reset tools for testing the survey system
-          </p>
+        {showTestingTools && (
+          <CardContent className="space-y-4">
+            <p className="text-sm text-orange-700">
+              Quick reset tools for testing the survey system
+            </p>
           <div className="flex flex-wrap gap-2">
             <Button 
               variant="outline" 
@@ -423,8 +443,9 @@ const SurveyReviewer = () => {
             >
               Reset ALL Surveys (Danger)
             </Button>
-          </div>
-        </CardContent>
+            </div>
+          </CardContent>
+        )}
       </Card>
 
       {/* Header with Statistics */}
