@@ -109,6 +109,36 @@ const SurveyReviewer = () => {
     }
   };
 
+  const handleResetSurvey = async (survey: any) => {
+    if (!confirm(`Are you sure you want to reset the survey for ${survey.learner_name}? This will allow them to retake the survey from the beginning.`)) {
+      return;
+    }
+
+    try {
+      const { DataService } = await import('@/services/dataService');
+      // Delete the survey submission to reset it completely
+      await DataService.deleteSurveySubmission(survey.id);
+      
+      // Remove from state
+      const updatedSurveys = storedSurveys.filter((s: any) => s.id !== survey.id);
+      setStoredSurveys(updatedSurveys);
+      setSelectedSurvey(null);
+      
+      toast({
+        title: "Survey Reset",
+        description: `${survey.learner_name}'s survey has been reset. They can now retake it from the beginning.`,
+      });
+      
+    } catch (error) {
+      console.error('Failed to reset survey:', error);
+      toast({
+        title: "Error",
+        description: "Failed to reset survey. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
@@ -212,6 +242,14 @@ const SurveyReviewer = () => {
           <div className="flex space-x-3">
             <Button 
               variant="outline" 
+              onClick={() => handleResetSurvey(selectedSurvey)}
+              className="border-red-200 text-red-600 hover:bg-red-50"
+            >
+              <AlertCircle className="h-4 w-4 mr-2" />
+              Reset Survey
+            </Button>
+            <Button 
+              variant="outline" 
               onClick={() => handleRejectSurvey(selectedSurvey)}
               disabled={selectedSurvey.status === 'needs_revision'}
             >
@@ -289,6 +327,106 @@ const SurveyReviewer = () => {
 
   return (
     <div className="space-y-6">
+      {/* Quick Reset Section for Testing */}
+      <Card className="border-orange-200 bg-orange-50">
+        <CardHeader>
+          <CardTitle className="text-orange-800 flex items-center">
+            <AlertCircle className="h-5 w-5 mr-2" />
+            Testing Tools
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-orange-700">
+            Quick reset tools for testing the survey system
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={async () => {
+                try {
+                  const { DataService } = await import('@/services/dataService');
+                  const allSurveys = await DataService.getSurveySubmissions();
+                  const targetEmails = ['caseyaaran@gmail.com', 'eabosse@hotmail.com'];
+                  const targetNames = ['A N Casey', 'Estelle'];
+                  
+                  // Find surveys for target learners
+                  const surveysToReset = allSurveys.filter((survey: any) => 
+                    targetNames.includes(survey.learner_name) || 
+                    targetEmails.some(email => survey.learner_name?.toLowerCase().includes(email.split('@')[0]))
+                  );
+                  
+                  if (surveysToReset.length === 0) {
+                    toast({
+                      title: "No surveys found",
+                      description: "caseyaaran@gmail.com and eabosse@hotmail.com don't have any survey submissions to reset.",
+                    });
+                    return;
+                  }
+                  
+                  // Reset them
+                  for (const survey of surveysToReset) {
+                    await DataService.deleteSurveySubmission(survey.id);
+                  }
+                  
+                  // Refresh the list
+                  const updatedSurveys = await DataService.getSurveySubmissions();
+                  setStoredSurveys(updatedSurveys);
+                  
+                  toast({
+                    title: "Surveys Reset",
+                    description: `Reset ${surveysToReset.length} survey(s) for the test learners.`,
+                  });
+                } catch (error) {
+                  console.error('Failed to reset test surveys:', error);
+                  toast({
+                    title: "Error",
+                    description: "Failed to reset surveys. Please try again.",
+                    variant: "destructive",
+                  });
+                }
+              }}
+              className="border-orange-300 text-orange-700 hover:bg-orange-100"
+            >
+              Reset Casey & Estelle Surveys
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={async () => {
+                if (!confirm('Are you sure you want to reset ALL surveys? This cannot be undone.')) return;
+                
+                try {
+                  const { DataService } = await import('@/services/dataService');
+                  const allSurveys = await DataService.getSurveySubmissions();
+                  
+                  for (const survey of allSurveys) {
+                    await DataService.deleteSurveySubmission(survey.id);
+                  }
+                  
+                  setStoredSurveys([]);
+                  
+                  toast({
+                    title: "All Surveys Reset",
+                    description: `Reset ${allSurveys.length} survey submissions.`,
+                  });
+                } catch (error) {
+                  console.error('Failed to reset all surveys:', error);
+                  toast({
+                    title: "Error",
+                    description: "Failed to reset all surveys. Please try again.",
+                    variant: "destructive",
+                  });
+                }
+              }}
+              className="border-red-300 text-red-700 hover:bg-red-100"
+            >
+              Reset ALL Surveys (Danger)
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Header with Statistics */}
       <div className="flex flex-col space-y-4">
         <div>

@@ -315,6 +315,31 @@ export class DataService {
     }
   }
 
+  static async deleteSurveySubmission(id: number) {
+    try {
+      const { error } = await supabase
+        .from('survey_submissions')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      // Also update localStorage as backup
+      const localSubmissions = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
+      const updatedSubmissions = localSubmissions.filter((submission: any) => submission.id !== id);
+      localStorage.setItem('surveySubmissions', JSON.stringify(updatedSubmissions));
+
+      return true;
+    } catch (error) {
+      console.error('Error deleting survey submission:', error);
+      // Fallback to localStorage
+      const localSubmissions = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
+      const updatedSubmissions = localSubmissions.filter((submission: any) => submission.id !== id);
+      localStorage.setItem('surveySubmissions', JSON.stringify(updatedSubmissions));
+      return true;
+    }
+  }
+
   // Migration helpers
   private static async migrateLearners(localLearners: any[]) {
     try {
