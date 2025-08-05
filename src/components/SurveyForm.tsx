@@ -32,125 +32,104 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
     isLastItem,
     isFirstItem,
     isCurrentAnswered,
+    isSaving,
+    lastSaved,
     handleAnswerChange,
     handleScaleGridChange,
     handleNext,
-    handlePrevious
+    handlePrevious,
+    saveProgress,
+    deleteSavedProgress
   } = useSurveyProgress(survey);
 
   const handleParticipantInfoComplete = (data: ParticipantInfo) => {
     setParticipantInfo(data);
   };
 
+  const handleManualSave = () => {
+    saveProgress(true); // Show toast for manual save
+  };
+
   const onNextClick = async () => {
     const isComplete = handleNext();
     if (isComplete) {
       try {
-        // Survey complete - save to localStorage
+        // Survey complete - save final submission and delete progress
         console.log('Survey submitted:', answers);
+
+        // Get the participant info from the survey state if available
+        let finalParticipantInfo = participantInfo;
         
-        // Prepare responses for AI analysis
-        const responses = Object.entries(answers).map(([key, value]) => {
-          // Find the question for this answer
-          let question = "";
-          for (const section of survey.sections) {
-            if (section.questions) {
-              const q = section.questions.find(q => 
-                q.id === key || key.startsWith(q.id + '_')
-              );
-              if (q) {
-                if (key.includes('_') && q.type === 'scale-grid') {
-                  // Handle scale-grid questions
-                  const promptIndex = parseInt(key.split('_')[1]);
-                  const scaleGridQ = q as any;
-                  question = `${q.question} - ${scaleGridQ.prompts[promptIndex]}`;
-                } else {
-                  question = q.question;
-                }
-                break;
-              }
-            }
-          }
-          
-          return {
-            question,
-            answer: Array.isArray(value) ? value.join(', ') : value.toString()
+        // If no participant info from form, try to extract from learnerData
+        if (!finalParticipantInfo && learnerData) {
+          finalParticipantInfo = {
+            fullName: learnerData.first_name && learnerData.last_name 
+              ? `${learnerData.first_name} ${learnerData.last_name}` 
+              : learnerData.email || '',
+            date: new Date().toISOString().split('T')[0],
+            company: learnerData.company || '',
+            businessArea: learnerData.department || '',
+            role: learnerData.role || ''
           };
-        }).filter(response => response.question); // Only include responses with questions
-
-        // Generate AI summary with fallback
-        let aiSummary = {
-          currentLeadershipStyle: "Managing, but close to overload",
-          confidenceRating: "Developing Confidence (2.5–3.4)",
-          strongestArea: "Motivate and align your team",
-          focusArea: "Lead through complexity and ambiguity",
-          leadershipAspirations: ["Empowering and people-centred", "Strategic and future-focused", "Curious and adaptive"],
-          purposeRating: 4,
-          agilityLevel: "Achiever",
-          topStrengths: ["Action Orientation & Delivery", "Decision-Making Agility", "Empowering Others & Collaboration"],
-          developmentAreas: ["Navigating Change & Uncertainty", "Strategic Agility & Systems Thinking", "Learning Agility & Growth Mindset"],
-          overallAssessment: "This leader demonstrates strong operational capabilities with clear areas for strategic development. Focus on building confidence in navigating ambiguity while leveraging existing strengths in team motivation and decision-making."
-        };
-
-        // Try to generate AI summary, but don't let it block completion
-        try {
-          const { data, error } = await supabase.functions.invoke('generate-leadership-summary', {
-            body: {
-              surveyResponses: responses,
-              surveyTitle: survey.title
-            }
-          });
-
-          if (!error && data?.aiSummary) {
-            aiSummary = data.aiSummary;
-            console.log('Generated AI summary:', aiSummary);
-          }
-        } catch (error) {
-          console.error('AI summary generation failed, using fallback:', error);
         }
-        
+
+        // Generate AI summary using the edge function
+        const { data: summaryData, error: summaryError } = await supabase.functions.invoke('generate-leadership-summary', {
+          body: {
+            answers,
+            participantInfo: finalParticipantInfo
+          }
+        });
+
+        if (summaryError) {
+          console.error('Failed to generate AI summary:', summaryError);
+        }
+
         // Create full survey submission object for localStorage
-        const surveySubmission = {
-          id: Date.now(),
-          title: survey.title,
-          learner: participantInfo?.fullName || "Current User",
-          department: participantInfo?.businessArea || "Department",
-          company: participantInfo?.company || "Company",
-          role: participantInfo?.role || "Role",
-          date: participantInfo?.date || new Date().toISOString().split('T')[0],
-          submittedDate: new Date().toISOString().split('T')[0],
-          status: "completed",
-          responses,
-          aiSummary,
-          participantInfo
+        const submissionData = {
+          id: crypto.randomUUID(),
+          participantInfo: finalParticipantInfo,
+          answers,
+          submittedAt: new Date().toISOString(),
+          status: 'completed',
+          learnerId: learnerData?.id,
+          learnerName: learnerData?.first_name && learnerData?.last_name 
+            ? `${learnerData.first_name} ${learnerData.last_name}` 
+            : learnerData?.email,
+          ...(summaryData && { aiSummary: summaryData })
         };
 
         // Always save to localStorage first as primary storage
         const existingSurveys = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
-        existingSurveys.push(surveySubmission);
+        existingSurveys.push(submissionData);
         localStorage.setItem('surveySubmissions', JSON.stringify(existingSurveys));
         console.log('Survey saved to localStorage successfully');
 
-        // Try to save to database as backup, but don't block on failure
+        // Try to save to database as backup
         try {
-          const { DataService } = await import('@/services/dataService');
-          const surveySubmissionForDB = {
-            learner_name: participantInfo?.fullName || learnerData?.name || "Current User",
-            responses,
-            status: "completed",
-            participant_info: participantInfo
-          };
-          await DataService.addSurveySubmission(surveySubmissionForDB);
-          console.log('Survey also saved to database');
+          const { error: dbError } = await supabase
+            .from('survey_submissions')
+            .insert([{
+              learner_id: learnerData?.id || null,
+              learner_name: finalParticipantInfo?.fullName || 'Unknown User',
+              responses: submissionData as any, // Cast to Json type
+              status: 'completed'
+            }]);
+          
+          if (!dbError) {
+            console.log('Survey also saved to database');
+          }
         } catch (error) {
           console.warn('Database save failed, but survey is saved locally:', error);
         }
 
-        // Always proceed to completion regardless of save status
+        // Delete the progress since survey is complete
+        await deleteSavedProgress();
+        
         onSubmit();
       } catch (error) {
-        console.error('Survey submission failed:', error);
-        // Even if everything fails, try to proceed
+        console.error('Error submitting survey:', error);
+        // Still call onSubmit to proceed even if there was an error
         onSubmit();
       }
     }
@@ -237,12 +216,15 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
 
         <div className="survey-fade-in">
           <SurveyNavigation
-            onPrevious={handlePrevious}
-            onNext={onNextClick}
             isFirstItem={isFirstItem}
             isLastItem={isLastItem}
-            isCurrentAnswered={isCurrentAnswered()}
-            progress={progress}
+            isCurrentAnswered={isCurrentAnswered}
+            onPrevious={handlePrevious}
+            onNext={onNextClick}
+            onBack={onBack}
+            onSave={handleManualSave}
+            isSaving={isSaving}
+            lastSaved={lastSaved}
           />
         </div>
       </div>

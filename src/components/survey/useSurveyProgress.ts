@@ -1,10 +1,131 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Survey, Question, ScaleGridQuestion } from './types';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/components/auth/AuthProvider';
+import { toast } from 'sonner';
 
 export const useSurveyProgress = (survey: Survey) => {
+  const { user } = useAuth();
   const [currentSection, setCurrentSection] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
+  const [isSaving, setIsSaving] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+
+  // Load saved progress on mount
+  useEffect(() => {
+    if (user) {
+      loadSavedProgress();
+    }
+  }, [user]);
+
+  // Auto-save every 2 minutes
+  useEffect(() => {
+    if (user && Object.keys(answers).length > 0) {
+      const interval = setInterval(() => {
+        saveProgress();
+      }, 2 * 60 * 1000); // 2 minutes
+
+      return () => clearInterval(interval);
+    }
+  }, [user, answers, currentSection, currentQuestion]);
+
+  const loadSavedProgress = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('survey_progress')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('survey_type', 'leadership_assessment')
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (data) {
+        setCurrentSection(data.current_section);
+        setCurrentQuestion(data.current_question);
+        setAnswers((data.answers as Record<string, string | string[]>) || {});
+        setLastSaved(new Date(data.updated_at));
+        console.log('Loaded saved survey progress:', data);
+      }
+    } catch (error) {
+      console.error('Failed to load saved progress:', error);
+      // Fallback to localStorage
+      const localProgress = localStorage.getItem('surveyProgress');
+      if (localProgress) {
+        const parsed = JSON.parse(localProgress);
+        setCurrentSection(parsed.currentSection || 0);
+        setCurrentQuestion(parsed.currentQuestion || 0);
+        setAnswers(parsed.answers || {});
+      }
+    }
+  };
+
+  const saveProgress = async (showToast = false) => {
+    if (!user || isSaving) return;
+
+    setIsSaving(true);
+    
+    try {
+      const progressData = {
+        user_id: user.id,
+        current_section: currentSection,
+        current_question: currentQuestion,
+        answers,
+        survey_type: 'leadership_assessment'
+      };
+
+      const { error } = await supabase
+        .from('survey_progress')
+        .upsert(progressData, { onConflict: 'user_id,survey_type' });
+
+      if (error) throw error;
+
+      setLastSaved(new Date());
+      
+      // Also save to localStorage as backup
+      localStorage.setItem('surveyProgress', JSON.stringify(progressData));
+      
+      if (showToast) {
+        toast.success('Progress saved successfully');
+      }
+      
+      console.log('Survey progress saved');
+    } catch (error) {
+      console.error('Failed to save progress:', error);
+      // Fallback to localStorage only
+      localStorage.setItem('surveyProgress', JSON.stringify({
+        currentSection,
+        currentQuestion,
+        answers
+      }));
+      
+      if (showToast) {
+        toast.error('Failed to save to cloud, but saved locally');
+      }
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const deleteSavedProgress = async () => {
+    if (!user) return;
+
+    try {
+      await supabase
+        .from('survey_progress')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('survey_type', 'leadership_assessment');
+      
+      localStorage.removeItem('surveyProgress');
+      console.log('Survey progress deleted');
+    } catch (error) {
+      console.error('Failed to delete saved progress:', error);
+    }
+  };
 
   const totalSections = survey.sections.length;
   const currentSectionData = survey.sections[currentSection];
@@ -117,9 +238,13 @@ export const useSurveyProgress = (survey: Survey) => {
     isLastItem,
     isFirstItem,
     isCurrentAnswered,
+    isSaving,
+    lastSaved,
     handleAnswerChange,
     handleScaleGridChange,
     handleNext,
-    handlePrevious
+    handlePrevious,
+    saveProgress,
+    deleteSavedProgress
   };
 };
