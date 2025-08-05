@@ -35,8 +35,18 @@ const AppContent = () => {
     if (user && session && !isAuthenticated) {
       setUserRole('admin');
       setIsAuthenticated(true);
+    } else if (!user && !session && isAuthenticated && userRole === 'admin') {
+      // Only log out admin users if they were authenticated via Supabase
+      // Don't affect hardcoded admin logins
+      const wasSupabaseAuth = sessionStorage.getItem('supabase-auth') === 'true';
+      if (wasSupabaseAuth) {
+        setUserRole(null);
+        setIsAuthenticated(false);
+        setLearnerData(null);
+        sessionStorage.removeItem('supabase-auth');
+      }
     }
-  }, [user, session, isAuthenticated]);
+  }, [user, session, isAuthenticated, userRole]);
 
   // Load Learn More settings
   useEffect(() => {
@@ -71,6 +81,7 @@ const AppContent = () => {
   };
 
   const handleSupabaseAuthSuccess = (authUser: User, authSession: Session) => {
+    sessionStorage.setItem('supabase-auth', 'true');
     setUserRole('admin');
     setIsAuthenticated(true);
     trackUserLogin('supabase-admin');
@@ -83,6 +94,7 @@ const AppContent = () => {
     if (user) {
       await signOut();
     }
+    sessionStorage.removeItem('supabase-auth');
     setUserRole(null);
     setIsAuthenticated(false);
     setLearnerData(null);
