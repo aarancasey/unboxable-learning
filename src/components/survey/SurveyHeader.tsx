@@ -12,12 +12,16 @@ export const SurveyHeader = ({ title, onBack }: SurveyHeaderProps) => {
     <header className="survey-header-gradient px-4 sm:px-6 lg:px-8 py-8">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center">
+          <div className="flex items-center space-x-4">
             <img 
-              src="/src/assets/unboxable-logo-white.png" 
+              src="/lovable-uploads/ee20533f-0842-485a-a131-07d4bfc223a0.png" 
               alt="unboxable." 
-              className="h-8 w-auto"
+              className="h-10 w-auto"
             />
+            <div className="text-left">
+              <h1 className="text-2xl font-montserrat font-bold text-white">LEADForward</h1>
+              <p className="text-white/90 text-sm font-montserrat font-bold">Leadership Self Assessment</p>
+            </div>
           </div>
           
           <Button
@@ -32,8 +36,8 @@ export const SurveyHeader = ({ title, onBack }: SurveyHeaderProps) => {
         </div>
         
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-white mb-2">{title}</h1>
-          <p className="text-white/80 text-lg max-w-2xl mx-auto leading-relaxed">
+          <h2 className="text-3xl font-montserrat font-bold text-white mb-2">{title}</h2>
+          <p className="text-white/80 text-lg max-w-2xl mx-auto leading-relaxed font-montserrat">
             Complete your leadership assessment to help you reflect on your current leadership mindset, sense of purpose and agility.
           </p>
         </div>
