@@ -38,7 +38,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log(`Sending assessment summary to: ${learnerEmail}`);
 
     const emailResult = await resend.emails.send({
-      from: "Unboxable Learning <noreply@unboxable.co.nz>",
+      from: "Unboxable Learning <onboarding@resend.dev>",
       to: [learnerEmail],
       subject: `🎓 Your Leadership Assessment Results - ${surveyTitle}`,
       html: `
