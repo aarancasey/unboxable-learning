@@ -66,8 +66,10 @@ export const useSurveyProgress = (survey: Survey) => {
 
   const saveProgress = async (showToast = false) => {
     console.log('saveProgress called, showToast:', showToast);
+    console.log('user:', !!user, 'isSaving:', isSaving);
     if (!user || isSaving) return;
 
+    console.log('Starting save process...');
     setIsSaving(true);
     setSaveComplete(false);
     
@@ -80,12 +82,15 @@ export const useSurveyProgress = (survey: Survey) => {
         survey_type: 'leadership_assessment'
       };
 
+      console.log('Save successful to database');
       const { error } = await supabase
         .from('survey_progress')
         .upsert(progressData, { onConflict: 'user_id,survey_type' });
 
+      console.log('Database save error:', error);
       if (error) throw error;
 
+      console.log('Setting save states - lastSaved and saveComplete');
       setLastSaved(new Date());
       setSaveComplete(true);
       
@@ -123,6 +128,7 @@ export const useSurveyProgress = (survey: Survey) => {
         setSaveComplete(false);
       }, 3000);
     } finally {
+      console.log('Save process completed, setting isSaving to false');
       setIsSaving(false);
     }
   };

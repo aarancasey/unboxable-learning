@@ -41,18 +41,6 @@ export const SurveyNavigation = ({
 
   return (
     <div className="flex flex-col gap-4 mt-8">
-      {/* Save Status */}
-      <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-        <Clock className="w-4 h-4" />
-        {isSaving ? (
-          <span>Saving...</span>
-        ) : lastSaved ? (
-          <span>Last saved: {formatLastSaved(lastSaved)}</span>
-        ) : (
-          <span>Progress will be saved automatically</span>
-        )}
-      </div>
-
       {/* Navigation Buttons */}
       <div className="flex items-center justify-between bg-card rounded-xl p-6 survey-card-shadow border-0">
         <div className="flex gap-3">
