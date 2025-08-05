@@ -67,7 +67,8 @@ export const useSurveyProgress = (survey: Survey) => {
   const saveProgress = async (showToast = false) => {
     console.log('saveProgress called, showToast:', showToast);
     console.log('user:', !!user, 'isSaving:', isSaving);
-    if (!user || isSaving) return;
+    
+    if (isSaving) return;
 
     console.log('Starting save process...');
     setIsSaving(true);
@@ -75,31 +76,42 @@ export const useSurveyProgress = (survey: Survey) => {
     
     try {
       const progressData = {
-        user_id: user.id,
         current_section: currentSection,
         current_question: currentQuestion,
         answers,
-        survey_type: 'leadership_assessment'
+        survey_type: 'leadership_assessment',
+        ...(user && { user_id: user.id })
       };
 
-      console.log('Save successful to database');
-      const { error } = await supabase
-        .from('survey_progress')
-        .upsert(progressData, { onConflict: 'user_id,survey_type' });
+      // Try to save to Supabase if user is authenticated
+      if (user) {
+        console.log('Attempting to save to database...');
+        const { error } = await supabase
+          .from('survey_progress')
+          .upsert(progressData, { onConflict: 'user_id,survey_type' });
 
-      console.log('Database save error:', error);
-      if (error) throw error;
+        console.log('Database save error:', error);
+        if (error) throw error;
+        console.log('Successfully saved to database');
+      } else {
+        console.log('No user authenticated, saving locally only');
+      }
 
+      // Always save to localStorage as backup
+      localStorage.setItem('surveyProgress', JSON.stringify(progressData));
+      console.log('Saved to localStorage');
+
+      // Always show success feedback
       console.log('Setting save states - lastSaved and saveComplete');
       setLastSaved(new Date());
       setSaveComplete(true);
       
-      // Also save to localStorage as backup
-      localStorage.setItem('surveyProgress', JSON.stringify(progressData));
-      
       if (showToast) {
         console.log('Showing success toast');
-        toast.success("Progress saved successfully! It's now safe to exit the survey.");
+        const message = user 
+          ? "Progress saved successfully! It's now safe to exit the survey."
+          : "Progress saved locally! It's now safe to exit the survey.";
+        toast.success(message);
       }
       
       // Reset the "Saved" state after 3 seconds
@@ -110,12 +122,14 @@ export const useSurveyProgress = (survey: Survey) => {
       console.log('Survey progress saved');
     } catch (error) {
       console.error('Failed to save progress:', error);
-      // Fallback to localStorage only
+      
+      // Always save to localStorage as fallback
       localStorage.setItem('surveyProgress', JSON.stringify({
         currentSection,
         currentQuestion,
         answers
       }));
+      console.log('Fallback: saved to localStorage');
       
       if (showToast) {
         console.log('Showing error toast');
