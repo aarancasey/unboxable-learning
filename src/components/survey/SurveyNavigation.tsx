@@ -41,6 +41,19 @@ export const SurveyNavigation = ({
 
   return (
     <div className="flex flex-col gap-4 mt-8">
+      {/* Save Success Message */}
+      {saveComplete && (
+        <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3 animate-fade-in">
+          <div className="flex items-center justify-center w-8 h-8 bg-green-500 rounded-full">
+            <Check className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <p className="text-green-800 font-semibold">Progress Saved Successfully!</p>
+            <p className="text-green-700 text-sm">Your answers have been saved. It's safe to exit the survey and return later.</p>
+          </div>
+        </div>
+      )}
+
       {/* Navigation Buttons */}
       <div className="flex items-center justify-between bg-card rounded-xl p-6 survey-card-shadow border-0">
         <div className="flex gap-3">
@@ -56,17 +69,17 @@ export const SurveyNavigation = ({
           <Button 
             variant="outline" 
             onClick={onSave}
-            disabled={isSaving}
-            className={`flex items-center gap-2 px-6 py-3 transition-all duration-200 ${
+            disabled={isSaving || saveComplete}
+            className={`flex items-center gap-2 px-6 py-3 transition-all duration-300 ${
               saveComplete 
-                ? 'border-green-500 hover:border-green-500 hover:bg-green-50 text-green-700' 
+                ? 'border-green-500 bg-green-50 text-green-700 hover:bg-green-50 hover:border-green-500' 
                 : 'border-unboxable-orange/20 hover:border-unboxable-orange hover:bg-unboxable-orange/5'
             }`}
           >
             {saveComplete ? (
               <>
                 <Check className="w-4 h-4 text-green-600" />
-                Saved
+                Saved ✓
               </>
             ) : (
               <>
