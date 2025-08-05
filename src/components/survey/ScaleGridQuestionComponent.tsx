@@ -8,7 +8,7 @@ interface ScaleGridQuestionComponentProps {
 
 export const ScaleGridQuestionComponent = ({ question, answers, onAnswerChange }: ScaleGridQuestionComponentProps) => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-8">
       {question.prompts?.map((prompt, promptIndex) => (
         <div key={promptIndex} className="flex items-center justify-between gap-6">
           {/* Statement */}
