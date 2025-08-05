@@ -74,20 +74,8 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
           };
         }
 
-        // Generate AI summary using the edge function
-        const { data: summaryData, error: summaryError } = await supabase.functions.invoke('generate-leadership-summary', {
-          body: {
-            answers,
-            participantInfo: finalParticipantInfo
-          }
-        });
-
-        if (summaryError) {
-          console.error('Failed to generate AI summary:', summaryError);
-        }
-
         // Create full survey submission object for localStorage
-        const submissionData = {
+        const submissionData: any = {
           id: crypto.randomUUID(),
           participantInfo: finalParticipantInfo,
           answers,
@@ -96,9 +84,30 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
           learnerId: learnerData?.id,
           learnerName: learnerData?.first_name && learnerData?.last_name 
             ? `${learnerData.first_name} ${learnerData.last_name}` 
-            : learnerData?.email,
-          ...(summaryData && { aiSummary: summaryData })
+            : learnerData?.email
         };
+
+        // Generate AI summary using the edge function
+        try {
+          const { data: summaryData, error: summaryError } = await supabase.functions.invoke('generate-leadership-summary', {
+            body: {
+              surveyResponses: Object.entries(answers).map(([key, value]) => ({
+                question: key,
+                answer: Array.isArray(value) ? value.join(', ') : value
+              })),
+              surveyTitle: survey.title
+            }
+          });
+
+          if (summaryError) {
+            console.error('Failed to generate AI summary:', summaryError);
+          } else if (summaryData) {
+            submissionData.aiSummary = summaryData.aiSummary;
+          }
+        } catch (summaryError) {
+          console.error('AI summary generation failed:', summaryError);
+          // Continue without AI summary
+        }
 
         // Always save to localStorage first as primary storage
         const existingSurveys = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
