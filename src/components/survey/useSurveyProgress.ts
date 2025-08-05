@@ -89,7 +89,7 @@ export const useSurveyProgress = (survey: Survey) => {
       localStorage.setItem('surveyProgress', JSON.stringify(progressData));
       
       if (showToast) {
-        toast.success('Progress saved successfully');
+        toast.success('Progress saved successfully! It\'s now safe to exit the survey.');
       }
       
       console.log('Survey progress saved');
@@ -103,7 +103,7 @@ export const useSurveyProgress = (survey: Survey) => {
       }));
       
       if (showToast) {
-        toast.error('Failed to save to cloud, but saved locally');
+        toast.error('Failed to save to cloud, but saved locally. It\'s safe to exit the survey.');
       }
     } finally {
       setIsSaving(false);
