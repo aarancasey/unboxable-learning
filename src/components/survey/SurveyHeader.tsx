@@ -14,7 +14,7 @@ export const SurveyHeader = ({ title, onBack }: SurveyHeaderProps) => {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
             <img 
-              src="/lovable-uploads/c8eb7e6b-35a2-4f41-a9d7-c1dd08c9b30b.png" 
+              src="/src/assets/unboxable-logo-white.png" 
               alt="unboxable." 
               className="h-8 w-auto"
             />

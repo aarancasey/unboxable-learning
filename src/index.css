@@ -142,10 +142,12 @@
   
   .survey-card-shadow {
     box-shadow: var(--survey-card-shadow);
+    border-left: 4px solid hsl(var(--unboxable-orange));
   }
   
   .survey-card-hover-shadow {
     box-shadow: var(--survey-card-hover-shadow);
+    border-left: 4px solid hsl(var(--unboxable-orange));
   }
   
   .survey-accent-gradient {

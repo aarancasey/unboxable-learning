@@ -4,9 +4,11 @@ import { SurveyProgress } from './survey/SurveyProgress';
 import { SurveyNavigation } from './survey/SurveyNavigation';
 import { InstructionsSection } from './survey/InstructionsSection';
 import { QuestionRenderer } from './survey/QuestionRenderer';
+import { ParticipantInfoForm, ParticipantInfo } from './survey/ParticipantInfoForm';
 import { useSurveyData } from './survey/useSurveyData';
 import { useSurveyProgress } from './survey/useSurveyProgress';
 import { supabase } from '@/integrations/supabase/client';
+import { useState } from 'react';
 
 interface SurveyFormProps {
   onBack: () => void;
@@ -15,6 +17,7 @@ interface SurveyFormProps {
 }
 
 const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
+  const [participantInfo, setParticipantInfo] = useState<ParticipantInfo | null>(null);
   const survey = useSurveyData();
   const {
     currentSection,
@@ -34,6 +37,10 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
     handleNext,
     handlePrevious
   } = useSurveyProgress(survey);
+
+  const handleParticipantInfoComplete = (data: ParticipantInfo) => {
+    setParticipantInfo(data);
+  };
 
   const onNextClick = async () => {
     const isComplete = handleNext();
@@ -106,12 +113,16 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
         const surveySubmission = {
           id: Date.now(),
           title: survey.title,
-          learner: "Current User",
-          department: "Department",
+          learner: participantInfo?.fullName || "Current User",
+          department: participantInfo?.businessArea || "Department",
+          company: participantInfo?.company || "Company",
+          role: participantInfo?.role || "Role",
+          date: participantInfo?.date || new Date().toISOString().split('T')[0],
           submittedDate: new Date().toISOString().split('T')[0],
           status: "completed",
           responses,
-          aiSummary
+          aiSummary,
+          participantInfo
         };
 
         // Always save to localStorage first as primary storage
@@ -124,9 +135,10 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
         try {
           const { DataService } = await import('@/services/dataService');
           const surveySubmissionForDB = {
-            learner_name: learnerData?.name || "Current User",
+            learner_name: participantInfo?.fullName || learnerData?.name || "Current User",
             responses,
-            status: "completed"
+            status: "completed",
+            participant_info: participantInfo
           };
           await DataService.addSurveySubmission(surveySubmissionForDB);
           console.log('Survey also saved to database');
@@ -160,6 +172,32 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
       />
     );
   };
+
+  // Show participant info form first
+  if (!participantInfo) {
+    return (
+      <div className="min-h-screen bg-background">
+        <SurveyHeader title={survey.title} onBack={onBack} />
+        
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="mb-8">
+            <div className="flex justify-between items-center text-sm text-muted-foreground mb-4">
+              <span>Part 1 of 3</span>
+              <span>33% Complete</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2 mb-8">
+              <div className="bg-gradient-to-r from-unboxable-navy to-unboxable-orange h-2 rounded-full" style={{ width: '33%' }}></div>
+            </div>
+          </div>
+          
+          <ParticipantInfoForm 
+            onComplete={handleParticipantInfoComplete} 
+            learnerData={learnerData}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
