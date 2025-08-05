@@ -8,16 +8,16 @@ interface ScaleGridQuestionComponentProps {
 
 export const ScaleGridQuestionComponent = ({ question, answers, onAnswerChange }: ScaleGridQuestionComponentProps) => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {question.prompts?.map((prompt, promptIndex) => (
-        <div key={promptIndex} className="space-y-2">
+        <div key={promptIndex} className="flex items-center justify-between gap-6">
           {/* Statement */}
-          <div className="text-base font-medium text-foreground">
+          <div className="text-base font-medium text-foreground flex-1">
             {prompt}
           </div>
           
-          {/* Radio buttons row - compact layout */}
-          <div className="flex items-center gap-4">
+          {/* Radio buttons row - aligned with text */}
+          <div className="flex items-center gap-4 flex-shrink-0">
             {[1, 2, 3, 4, 5, 6].map((value) => (
               <label key={value} className="cursor-pointer flex items-center gap-1">
                 <input
@@ -45,7 +45,7 @@ export const ScaleGridQuestionComponent = ({ question, answers, onAnswerChange }
       ))}
       
       {/* Labels at the bottom */}
-      <div className="flex justify-between text-sm text-muted-foreground pt-4 border-t border-gray-200">
+      <div className="flex justify-between text-sm text-muted-foreground pt-6 mt-6 border-t border-gray-200">
         <span>1 = Never/Not at all true</span>
         <span>6 = Always/Very true</span>
       </div>
