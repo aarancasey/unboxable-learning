@@ -38,6 +38,7 @@ import { ConfidenceLevelBar } from './charts/ConfidenceLevelBar';
 import { AgilityLevelIndicator } from './charts/AgilityLevelIndicator';
 import { getRubricTemplates } from '@/hooks/useRubrics';
 import { AISummaryEditorModal } from './AISummaryEditorModal';
+import { EmailSendModal } from './EmailSendModal';
 
 interface EditableAISummaryProps {
   survey: any;
@@ -79,8 +80,8 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
   const [isEditing, setIsEditing] = useState(false);
   const [editedSummary, setEditedSummary] = useState(survey.aiSummary || defaultSummary);
   const [isExporting, setIsExporting] = useState(false);
-  const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [showEditorModal, setShowEditorModal] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
   const { toast } = useToast();
 
   const handleEdit = () => {
@@ -139,35 +140,8 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
     }
   };
 
-  const handleSendEmail = async () => {
-    setIsSendingEmail(true);
-    try {
-      const learnerName = survey.learner || survey.learner_name;
-      const { data, error } = await supabase.functions.invoke('send-assessment-summary', {
-        body: {
-          learnerName: learnerName,
-          learnerEmail: survey.email || 'learner@example.com',
-          summary: survey.aiSummary,
-          surveyTitle: survey.title
-        }
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Email Sent",
-        description: "Assessment summary has been sent to the learner.",
-      });
-    } catch (error) {
-      console.error('Email failed:', error);
-      toast({
-        title: "Email Failed",
-        description: "Failed to send assessment summary. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSendingEmail(false);
-    }
+  const handleSendEmail = () => {
+    setShowEmailModal(true);
   };
 
   const handleExportCSV = () => {
@@ -709,7 +683,7 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
                     <Edit3 className="h-4 w-4 mr-2" />
                     Quick Edit
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleSendEmail} disabled={isSendingEmail}>
+                  <DropdownMenuItem onClick={handleSendEmail}>
                     <Mail className="h-4 w-4 mr-2" />
                     Send Email
                   </DropdownMenuItem>
@@ -752,6 +726,13 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
           
           setShowEditorModal(false);
         }}
+      />
+
+      {/* Email Send Modal */}
+      <EmailSendModal
+        open={showEmailModal}
+        onClose={() => setShowEmailModal(false)}
+        survey={survey}
       />
     </div>
   );
