@@ -282,12 +282,39 @@ const SurveyReviewer = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                {selectedSurvey.responses.map((response: any, index: number) => (
-                  <div key={index} className="border-b border-gray-200 pb-4 last:border-b-0">
-                    <h4 className="font-medium text-gray-900 mb-2">{response.question}</h4>
-                    <p className="text-gray-700 bg-gray-50 p-3 rounded-lg">{response.answer}</p>
+                {/* Participant Information */}
+                {selectedSurvey.responses?.participantInfo && (
+                  <div className="border-b border-gray-200 pb-4">
+                    <h4 className="font-medium text-gray-900 mb-2">Participant Information</h4>
+                    <div className="bg-gray-50 p-3 rounded-lg space-y-1">
+                      <p><strong>Name:</strong> {selectedSurvey.responses.participantInfo.fullName}</p>
+                      <p><strong>Company:</strong> {selectedSurvey.responses.participantInfo.company}</p>
+                      <p><strong>Role:</strong> {selectedSurvey.responses.participantInfo.role}</p>
+                      <p><strong>Business Area:</strong> {selectedSurvey.responses.participantInfo.businessArea}</p>
+                      <p><strong>Date:</strong> {selectedSurvey.responses.participantInfo.date}</p>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Survey Answers */}
+                {selectedSurvey.responses?.answers && Object.entries(selectedSurvey.responses.answers).map(([questionId, answer], index) => (
+                  <div key={questionId} className="border-b border-gray-200 pb-4 last:border-b-0">
+                    <h4 className="font-medium text-gray-900 mb-2">{questionId}</h4>
+                    <p className="text-gray-700 bg-gray-50 p-3 rounded-lg">
+                      {Array.isArray(answer) ? answer.join(', ') : String(answer)}
+                    </p>
                   </div>
                 ))}
+                
+                {/* Fallback for old data structure */}
+                {(!selectedSurvey.responses?.answers && selectedSurvey.responses && Array.isArray(selectedSurvey.responses)) && 
+                  selectedSurvey.responses.map((response: any, index: number) => (
+                    <div key={index} className="border-b border-gray-200 pb-4 last:border-b-0">
+                      <h4 className="font-medium text-gray-900 mb-2">{response.question}</h4>
+                      <p className="text-gray-700 bg-gray-50 p-3 rounded-lg">{response.answer}</p>
+                    </div>
+                  ))
+                }
               </CardContent>
             </Card>
           </div>
