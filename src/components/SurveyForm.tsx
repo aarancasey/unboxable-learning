@@ -162,7 +162,7 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <SurveyHeader title={survey.title} onBack={onBack} />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -178,33 +178,35 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
 
         {/* Section Description */}
         {currentSectionData.description && (
-          <Card className="mb-6">
-            <CardContent className="p-6">
-              <p className="text-gray-600">{currentSectionData.description}</p>
+          <Card className="mb-8 survey-card-shadow border-0 survey-fade-in">
+            <CardContent className="p-8">
+              <p className="text-muted-foreground text-lg leading-relaxed">{currentSectionData.description}</p>
             </CardContent>
           </Card>
         )}
 
         {/* Question/Content */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="text-xl">
+        <Card className="mb-8 survey-card-shadow border-0 survey-slide-in">
+          <CardHeader className="pb-6">
+            <CardTitle className="text-2xl font-semibold text-primary leading-relaxed">
               {isInstructionsSection ? currentSectionData.title : currentQ?.question}
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6 px-8 pb-8">
             {renderContent()}
           </CardContent>
         </Card>
 
-        <SurveyNavigation
-          onPrevious={handlePrevious}
-          onNext={onNextClick}
-          isFirstItem={isFirstItem}
-          isLastItem={isLastItem}
-          isCurrentAnswered={isCurrentAnswered()}
-          progress={progress}
-        />
+        <div className="survey-fade-in">
+          <SurveyNavigation
+            onPrevious={handlePrevious}
+            onNext={onNextClick}
+            isFirstItem={isFirstItem}
+            isLastItem={isLastItem}
+            isCurrentAnswered={isCurrentAnswered()}
+            progress={progress}
+          />
+        </div>
       </div>
     </div>
   );

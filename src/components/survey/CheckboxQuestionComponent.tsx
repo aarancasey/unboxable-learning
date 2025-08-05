@@ -13,34 +13,41 @@ export const CheckboxQuestionComponent = ({ question, value, onChange }: Checkbo
   const maxSelections = question.maxSelections;
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {maxSelections && (
-        <p className="text-sm text-gray-600 mb-4">
-          Select up to {maxSelections} options
-        </p>
+        <div className="bg-accent/10 border border-accent/20 rounded-lg p-4 mb-6">
+          <p className="text-accent font-medium">
+            Select up to {maxSelections} options
+          </p>
+        </div>
       )}
       {question.options?.map((option, index) => (
-        <div key={index} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer">
-          <Checkbox
-            id={`checkbox-${index}`}
-            checked={selectedOptions.includes(option)}
-            onCheckedChange={(checked) => {
-              let newSelection = [...selectedOptions];
-              if (checked) {
-                if (!maxSelections || newSelection.length < maxSelections) {
-                  newSelection.push(option);
+        <div key={index} className={`survey-option ${selectedOptions.includes(option) ? 'selected' : ''}`}>
+          <div className="flex items-start space-x-4">
+            <Checkbox
+              id={`checkbox-${index}`}
+              checked={selectedOptions.includes(option)}
+              onCheckedChange={(checked) => {
+                let newSelection = [...selectedOptions];
+                if (checked) {
+                  if (!maxSelections || newSelection.length < maxSelections) {
+                    newSelection.push(option);
+                  }
+                } else {
+                  newSelection = newSelection.filter(item => item !== option);
                 }
-              } else {
-                newSelection = newSelection.filter(item => item !== option);
-              }
-              onChange(newSelection);
-            }}
-            disabled={maxSelections && selectedOptions.length >= maxSelections && !selectedOptions.includes(option)}
-            className="mt-1"
-          />
-          <Label htmlFor={`checkbox-${index}`} className="flex-1 cursor-pointer leading-relaxed">
-            {option}
-          </Label>
+                onChange(newSelection);
+              }}
+              disabled={maxSelections && selectedOptions.length >= maxSelections && !selectedOptions.includes(option)}
+              className="mt-1 border-2 border-primary data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+            />
+            <Label 
+              htmlFor={`checkbox-${index}`} 
+              className="flex-1 cursor-pointer text-base leading-relaxed font-medium text-foreground"
+            >
+              {option}
+            </Label>
+          </div>
         </div>
       ))}
     </div>

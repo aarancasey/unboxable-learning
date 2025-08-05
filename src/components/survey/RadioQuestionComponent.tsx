@@ -13,13 +13,23 @@ export const RadioQuestionComponent = ({ question, value, onChange }: RadioQuest
     <RadioGroup
       value={value || ''}
       onValueChange={onChange}
+      className="space-y-4"
     >
       {question.options?.map((option, index) => (
-        <div key={index} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer">
-          <RadioGroupItem value={option} id={`option-${index}`} className="mt-1" />
-          <Label htmlFor={`option-${index}`} className="flex-1 cursor-pointer leading-relaxed">
-            {option}
-          </Label>
+        <div key={index} className={`survey-option ${value === option ? 'selected' : ''}`}>
+          <div className="flex items-start space-x-4">
+            <RadioGroupItem 
+              value={option} 
+              id={`option-${index}`} 
+              className="mt-1 border-2 border-primary data-[state=checked]:bg-primary data-[state=checked]:border-primary" 
+            />
+            <Label 
+              htmlFor={`option-${index}`} 
+              className="flex-1 cursor-pointer text-base leading-relaxed font-medium text-foreground"
+            >
+              {option}
+            </Label>
+          </div>
         </div>
       ))}
     </RadioGroup>

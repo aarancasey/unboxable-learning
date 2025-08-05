@@ -3,13 +3,11 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Enhanced design system for survey styling. All colors MUST be HSL. */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 0 0% 98%;
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
@@ -37,7 +35,7 @@ All colors MUST be HSL.
     --input: 214.3 31.8% 91.4%;
     --ring: 235 73% 21%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 235 73% 21%;
@@ -51,6 +49,15 @@ All colors MUST be HSL.
     /* Unboxable brand colors */
     --unboxable-navy: 235 73% 21%;
     --unboxable-orange: 16 100% 50%;
+    
+    /* Survey-specific design tokens */
+    --survey-header-gradient: linear-gradient(135deg, hsl(235 73% 21%), hsl(235 83% 25%));
+    --survey-card-shadow: 0 8px 32px -8px hsl(235 73% 21% / 0.15);
+    --survey-card-hover-shadow: 0 12px 40px -12px hsl(235 73% 21% / 0.25);
+    --survey-accent-gradient: linear-gradient(135deg, hsl(16 100% 50%), hsl(16 100% 55%));
+    --survey-progress-bg: hsl(210 40% 96%);
+    --survey-option-hover: hsl(235 73% 97%);
+    --survey-option-selected: hsl(235 73% 21% / 0.08);
   }
 
   .dark {
@@ -102,7 +109,7 @@ All colors MUST be HSL.
   }
 }
 
-/* Unboxable brand utilities */
+/* Enhanced Unboxable brand utilities and survey styling */
 @layer utilities {
   .bg-unboxable-navy {
     background-color: hsl(var(--unboxable-navy));
@@ -126,5 +133,79 @@ All colors MUST be HSL.
   
   .border-unboxable-orange {
     border-color: hsl(var(--unboxable-orange));
+  }
+
+  /* Survey-specific utilities */
+  .survey-header-gradient {
+    background: var(--survey-header-gradient);
+  }
+  
+  .survey-card-shadow {
+    box-shadow: var(--survey-card-shadow);
+  }
+  
+  .survey-card-hover-shadow {
+    box-shadow: var(--survey-card-hover-shadow);
+  }
+  
+  .survey-accent-gradient {
+    background: var(--survey-accent-gradient);
+  }
+  
+  .survey-option {
+    @apply rounded-xl border-2 border-transparent bg-card p-4 transition-all duration-200 cursor-pointer;
+  }
+  
+  .survey-option:hover {
+    @apply border-primary/20 bg-[var(--survey-option-hover)] transform scale-[1.02];
+  }
+  
+  .survey-option.selected {
+    @apply border-primary bg-[var(--survey-option-selected)] ring-2 ring-primary/20;
+  }
+  
+  .survey-scale-grid {
+    @apply grid gap-4 rounded-xl border border-border/50 bg-card p-6;
+  }
+  
+  .survey-scale-option {
+    @apply flex h-10 w-10 items-center justify-center rounded-full border-2 border-border transition-all duration-200 cursor-pointer hover:border-primary hover:bg-primary/10;
+  }
+  
+  .survey-scale-option.selected {
+    @apply border-primary bg-primary text-primary-foreground;
+  }
+}
+
+/* Survey animations */
+@layer components {
+  .survey-fade-in {
+    animation: fadeInUp 0.6s ease-out;
+  }
+  
+  .survey-slide-in {
+    animation: slideInRight 0.5s ease-out;
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
   }
 }

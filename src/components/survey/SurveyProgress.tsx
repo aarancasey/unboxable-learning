@@ -1,4 +1,3 @@
-import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 
 interface SurveyProgressProps {
@@ -21,20 +20,33 @@ export const SurveyProgress = ({
   isInstructionsSection 
 }: SurveyProgressProps) => {
   return (
-    <Card className="mb-6">
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-gray-600">Assessment Progress</span>
-          <span className="text-sm text-gray-600">{Math.round(progress)}%</span>
+    <div className="mb-10">
+      <div className="flex justify-between items-center mb-4">
+        <div>
+          <h2 className="text-lg font-semibold text-primary mb-1">
+            {sectionTitle}
+          </h2>
+          <span className="text-sm text-muted-foreground">
+            Section {currentSection + 1} of {totalSections}
+          </span>
         </div>
-        <Progress value={progress} className="mb-2" />
-        <div className="text-xs text-gray-500">
-          Section {currentSection + 1} of {totalSections}: {sectionTitle}
-          {!isInstructionsSection && totalQuestions && currentQuestion !== undefined && 
-            ` - Question ${currentQuestion + 1} of ${totalQuestions}`
-          }
+        <div className="text-right">
+          <span className="text-2xl font-bold text-primary">
+            {Math.round(progress)}%
+          </span>
+          <div className="text-sm text-muted-foreground">Complete</div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+      
+      <Progress value={progress} className="h-3 mb-3" />
+      
+      {!isInstructionsSection && totalQuestions && currentQuestion !== undefined && (
+        <div className="text-center">
+          <span className="text-sm text-muted-foreground">
+            Question {currentQuestion + 1} of {totalQuestions}
+          </span>
+        </div>
+      )}
+    </div>
   );
 };
