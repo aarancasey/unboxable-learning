@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight, Save, Clock, Check } from 'lucide-react';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 interface SurveyNavigationProps {
   isFirstItem: boolean;
@@ -26,6 +27,7 @@ export const SurveyNavigation = ({
   lastSaved,
   saveComplete
 }: SurveyNavigationProps) => {
+  const { user } = useAuth();
   const formatLastSaved = (date: Date) => {
     const now = new Date();
     const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
@@ -69,10 +71,13 @@ export const SurveyNavigation = ({
           <Button 
             variant="outline" 
             onClick={onSave}
-            disabled={isSaving || saveComplete}
+            disabled={!user || isSaving || saveComplete}
+            title={!user ? "Please log in to save progress" : ""}
             className={`flex items-center gap-2 px-6 py-3 transition-all duration-300 ${
               saveComplete 
                 ? 'border-green-500 bg-green-50 text-green-700 hover:bg-green-50 hover:border-green-500' 
+                : !user
+                ? 'border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed'
                 : 'border-unboxable-orange/20 hover:border-unboxable-orange hover:bg-unboxable-orange/5'
             }`}
           >
@@ -84,7 +89,7 @@ export const SurveyNavigation = ({
             ) : (
               <>
                 <Save className="w-4 h-4" />
-                {isSaving ? 'Saving...' : 'Save Progress'}
+                {!user ? 'Login to Save' : isSaving ? 'Saving...' : 'Save Progress'}
               </>
             )}
           </Button>
