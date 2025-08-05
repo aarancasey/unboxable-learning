@@ -24,7 +24,7 @@ import CourseManagement from './CourseManagement';
 import SurveyReviewer from './SurveyReviewer';
 import { CalendarView } from './calendar/CalendarView';
 import AnalyticsDashboard from './analytics/AnalyticsDashboard';
-import EmailTestModal from './EmailTestModal';
+
 import { EmailTemplateManager } from './email-management/EmailTemplateManager';
 import { ContentLibraryManager } from './content-library/ContentLibraryManager';
 import { DataService } from '@/services/dataService';

@@ -34,7 +34,7 @@ const SurveyReviewer = () => {
   const [sortBy, setSortBy] = useState('newest');
   const [searchTerm, setSearchTerm] = useState('');
   const [storedSurveys, setStoredSurveys] = useState<any[]>([]);
-  const [showTestingTools, setShowTestingTools] = useState(false);
+  
   const { toast } = useToast();
 
   // Load ALL surveys from Supabase database on component mount
@@ -358,122 +358,6 @@ const SurveyReviewer = () => {
 
   return (
     <div className="space-y-6">
-      {/* Collapsible Testing Tools Section */}
-      <Card className="border-orange-200 bg-orange-50">
-        <CardHeader 
-          className="cursor-pointer hover:bg-orange-100 transition-colors"
-          onClick={() => setShowTestingTools(!showTestingTools)}
-        >
-          <CardTitle className="text-orange-800 flex items-center justify-between">
-            <div className="flex items-center">
-              <Settings className="h-5 w-5 mr-2" />
-              Admin Testing Tools
-            </div>
-            <div className="flex items-center space-x-2">
-              <span className="text-xs text-orange-600 font-normal">
-                {showTestingTools ? 'Click to hide' : 'Click to expand'}
-              </span>
-              {showTestingTools ? (
-                <ChevronUp className="h-4 w-4" />
-              ) : (
-                <ChevronDown className="h-4 w-4" />
-              )}
-            </div>
-          </CardTitle>
-        </CardHeader>
-        {showTestingTools && (
-          <CardContent className="space-y-4">
-            <p className="text-sm text-orange-700">
-              Quick reset tools for testing the survey system
-            </p>
-          <div className="flex flex-wrap gap-2">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={async () => {
-                try {
-                  const { DataService } = await import('@/services/dataService');
-                  const allSurveys = await DataService.getSurveySubmissions();
-                  const targetEmails = ['caseyaaran@gmail.com', 'eabosse@hotmail.com'];
-                  const targetNames = ['A N Casey', 'Estelle'];
-                  
-                  // Find surveys for target learners
-                  const surveysToReset = allSurveys.filter((survey: any) => 
-                    targetNames.includes(survey.learner_name) || 
-                    targetEmails.some(email => survey.learner_name?.toLowerCase().includes(email.split('@')[0]))
-                  );
-                  
-                  if (surveysToReset.length === 0) {
-                    toast({
-                      title: "No surveys found",
-                      description: "caseyaaran@gmail.com and eabosse@hotmail.com don't have any survey submissions to reset.",
-                    });
-                    return;
-                  }
-                  
-                  // Reset them
-                  for (const survey of surveysToReset) {
-                    await DataService.deleteSurveySubmission(survey.id);
-                  }
-                  
-                  // Refresh the list
-                  const updatedSurveys = await DataService.getSurveySubmissions();
-                  setStoredSurveys(updatedSurveys);
-                  
-                  toast({
-                    title: "Surveys Reset",
-                    description: `Reset ${surveysToReset.length} survey(s) for the test learners.`,
-                  });
-                } catch (error) {
-                  console.error('Failed to reset test surveys:', error);
-                  toast({
-                    title: "Error",
-                    description: "Failed to reset surveys. Please try again.",
-                    variant: "destructive",
-                  });
-                }
-              }}
-              className="border-orange-300 text-orange-700 hover:bg-orange-100"
-            >
-              Reset Casey & Estelle Surveys
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={async () => {
-                if (!confirm('Are you sure you want to reset ALL surveys? This cannot be undone.')) return;
-                
-                try {
-                  const { DataService } = await import('@/services/dataService');
-                  const allSurveys = await DataService.getSurveySubmissions();
-                  
-                  for (const survey of allSurveys) {
-                    await DataService.deleteSurveySubmission(survey.id);
-                  }
-                  
-                  setStoredSurveys([]);
-                  
-                  toast({
-                    title: "All Surveys Reset",
-                    description: `Reset ${allSurveys.length} survey submissions.`,
-                  });
-                } catch (error) {
-                  console.error('Failed to reset all surveys:', error);
-                  toast({
-                    title: "Error",
-                    description: "Failed to reset all surveys. Please try again.",
-                    variant: "destructive",
-                  });
-                }
-              }}
-              className="border-red-300 text-red-700 hover:bg-red-100"
-            >
-              Reset ALL Surveys (Danger)
-            </Button>
-            </div>
-          </CardContent>
-        )}
-      </Card>
 
       {/* Header with Statistics */}
       <div className="flex flex-col space-y-4">
