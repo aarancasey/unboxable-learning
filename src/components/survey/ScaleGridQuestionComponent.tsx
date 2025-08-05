@@ -19,7 +19,7 @@ export const ScaleGridQuestionComponent = ({ question, answers, onAnswerChange }
           {/* Scale Options */}
           <div className="space-y-3">
             {/* Radio buttons row */}
-            <div className="flex items-center justify-between max-w-md">
+            <div className="flex items-center justify-between w-full">
               {[1, 2, 3, 4, 5, 6].map((value) => (
                 <label key={value} className="cursor-pointer">
                   <input
@@ -42,7 +42,7 @@ export const ScaleGridQuestionComponent = ({ question, answers, onAnswerChange }
             </div>
             
             {/* Labels */}
-            <div className="flex justify-between text-sm text-muted-foreground max-w-md">
+            <div className="flex justify-between text-sm text-muted-foreground w-full">
               <span>1 = Never/Not at all true</span>
               <span>6 = Always/Very true</span>
             </div>
