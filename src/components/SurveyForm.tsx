@@ -34,6 +34,7 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
     isCurrentAnswered,
     isSaving,
     lastSaved,
+    saveComplete,
     handleAnswerChange,
     handleScaleGridChange,
     handleNext,
@@ -225,6 +226,7 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
             onSave={handleManualSave}
             isSaving={isSaving}
             lastSaved={lastSaved}
+            saveComplete={saveComplete}
           />
         </div>
       </div>

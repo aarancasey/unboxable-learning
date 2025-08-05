@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight, Save, Clock } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Save, Clock, Check } from 'lucide-react';
 
 interface SurveyNavigationProps {
   isFirstItem: boolean;
@@ -11,6 +11,7 @@ interface SurveyNavigationProps {
   onSave: () => void;
   isSaving: boolean;
   lastSaved: Date | null;
+  saveComplete: boolean;
 }
 
 export const SurveyNavigation = ({
@@ -22,7 +23,8 @@ export const SurveyNavigation = ({
   onBack,
   onSave,
   isSaving,
-  lastSaved
+  lastSaved,
+  saveComplete
 }: SurveyNavigationProps) => {
   const formatLastSaved = (date: Date) => {
     const now = new Date();
@@ -67,10 +69,23 @@ export const SurveyNavigation = ({
             variant="outline" 
             onClick={onSave}
             disabled={isSaving}
-            className="flex items-center gap-2 px-6 py-3 border-unboxable-orange/20 hover:border-unboxable-orange hover:bg-unboxable-orange/5"
+            className={`flex items-center gap-2 px-6 py-3 transition-all duration-200 ${
+              saveComplete 
+                ? 'border-green-500 hover:border-green-500 hover:bg-green-50 text-green-700' 
+                : 'border-unboxable-orange/20 hover:border-unboxable-orange hover:bg-unboxable-orange/5'
+            }`}
           >
-            <Save className="w-4 h-4" />
-            {isSaving ? 'Saving...' : 'Save Progress'}
+            {saveComplete ? (
+              <>
+                <Check className="w-4 h-4 text-green-600" />
+                Saved
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4" />
+                {isSaving ? 'Saving...' : 'Save Progress'}
+              </>
+            )}
           </Button>
         </div>
 

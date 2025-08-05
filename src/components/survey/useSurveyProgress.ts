@@ -11,6 +11,7 @@ export const useSurveyProgress = (survey: Survey) => {
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [saveComplete, setSaveComplete] = useState(false);
 
   // Load saved progress on mount
   useEffect(() => {
@@ -68,6 +69,7 @@ export const useSurveyProgress = (survey: Survey) => {
     if (!user || isSaving) return;
 
     setIsSaving(true);
+    setSaveComplete(false);
     
     try {
       const progressData = {
@@ -85,6 +87,7 @@ export const useSurveyProgress = (survey: Survey) => {
       if (error) throw error;
 
       setLastSaved(new Date());
+      setSaveComplete(true);
       
       // Also save to localStorage as backup
       localStorage.setItem('surveyProgress', JSON.stringify(progressData));
@@ -93,6 +96,11 @@ export const useSurveyProgress = (survey: Survey) => {
         console.log('Showing success toast');
         toast.success("Progress saved successfully! It's now safe to exit the survey.");
       }
+      
+      // Reset the "Saved" state after 3 seconds
+      setTimeout(() => {
+        setSaveComplete(false);
+      }, 3000);
       
       console.log('Survey progress saved');
     } catch (error) {
@@ -108,6 +116,12 @@ export const useSurveyProgress = (survey: Survey) => {
         console.log('Showing error toast');
         toast.error("Failed to save to cloud, but saved locally. It's safe to exit the survey.");
       }
+      
+      // Even if cloud save fails, we still saved locally, so show success
+      setSaveComplete(true);
+      setTimeout(() => {
+        setSaveComplete(false);
+      }, 3000);
     } finally {
       setIsSaving(false);
     }
@@ -243,6 +257,7 @@ export const useSurveyProgress = (survey: Survey) => {
     isCurrentAnswered,
     isSaving,
     lastSaved,
+    saveComplete,
     handleAnswerChange,
     handleScaleGridChange,
     handleNext,
