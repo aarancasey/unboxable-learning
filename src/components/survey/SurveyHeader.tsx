@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import UnboxableLogo from '@/components/login/UnboxableLogo';
 
 interface SurveyHeaderProps {
   title: string;
@@ -11,6 +12,14 @@ export const SurveyHeader = ({ title, onBack }: SurveyHeaderProps) => {
     <header className="survey-header-gradient px-4 sm:px-6 lg:px-8 py-8">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center">
+            <img 
+              src="/lovable-uploads/c8eb7e6b-35a2-4f41-a9d7-c1dd08c9b30b.png" 
+              alt="unboxable." 
+              className="h-8 w-auto"
+            />
+          </div>
+          
           <Button
             variant="ghost"
             size="sm"
@@ -20,11 +29,6 @@ export const SurveyHeader = ({ title, onBack }: SurveyHeaderProps) => {
             <ArrowLeft className="h-4 w-4" />
             <span>Back</span>
           </Button>
-          
-          <div className="text-center">
-            <div className="text-white text-sm font-medium opacity-90 mb-1">UNBOXABLE</div>
-            <div className="text-white/60 text-xs tracking-wider">LEADERSHIP ASSESSMENT</div>
-          </div>
         </div>
         
         <div className="text-center">
