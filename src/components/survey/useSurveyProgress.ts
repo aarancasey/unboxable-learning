@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Survey, Question, ScaleGridQuestion } from './types';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/components/auth/AuthProvider';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 export const useSurveyProgress = (survey: Survey) => {
   const { user } = useAuth();
@@ -64,6 +64,7 @@ export const useSurveyProgress = (survey: Survey) => {
   };
 
   const saveProgress = async (showToast = false) => {
+    console.log('saveProgress called, showToast:', showToast);
     if (!user || isSaving) return;
 
     setIsSaving(true);
@@ -89,10 +90,8 @@ export const useSurveyProgress = (survey: Survey) => {
       localStorage.setItem('surveyProgress', JSON.stringify(progressData));
       
       if (showToast) {
-        toast({
-          title: "Success",
-          description: "Progress saved successfully! It's now safe to exit the survey.",
-        });
+        console.log('Showing success toast');
+        toast.success("Progress saved successfully! It's now safe to exit the survey.");
       }
       
       console.log('Survey progress saved');
@@ -106,11 +105,8 @@ export const useSurveyProgress = (survey: Survey) => {
       }));
       
       if (showToast) {
-        toast({
-          title: "Warning",
-          description: "Failed to save to cloud, but saved locally. It's safe to exit the survey.",
-          variant: "destructive"
-        });
+        console.log('Showing error toast');
+        toast.error("Failed to save to cloud, but saved locally. It's safe to exit the survey.");
       }
     } finally {
       setIsSaving(false);
