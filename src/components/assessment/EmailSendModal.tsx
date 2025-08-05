@@ -20,7 +20,7 @@ export const EmailSendModal = ({ open, onClose, survey }: EmailSendModalProps) =
   const { toast } = useToast();
 
   const learnerName = survey.learner || survey.learner_name || 'Unknown Learner';
-  const learnerEmail = survey.learner_email || survey.email || (survey.responses && survey.responses.find((r: any) => r.question?.toLowerCase().includes('email'))?.answer) || 'learner@example.com';
+  const learnerEmail = survey.learner_email || survey.email || (Array.isArray(survey.responses) && survey.responses.find((r: any) => r.question?.toLowerCase().includes('email'))?.answer) || 'learner@example.com';
   const surveyTitle = survey.title || 'Leadership Assessment';
 
   const handleSend = async () => {
