@@ -10,7 +10,7 @@ export const ScaleGridQuestionComponent = ({ question, answers, onAnswerChange }
   return (
     <div className="survey-scale-grid">
       {/* Scale Header */}
-      <div className="grid grid-cols-8 gap-3 mb-6 pb-4 border-b border-border">
+      <div className="grid gap-3 mb-6 pb-4 border-b border-border" style={{ gridTemplateColumns: '1.5fr 1fr 1fr 1fr 1fr 1fr 1fr' }}>
         <div className="text-sm font-semibold text-primary">Statement</div>
         <div className="text-center">
           <div className="text-xs font-medium text-primary mb-1">1</div>
@@ -41,7 +41,7 @@ export const ScaleGridQuestionComponent = ({ question, answers, onAnswerChange }
       {/* Scale Grid Items */}
       <div className="space-y-4">
         {question.prompts?.map((prompt, promptIndex) => (
-          <div key={promptIndex} className="grid grid-cols-8 gap-3 items-center py-4 px-2 rounded-lg hover:bg-background/50 transition-colors">
+          <div key={promptIndex} className="grid gap-3 items-center py-4 px-2 rounded-lg hover:bg-background/50 transition-colors" style={{ gridTemplateColumns: '1.5fr 1fr 1fr 1fr 1fr 1fr 1fr' }}>
             <div className="text-sm font-medium text-foreground pr-2">{prompt}</div>
             {[1, 2, 3, 4, 5, 6].map((value) => (
               <div key={value} className="flex justify-center">
