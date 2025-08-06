@@ -46,19 +46,24 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
   // Update admin data based on survey submissions and learners
   useEffect(() => {
     const loadAdminData = async () => {
-      const savedSurveys = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
-      const learners = await DataService.getLearners();
+      const [learners, surveys, recentActivity, upcomingTasks] = await Promise.all([
+        DataService.getLearners(),
+        DataService.getSurveySubmissions(),
+        DataService.getRecentActivities(),
+        DataService.getUpcomingTasks()
+      ]);
       
       // Calculate completion rate based on active learners
       const activeLearners = learners.filter(learner => learner.status === 'active').length;
       const completionRate = learners.length > 0 ? Math.round((activeLearners / learners.length) * 100) : 0;
       
-      setAdminData(prev => ({
-        ...prev,
+      setAdminData({
         totalLearners: learners.length,
-        pendingSurveys: savedSurveys.filter(survey => survey.status === 'pending').length,
-        completionRate
-      }));
+        pendingSurveys: surveys.filter(survey => survey.status === 'pending').length,
+        completionRate,
+        recentActivity,
+        upcomingTasks
+      });
     };
     
     loadAdminData();
@@ -170,11 +175,31 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-center py-8">
-                    <Clock className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                    <p className="text-gray-600">No recent activity</p>
-                    <p className="text-sm text-gray-500">Activity will appear here once learners start engaging with content</p>
-                  </div>
+                  {adminData.recentActivity.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Clock className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                      <p className="text-gray-600">No recent activity</p>
+                      <p className="text-sm text-gray-500">Activity will appear here once learners start engaging with content</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {adminData.recentActivity.map((activity) => (
+                        <div key={activity.id} className="flex items-start space-x-3 p-2 rounded-lg hover:bg-gray-50">
+                          <div className="flex-shrink-0 mt-1">
+                            {activity.icon === 'user-plus' && <Users className="h-4 w-4 text-unboxable-navy" />}
+                            {activity.icon === 'file-text' && <FileText className="h-4 w-4 text-unboxable-orange" />}
+                            {activity.icon === 'calendar' && <Calendar className="h-4 w-4 text-green-600" />}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900">{activity.message}</p>
+                            <p className="text-xs text-gray-500">
+                              {new Date(activity.timestamp).toLocaleDateString()} at {new Date(activity.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 

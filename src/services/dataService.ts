@@ -410,4 +410,152 @@ export class DataService {
       console.error('Error migrating survey submissions:', error);
     }
   }
+
+  // Recent Activities
+  static async getRecentActivities(days: number = 14) {
+    try {
+      const activities = [];
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - days);
+
+      // Get recent learner registrations
+      const learners = await this.getLearners();
+      const recentLearners = learners.filter(learner => 
+        new Date(learner.created_at || learner.createdAt || Date.now()) >= cutoffDate
+      );
+
+      // Get recent survey submissions
+      const surveys = await this.getSurveySubmissions();
+      const recentSurveys = surveys.filter(survey => 
+        new Date(survey.submitted_at || survey.submittedAt || Date.now()) >= cutoffDate
+      );
+
+      // Get recent course schedules from Supabase
+      const { data: courseSchedules } = await supabase
+        .from('course_schedules')
+        .select('*')
+        .gte('created_at', cutoffDate.toISOString())
+        .order('created_at', { ascending: false });
+
+      // Format learner activities
+      recentLearners.forEach(learner => {
+        activities.push({
+          id: `learner-${learner.id}`,
+          type: 'learner_registration',
+          message: `New learner registered: ${learner.name}`,
+          timestamp: learner.created_at || learner.createdAt || new Date().toISOString(),
+          icon: 'user-plus',
+          participant: learner.name
+        });
+      });
+
+      // Format survey activities
+      recentSurveys.forEach(survey => {
+        activities.push({
+          id: `survey-${survey.id}`,
+          type: 'survey_submission',
+          message: `Survey completed by ${survey.learner_name || survey.learnerName}`,
+          timestamp: survey.submitted_at || survey.submittedAt || new Date().toISOString(),
+          icon: 'file-text',
+          participant: survey.learner_name || survey.learnerName
+        });
+      });
+
+      // Format course schedule activities
+      if (courseSchedules) {
+        courseSchedules.forEach(schedule => {
+          activities.push({
+            id: `course-${schedule.id}`,
+            type: 'course_scheduled',
+            message: `Course scheduled: ${schedule.course_name}`,
+            timestamp: schedule.created_at,
+            icon: 'calendar',
+            participant: schedule.instructor || 'System'
+          });
+        });
+      }
+
+      // Sort by timestamp, most recent first
+      return activities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 10);
+    } catch (error) {
+      console.error('Error getting recent activities:', error);
+      return [];
+    }
+  }
+
+  // Upcoming Tasks
+  static async getUpcomingTasks() {
+    try {
+      const tasks = [];
+      const now = new Date();
+
+      // Get pending survey reviews
+      const surveys = await this.getSurveySubmissions();
+      const pendingSurveys = surveys.filter(survey => survey.status === 'pending');
+
+      // Get upcoming course schedules
+      const { data: upcomingCourses } = await supabase
+        .from('course_schedules')
+        .select('*')
+        .gte('start_date', now.toISOString().split('T')[0])
+        .lt('start_date', new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
+        .order('start_date', { ascending: true });
+
+      // Get learners requiring password changes
+      const learners = await this.getLearners();
+      const passwordChanges = learners.filter(learner => learner.requires_password_change || learner.requiresPasswordChange);
+
+      // Format pending survey tasks
+      pendingSurveys.forEach(survey => {
+        const daysOld = Math.floor((now.getTime() - new Date(survey.submitted_at || survey.submittedAt).getTime()) / (1000 * 60 * 60 * 24));
+        tasks.push({
+          id: `review-${survey.id}`,
+          task: `Review survey: ${survey.learner_name || survey.learnerName}`,
+          due: `${daysOld} days ago`,
+          priority: daysOld > 7 ? 'high' : daysOld > 3 ? 'medium' : 'low',
+          type: 'survey_review',
+          dueDate: survey.submitted_at || survey.submittedAt
+        });
+      });
+
+      // Format upcoming course tasks
+      if (upcomingCourses) {
+        upcomingCourses.forEach(course => {
+          const daysUntil = Math.ceil((new Date(course.start_date).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+          tasks.push({
+            id: `course-${course.id}`,
+            task: `Course starting: ${course.course_name}`,
+            due: daysUntil === 0 ? 'Today' : daysUntil === 1 ? 'Tomorrow' : `In ${daysUntil} days`,
+            priority: daysUntil <= 3 ? 'high' : daysUntil <= 7 ? 'medium' : 'low',
+            type: 'course_start',
+            dueDate: course.start_date
+          });
+        });
+      }
+
+      // Format password change tasks
+      passwordChanges.forEach(learner => {
+        tasks.push({
+          id: `password-${learner.id}`,
+          task: `Password change required: ${learner.name}`,
+          due: 'Overdue',
+          priority: 'high',
+          type: 'password_change',
+          dueDate: learner.created_at || learner.createdAt
+        });
+      });
+
+      // Sort by priority and due date
+      const priorityOrder = { high: 3, medium: 2, low: 1 };
+      return tasks.sort((a, b) => {
+        if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
+          return priorityOrder[b.priority] - priorityOrder[a.priority];
+        }
+        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+      }).slice(0, 8);
+    } catch (error) {
+      console.error('Error getting upcoming tasks:', error);
+      return [];
+    }
+  }
 }
