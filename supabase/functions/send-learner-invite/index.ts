@@ -90,7 +90,7 @@ const handler = async (req: Request): Promise<Response> => {
     };
 
     let subject = template.subject_template;
-    let htmlContent = template.content_template;
+    let htmlContent = template.html_template;
 
     // Replace variables in subject and content
     Object.entries(variables).forEach(([key, value]) => {
