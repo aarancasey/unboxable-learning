@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.2';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -26,22 +27,67 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const resend = new Resend(resendApiKey);
-    const { learnerName, learnerEmail, summary, surveyTitle } = await req.json();
+    
+    // Initialize Supabase client
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    const supabase = createClient(supabaseUrl!, supabaseKey!);
+    
+    const { learnerName, learnerEmail, summary, surveyTitle, completionDate, useTemplate } = await req.json();
 
-    if (!learnerEmail || !learnerName || !summary) {
+    if (!learnerEmail || !learnerName) {
       return new Response(
-        JSON.stringify({ error: "learnerEmail, learnerName, and summary are required" }),
+        JSON.stringify({ error: "learnerEmail and learnerName are required" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     console.log(`Sending assessment summary to: ${learnerEmail}`);
 
-    const emailResult = await resend.emails.send({
-      from: "Unboxable Learning <onboarding@resend.dev>",
-      to: [learnerEmail],
-      subject: `🎓 Your Leadership Assessment Results - ${surveyTitle}`,
-      html: `
+    let emailSubject = `🎓 Your Leadership Assessment Results - ${surveyTitle}`;
+    let emailContent = '';
+    let emailHtml = '';
+
+    // Try to use template if requested
+    if (useTemplate) {
+      try {
+        const { data: templates, error: templateError } = await supabase
+          .from('email_templates')
+          .select('*')
+          .eq('template_type', 'survey_completion')
+          .eq('is_default', true)
+          .limit(1);
+
+        if (!templateError && templates && templates.length > 0) {
+          const template = templates[0];
+          
+          // Template variables for replacement
+          const variables = {
+            learnerName,
+            surveyTitle: surveyTitle || 'Leadership Assessment',
+            completionDate: completionDate || new Date().toLocaleDateString(),
+            course_name: surveyTitle || 'Leadership Assessment',
+            participant_name: learnerName
+          };
+
+          // Replace variables in subject and content
+          emailSubject = replaceVariables(template.subject_template, variables);
+          emailContent = replaceVariables(template.content_template, variables);
+          emailHtml = template.html_template ? replaceVariables(template.html_template, variables) : '';
+          
+          console.log('Using survey completion email template');
+        } else {
+          console.log('No survey completion template found, using default content');
+        }
+      } catch (templateError) {
+        console.error('Error fetching email template:', templateError);
+        console.log('Falling back to default email content');
+      }
+    }
+
+    // If no template content was loaded, use default content
+    if (!emailContent && !emailHtml) {
+      emailHtml = `
         <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f8fafc;">
           <div style="background-color: white; border-radius: 8px; padding: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
             
@@ -192,7 +238,16 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
           </div>
         </div>
-      `,
+      `;
+    }
+
+    // Send email using template content or default
+    const emailResult = await resend.emails.send({
+      from: "Unboxable Learning <noreply@unboxable.co.nz>",
+      to: [learnerEmail],
+      subject: emailSubject,
+      html: emailHtml || emailContent,
+      text: emailContent || `Hi ${learnerName}, thank you for completing ${surveyTitle}. Your results are ready for review.`
     });
 
     console.log("Assessment summary email sent successfully:", emailResult);
@@ -218,5 +273,23 @@ const handler = async (req: Request): Promise<Response> => {
     );
   }
 };
+
+// Helper function to replace template variables
+function replaceVariables(template: string, variables: Record<string, any>): string {
+  let content = template;
+  
+  // Replace template variables
+  Object.entries(variables).forEach(([key, value]) => {
+    const regex = new RegExp(`\\{\\{${key}\\}\\}`, 'g');
+    content = content.replace(regex, value?.toString() || '');
+  });
+  
+  // Handle conditional sections
+  content = content.replace(/\{\{#(\w+)\}\}(.*?)\{\{\/\1\}\}/gs, (match, condition, conditionalContent) => {
+    return variables[condition] ? conditionalContent : '';
+  });
+  
+  return content;
+}
 
 serve(handler);

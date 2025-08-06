@@ -99,6 +99,7 @@ export const EmailTemplateForm = ({ editingTemplate, isOpen, onClose, onSave }: 
                   <SelectItem value="course_reminder">Course Reminder</SelectItem>
                   <SelectItem value="pre_survey">Pre-Survey</SelectItem>
                   <SelectItem value="module_unlock">Module Unlock</SelectItem>
+                  <SelectItem value="survey_completion">Survey Completion</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -163,7 +164,7 @@ The Learning Team"
                 </TabsContent>
               </Tabs>
               <p className="text-xs text-muted-foreground">
-                Use {"{{course_name}}"}, {"{{participant_name}}"}, {"{{course_start_date}}"} to personalize your message
+                Use {"{{learnerName}}"}, {"{{surveyTitle}}"}, {"{{completionDate}}"}, {"{{course_name}}"}, {"{{participant_name}}"}, {"{{course_start_date}}"} to personalize your message
               </p>
             </div>
           </div>

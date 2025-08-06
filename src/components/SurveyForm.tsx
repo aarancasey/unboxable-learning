@@ -133,6 +133,28 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
           console.warn('Database save failed, but survey is saved locally:', error);
         }
 
+        // Send completion email using template
+        try {
+          const { error: emailError } = await supabase.functions.invoke('send-assessment-summary', {
+            body: {
+              learnerName: finalParticipantInfo?.fullName || learnerData?.name || 'Unknown User',
+              learnerEmail: finalParticipantInfo?.email || learnerData?.email || '',
+              summary: submissionData.aiSummary || {},
+              surveyTitle: survey.title,
+              completionDate: new Date().toLocaleDateString(),
+              useTemplate: true // Flag to use template system
+            }
+          });
+
+          if (emailError) {
+            console.error('Failed to send completion email:', emailError);
+          } else {
+            console.log('Survey completion email sent successfully');
+          }
+        } catch (emailError) {
+          console.error('Email sending failed:', emailError);
+        }
+
         // Delete the progress since survey is complete
         await deleteSavedProgress();
         
