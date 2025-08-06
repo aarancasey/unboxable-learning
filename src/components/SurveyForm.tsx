@@ -138,7 +138,7 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
           const { error: emailError } = await supabase.functions.invoke('send-assessment-summary', {
             body: {
               learnerName: finalParticipantInfo?.fullName || learnerData?.name || 'Unknown User',
-              learnerEmail: finalParticipantInfo?.email || learnerData?.email || '',
+              learnerEmail: learnerData?.email || '',
               summary: submissionData.aiSummary || {},
               surveyTitle: survey.title,
               completionDate: new Date().toLocaleDateString(),
