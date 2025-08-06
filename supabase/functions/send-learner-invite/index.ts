@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.2';
 import { Resend } from "npm:resend@2.0.0";
 
 const corsHeaders = {
@@ -28,6 +29,11 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("RESEND_API_KEY found, length:", resendApiKey.length);
 
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    );
+
     const resend = new Resend(resendApiKey);
     const { learnerName, learnerEmail, department } = await req.json();
 
@@ -42,57 +48,62 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Attempting to send email with API key: ${resendApiKey.substring(0, 10)}...`);
     
+    // Get the learner invitation email template
+    const { data: templates, error: templateError } = await supabase
+      .from('email_templates')
+      .select('*')
+      .eq('template_type', 'learner_invitation')
+      .eq('is_default', true)
+      .limit(1);
+
+    if (templateError) {
+      console.error('Error fetching email template:', templateError);
+      return new Response(
+        JSON.stringify({ 
+          error: "Failed to fetch email template",
+          message: templateError.message
+        }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (!templates || templates.length === 0) {
+      console.error('No learner invitation template found');
+      return new Response(
+        JSON.stringify({ 
+          error: "Email template not found",
+          message: "No learner invitation template configured"
+        }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const template = templates[0];
+    
+    // Replace template variables
+    const variables = {
+      learner_name: learnerName,
+      learner_email: learnerEmail,
+      department: department,
+      platform_name: 'Unboxable Learning',
+      portal_url: 'https://dntowvxkzsvqsykoranf.supabase.co'
+    };
+
+    let subject = template.subject_template;
+    let htmlContent = template.html_template;
+
+    // Replace variables in subject and content
+    Object.entries(variables).forEach(([key, value]) => {
+      const regex = new RegExp(`\\{\\{${key}\\}\\}`, 'g');
+      subject = subject.replace(regex, value || '');
+      htmlContent = htmlContent.replace(regex, value || '');
+    });
+    
     const emailResult = await resend.emails.send({
-      from: "Unboxable Learning <onboarding@resend.dev>", // Using default Resend domain
+      from: "Unboxable Learning <onboarding@resend.dev>",
       to: [learnerEmail],
-      subject: "🎓 Welcome to Unboxable Learning - Your Invitation Inside",
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8fafc;">
-          <div style="background-color: white; border-radius: 8px; padding: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-            <div style="text-align: center; margin-bottom: 30px;">
-              <h1 style="color: #1e3a8a; margin: 0; font-size: 28px;">🎓 Welcome to Unboxable Learning!</h1>
-            </div>
-            
-            <div style="margin-bottom: 30px;">
-              <p style="font-size: 16px; color: #374151; line-height: 1.6;">Hi ${learnerName},</p>
-              <p style="font-size: 16px; color: #374151; line-height: 1.6;">
-                You've been invited to join our learning platform! We're excited to have you from the <strong>${department}</strong> department as part of our learning community.
-              </p>
-            </div>
-
-            <div style="background-color: #eff6ff; border: 1px solid: #93c5fd; border-radius: 6px; padding: 20px; margin: 25px 0;">
-              <h3 style="color: #1e40af; margin-top: 0; font-size: 18px;">🚀 What's Next?</h3>
-              <ul style="color: #374151; margin: 10px 0; padding-left: 20px;">
-                <li style="margin-bottom: 8px;">Access your personalized learning dashboard</li>
-                <li style="margin-bottom: 8px;">Complete your pre-course survey</li>
-                <li style="margin-bottom: 8px;">Explore available learning modules</li>
-                <li style="margin-bottom: 8px;">Track your progress and achievements</li>
-              </ul>
-            </div>
-
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="https://dntowvxkzsvqsykoran.supabase.co" style="background-color: #1e40af; color: white; padding: 14px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block; font-size: 16px;">
-                🎯 Access Learning Portal
-              </a>
-            </div>
-
-            <div style="background-color: #f9fafb; border-radius: 6px; padding: 15px; margin: 25px 0;">
-              <p style="margin: 0; color: #6b7280; font-size: 14px;">
-                <strong>Having trouble?</strong> Contact our support team or reply to this email for assistance.
-              </p>
-            </div>
-
-            <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
-            
-            <div style="text-align: center;">
-              <p style="color: #9ca3af; font-size: 12px; margin: 0;">
-                This invitation was sent to ${learnerEmail}<br>
-                Unboxable Learning Platform | Empowering Growth Through Learning
-              </p>
-            </div>
-          </div>
-        </div>
-      `,
+      subject: subject,
+      html: htmlContent,
     });
 
     if (emailResult.error) {
@@ -114,7 +125,8 @@ const handler = async (req: Request): Promise<Response> => {
         success: true,
         message: "Invitation sent successfully!",
         emailId: emailResult.data?.id,
-        recipient: learnerEmail
+        recipient: learnerEmail,
+        template_used: template.template_name
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
