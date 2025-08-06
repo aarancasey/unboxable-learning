@@ -100,7 +100,7 @@ const handler = async (req: Request): Promise<Response> => {
     });
     
     const emailResult = await resend.emails.send({
-      from: "Unboxable Learning <onboarding@resend.dev>",
+      from: "Unboxable Learning <noreply@unboxable.co.nz>",
       to: [learnerEmail],
       subject: subject,
       html: htmlContent,
