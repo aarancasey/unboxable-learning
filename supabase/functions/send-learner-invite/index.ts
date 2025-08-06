@@ -16,14 +16,17 @@ const handler = async (req: Request): Promise<Response> => {
     // Check if RESEND_API_KEY is configured
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
     if (!resendApiKey) {
+      console.error("RESEND_API_KEY environment variable not found");
       return new Response(
         JSON.stringify({ 
           error: "RESEND_API_KEY not configured",
-          message: "Please add your Resend API key to Supabase secrets"
+          message: "Please add your Resend API key to Supabase Edge Functions secrets"
         }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    console.log("RESEND_API_KEY found, length:", resendApiKey.length);
 
     const resend = new Resend(resendApiKey);
     const { learnerName, learnerEmail, department } = await req.json();
@@ -37,6 +40,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Sending invitation to: ${learnerEmail}`);
 
+    console.log(`Attempting to send email with API key: ${resendApiKey.substring(0, 10)}...`);
+    
     const emailResult = await resend.emails.send({
       from: "Unboxable Learning <onboarding@resend.dev>", // Using default Resend domain
       to: [learnerEmail],
@@ -89,6 +94,18 @@ const handler = async (req: Request): Promise<Response> => {
         </div>
       `,
     });
+
+    if (emailResult.error) {
+      console.error("Resend API error:", emailResult.error);
+      return new Response(
+        JSON.stringify({ 
+          error: "Email sending failed",
+          message: emailResult.error.message || "Failed to send invitation email",
+          details: emailResult.error
+        }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     console.log("Invitation email sent successfully:", emailResult);
 
