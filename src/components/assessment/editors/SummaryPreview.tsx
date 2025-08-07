@@ -188,13 +188,27 @@ export const SummaryPreview = ({ summaryData, survey }: SummaryPreviewProps) => 
                       Current Confidence Rating: <strong>{summaryData.confidenceRating || 'Developing Confidence (2.5–3.4)'}</strong>
                     </p>
                   </div>
-                  <ConfidenceLevelBar 
-                    confidenceRating={summaryData.confidenceRating || 'Developing Confidence (2.5–3.4)'}
-                  />
+                  <div className="h-32"> {/* Fixed height container */}
+                    <ConfidenceLevelBar 
+                      confidenceRating={summaryData.confidenceRating || 'Developing Confidence (2.5–3.4)'}
+                    />
+                  </div>
                   <div className="text-xs text-muted-foreground text-center">
                     Confidence progression from Low to Mastery level
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Debug: Always show if confidence bar should be enabled */}
+          {!summaryData.visualizations?.confidenceBar?.enabled && (
+            <Card className="bg-yellow-50 border-yellow-200">
+              <CardContent className="p-4">
+                <p className="text-sm text-yellow-800">
+                  <strong>Debug:</strong> Confidence bar is disabled in visualizations config. 
+                  Current config: {JSON.stringify(summaryData.visualizations?.confidenceBar)}
+                </p>
               </CardContent>
             </Card>
           )}
