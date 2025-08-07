@@ -163,6 +163,17 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
       return;
     }
 
+    // Check authentication before proceeding
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to upload content",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
