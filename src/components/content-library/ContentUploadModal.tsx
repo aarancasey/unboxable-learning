@@ -163,24 +163,37 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
           const categoryName = type.charAt(0).toUpperCase() + type.slice(1) + 's';
           const relatedConcepts = processedText.concepts.filter(c => c.type === type);
           
-          const { data: categoryData, error: categoryError } = await supabase
-            .from('content_categories')
-            .upsert({
-              name: categoryName,
-              description: `${categoryName} extracted from ${formData.title}`,
-              framework_section: type === 'process' ? 'agility' : 'development',
-              ai_generated: true,
-              source_document_id: contentLibraryId || null,
-              confidence_score: Math.max(...relatedConcepts.map(c => c.confidence))
-            }, { 
-              onConflict: 'name',
-              ignoreDuplicates: false 
-            })
-            .select()
-            .single();
+          try {
+            // Check if category already exists
+            const { data: existingCategory } = await supabase
+              .from('content_categories')
+              .select('*')
+              .eq('name', categoryName)
+              .single();
 
-          if (!categoryError && categoryData) {
-            createdCategories.push(categoryData);
+            if (existingCategory) {
+              createdCategories.push(existingCategory);
+            } else {
+              // Create new category
+              const { data: categoryData, error: categoryError } = await supabase
+                .from('content_categories')
+                .insert({
+                  name: categoryName,
+                  description: `${categoryName} extracted from ${formData.title}`,
+                  framework_section: type === 'process' ? 'agility' : 'development',
+                  ai_generated: true,
+                  source_document_id: contentLibraryId || null,
+                  confidence_score: Math.max(...relatedConcepts.map(c => c.confidence))
+                })
+                .select()
+                .single();
+
+              if (!categoryError && categoryData) {
+                createdCategories.push(categoryData);
+              }
+            }
+          } catch (error) {
+            console.error(`Error processing category ${categoryName}:`, error);
           }
         }
 
