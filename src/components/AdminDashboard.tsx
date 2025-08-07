@@ -31,6 +31,7 @@ import ActivitiesView from './ActivitiesView';
 import { EmailTemplateManager } from './email-management/EmailTemplateManager';
 import { ContentLibraryManager } from './content-library/ContentLibraryManager';
 import { DataService } from '@/services/dataService';
+import { dateHelpers } from '@/lib/dateUtils';
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -310,7 +311,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                               <div className="flex-1 min-w-0">
                                 <p className="text-sm font-medium text-foreground">{activity.message}</p>
                                 <p className="text-xs text-muted-foreground">
-                                  {new Date(activity.timestamp).toLocaleDateString()} at {new Date(activity.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                  {dateHelpers.dateTime(activity.timestamp)}
                                 </p>
                               </div>
                             </div>

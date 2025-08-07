@@ -8,6 +8,7 @@ import { ParticipantInfoForm, ParticipantInfo } from './survey/ParticipantInfoFo
 import { useSurveyData } from './survey/useSurveyData';
 import { useSurveyProgress } from './survey/useSurveyProgress';
 import { supabase } from '@/integrations/supabase/client';
+import { dateHelpers } from '@/lib/dateUtils';
 import { useState } from 'react';
 
 interface SurveyFormProps {
@@ -152,7 +153,7 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
               learnerEmail: learnerData?.email || '',
               summary: submissionData.aiSummary || {},
               surveyTitle: survey.title,
-              completionDate: new Date().toLocaleDateString(),
+              completionDate: dateHelpers.shortDate(new Date()),
               useTemplate: true // Flag to use template system
             }
           });

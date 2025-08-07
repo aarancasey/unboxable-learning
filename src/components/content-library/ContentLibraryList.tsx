@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Search, FileText, Download, Edit, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { dateHelpers } from '@/lib/dateUtils';
 
 interface ContentItem {
   id: string;
@@ -258,7 +259,7 @@ export const ContentLibraryList: React.FC = () => {
               )}
 
               <div className="text-xs text-muted-foreground">
-                Added {new Date(item.created_at).toLocaleDateString()}
+                Added {dateHelpers.shortDate(item.created_at)}
               </div>
             </CardContent>
           </Card>

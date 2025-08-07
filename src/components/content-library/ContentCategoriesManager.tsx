@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Edit, Trash2, Bot, Star, AlertCircle, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { dateHelpers } from '@/lib/dateUtils';
 import { CategorySuggestionDialog } from './CategorySuggestionDialog';
 
 interface Category {
@@ -301,7 +302,7 @@ export const ContentCategoriesManager: React.FC = () => {
                     )}
                     <div className="flex items-center justify-between mt-2">
                       <p className="text-xs text-muted-foreground">
-                        Created {new Date(category.created_at).toLocaleDateString()}
+                        Created {dateHelpers.shortDate(category.created_at)}
                         {category.ai_generated && category.confidence_score && (
                           <span className="ml-2">
                             • Confidence: {Math.round(category.confidence_score * 100)}%

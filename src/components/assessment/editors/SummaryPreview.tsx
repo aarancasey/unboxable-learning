@@ -14,6 +14,7 @@ import {
   Mail,
   Eye
 } from 'lucide-react';
+import { dateHelpers } from '@/lib/dateUtils';
 import { PurposeRatingGauge } from '../charts/PurposeRatingGauge';
 import { RubricScoresRadar } from '../charts/RubricScoresRadar';
 import { StrengthsComparisonChart } from '../charts/StrengthsComparisonChart';
@@ -89,8 +90,8 @@ export const SummaryPreview = ({ summaryData, survey }: SummaryPreviewProps) => 
             </p>
             <p className="text-xs text-muted-foreground">
               Submitted: {summaryData.learnerInfo?.submittedDate ? 
-                new Date(summaryData.learnerInfo.submittedDate).toLocaleDateString() : 
-                new Date().toLocaleDateString()}
+                dateHelpers.shortDate(summaryData.learnerInfo.submittedDate) : 
+                dateHelpers.shortDate(new Date())}
             </p>
           </div>
 

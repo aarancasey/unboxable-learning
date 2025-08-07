@@ -11,6 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import { Plus, Edit, Trash2, X, ChevronDown, ChevronRight, FileText, Bot, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { dateHelpers } from '@/lib/dateUtils';
 
 
 interface Rubric {
@@ -463,7 +464,7 @@ export const AssessmentRubricsManager: React.FC = () => {
                         </div>
 
                         <div className="text-xs text-muted-foreground pt-2 border-t">
-                          Created: {new Date(rubric.created_at).toLocaleDateString()} at {new Date(rubric.created_at).toLocaleTimeString()}
+                          Created: {dateHelpers.dateTime(rubric.created_at)}
                         </div>
                       </div>
                     </CardContent>
@@ -540,7 +541,7 @@ export const AssessmentRubricsManager: React.FC = () => {
                     </div>
 
                     <div className="text-xs text-muted-foreground">
-                      Created {new Date(rubric.created_at).toLocaleDateString()}
+                      Created {dateHelpers.shortDate(rubric.created_at)}
                     </div>
                   </div>
                 </CardContent>

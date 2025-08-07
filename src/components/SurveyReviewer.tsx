@@ -27,6 +27,7 @@ import {
   ChevronUp,
   Settings
 } from 'lucide-react';
+import { dateHelpers } from '@/lib/dateUtils';
 
 const SurveyReviewer = () => {
   const [selectedSurvey, setSelectedSurvey] = useState<any>(null);
@@ -237,7 +238,7 @@ const SurveyReviewer = () => {
               </div>
               <div className="flex items-center space-x-1">
                 <Calendar className="h-4 w-4" />
-                <span>Submitted {selectedSurvey.submitted_at ? new Date(selectedSurvey.submitted_at).toLocaleDateString() : selectedSurvey.submittedDate}</span>
+                <span>Submitted {selectedSurvey.submitted_at ? dateHelpers.shortDate(selectedSurvey.submitted_at) : selectedSurvey.submittedDate}</span>
               </div>
               {getStatusBadge(selectedSurvey.status)}
             </div>
@@ -513,7 +514,7 @@ const SurveyReviewer = () => {
                     </div>
                     <div className="flex items-center space-x-2">
                       <Calendar className="h-4 w-4" />
-                      <span>Submitted {survey.submitted_at ? new Date(survey.submitted_at).toLocaleDateString() : survey.submittedDate}</span>
+                      <span>Submitted {survey.submitted_at ? dateHelpers.shortDate(survey.submitted_at) : survey.submittedDate}</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <span className="text-gray-500">Team:</span>

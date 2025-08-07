@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { CardTitle } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
+import { dateHelpers } from '@/lib/dateUtils';
 
 interface CalendarNavigationProps {
   currentDate: Date;
@@ -21,7 +22,7 @@ export const CalendarNavigation = ({
       </Button>
       
       <CardTitle className="text-xl">
-        {format(currentDate, view === 'week' ? 'MMM d, yyyy' : 'MMMM yyyy')}
+        {format(currentDate, view === 'week' ? 'd MMM yyyy' : 'MMMM yyyy')}
       </CardTitle>
       
       <Button variant="outline" size="sm" onClick={() => onNavigate('next')}>

@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { format, isAfter, parseISO } from 'date-fns';
+import { dateHelpers } from '@/lib/dateUtils';
 
 interface Module {
   id: string;
@@ -67,7 +68,7 @@ const ModulesSection = ({ modules, onModuleClick }: ModulesSectionProps) => {
   const getModuleUnlockDate = (module: Module) => {
     const scheduledModule = scheduledModules.find(sm => sm.module_id === module.id);
     if (scheduledModule) {
-      return format(parseISO(scheduledModule.unlock_date), 'MMM d, yyyy');
+      return format(parseISO(scheduledModule.unlock_date), 'd MMM yyyy');
     }
     return module.unlockDate || 'Complete previous modules to unlock';
   };

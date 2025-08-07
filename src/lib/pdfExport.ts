@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { dateHelpers } from '@/lib/dateUtils';
 
 export const exportToPDF = async (survey: any, filename: string = 'assessment') => {
   console.log('Starting PDF export for survey:', survey);
@@ -110,7 +111,7 @@ export const exportToPDF = async (survey: any, filename: string = 'assessment') 
       pdf.setPage(i);
       pdf.setFontSize(8);
       pdf.setTextColor(150, 150, 150);
-      pdf.text(`${learnerName} - Leadership Assessment (${new Date().toLocaleDateString()})`, margin, pageHeight - 5);
+      pdf.text(`${learnerName} - Leadership Assessment (${dateHelpers.shortDate(new Date())})`, margin, pageHeight - 5);
       if (totalPages > 1) {
         pdf.text(`Page ${i} of ${totalPages}`, pageWidth - 30, pageHeight - 5);
       }

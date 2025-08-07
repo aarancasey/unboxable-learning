@@ -15,6 +15,7 @@ import {
   Download
 } from 'lucide-react';
 import { DataService } from '@/services/dataService';
+import { dateHelpers } from '@/lib/dateUtils';
 
 interface Activity {
   id: string;
@@ -120,8 +121,8 @@ const ActivitiesView = () => {
         getActivityTypeLabel(activity.type),
         `"${activity.message}"`,
         activity.participant,
-        new Date(activity.timestamp).toLocaleDateString(),
-        new Date(activity.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        dateHelpers.shortDate(activity.timestamp),
+        dateHelpers.time(activity.timestamp)
       ].join(','))
     ].join('\n');
 
@@ -247,8 +248,8 @@ const ActivitiesView = () => {
                         </div>
                         <div className="flex items-center space-x-4 text-xs text-muted-foreground">
                           <span>
-                            {new Date(activity.timestamp).toLocaleDateString()} at{' '}
-                            {new Date(activity.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            {dateHelpers.shortDate(activity.timestamp)} at{' '}
+                            {dateHelpers.time(activity.timestamp)}
                           </span>
                           <span>•</span>
                           <span>by {activity.participant}</span>
