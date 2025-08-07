@@ -43,6 +43,85 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
     upcomingTasks: []
   });
 
+  // Navigation helper function
+  const navigateToTab = (tabName: string) => {
+    setActiveTab(tabName);
+  };
+
+  // Action handlers for activities
+  const handleActivityAction = (activity: any) => {
+    switch (activity.type) {
+      case 'learner_registration':
+        navigateToTab('users');
+        break;
+      case 'survey_submission':
+        navigateToTab('surveys');
+        break;
+      case 'course_enrollment':
+      case 'course_schedule':
+        navigateToTab('courses');
+        break;
+      default:
+        break;
+    }
+  };
+
+  // Action handlers for tasks
+  const handleTaskAction = (task: any) => {
+    switch (task.type) {
+      case 'pending_survey':
+        navigateToTab('surveys');
+        break;
+      case 'upcoming_course':
+        navigateToTab('calendar');
+        break;
+      case 'password_change':
+        navigateToTab('users');
+        break;
+      default:
+        break;
+    }
+  };
+
+  // Get action button text
+  const getActionButtonText = (activity: any) => {
+    switch (activity.type) {
+      case 'learner_registration':
+        return 'View Learner';
+      case 'survey_submission':
+        return 'View Survey';
+      case 'course_enrollment':
+      case 'course_schedule':
+        return 'View Course';
+      default:
+        return 'View';
+    }
+  };
+
+  // Get task action button text
+  const getTaskActionText = (task: any) => {
+    switch (task.type) {
+      case 'pending_survey':
+        return 'Review Now';
+      case 'upcoming_course':
+        return 'View Course';
+      case 'password_change':
+        return 'Send Reminder';
+      default:
+        return 'View Details';
+    }
+  };
+
+  // Get priority styling
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'high': return 'destructive';
+      case 'medium': return 'default';
+      case 'low': return 'secondary';
+      default: return 'secondary';
+    }
+  };
+
   // Update admin data based on survey submissions and learners
   useEffect(() => {
     const loadAdminData = async () => {
@@ -182,23 +261,51 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                       <p className="text-sm text-gray-500">Activity will appear here once learners start engaging with content</p>
                     </div>
                   ) : (
-                    <div className="space-y-3">
-                      {adminData.recentActivity.map((activity) => (
-                        <div key={activity.id} className="flex items-start space-x-3 p-2 rounded-lg hover:bg-gray-50">
-                          <div className="flex-shrink-0 mt-1">
-                            {activity.icon === 'user-plus' && <Users className="h-4 w-4 text-unboxable-navy" />}
-                            {activity.icon === 'file-text' && <FileText className="h-4 w-4 text-unboxable-orange" />}
-                            {activity.icon === 'calendar' && <Calendar className="h-4 w-4 text-green-600" />}
+                    <>
+                      <div className="space-y-3">
+                        {adminData.recentActivity.slice(0, 4).map((activity) => (
+                          <div key={activity.id} className="flex items-start justify-between p-3 rounded-lg hover:bg-muted/50 border border-transparent hover:border-border transition-colors">
+                            <div className="flex items-start space-x-3 flex-1">
+                              <div className="flex-shrink-0 mt-1">
+                                {activity.icon === 'user-plus' && <Users className="h-4 w-4 text-unboxable-navy" />}
+                                {activity.icon === 'file-text' && <FileText className="h-4 w-4 text-unboxable-orange" />}
+                                {activity.icon === 'calendar' && <Calendar className="h-4 w-4 text-green-600" />}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-foreground">{activity.message}</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {new Date(activity.timestamp).toLocaleDateString()} at {new Date(activity.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </p>
+                              </div>
+                            </div>
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              onClick={() => handleActivityAction(activity)}
+                              className="ml-2 shrink-0"
+                            >
+                              <Eye className="h-3 w-3 mr-1" />
+                              {getActionButtonText(activity)}
+                            </Button>
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900">{activity.message}</p>
-                            <p className="text-xs text-gray-500">
-                              {new Date(activity.timestamp).toLocaleDateString()} at {new Date(activity.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                      
+                      {/* Activity Counter and View All Button */}
+                      <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">
+                          Showing 4 of {adminData.recentActivity.length} activities
+                        </span>
+                        <Button 
+                          size="sm" 
+                          variant="ghost" 
+                          onClick={() => navigateToTab('analytics')}
+                          className="text-xs"
+                        >
+                          View All Activities
+                        </Button>
+                      </div>
+                    </>
                   )}
                 </CardContent>
               </Card>
@@ -219,18 +326,26 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                       <p className="text-sm text-gray-500">Tasks will appear here as they are scheduled</p>
                     </div>
                   ) : (
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       {adminData.upcomingTasks.map((task) => (
-                        <div key={task.id} className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <p className="text-sm font-medium text-unboxable-navy">{task.task}</p>
-                            <p className="text-xs text-gray-500">Due: {task.due}</p>
+                        <div key={task.id} className="flex items-start justify-between p-3 rounded-lg hover:bg-muted/50 border border-transparent hover:border-border transition-colors">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center space-x-2 mb-1">
+                              <p className="text-sm font-medium text-foreground">{task.task}</p>
+                              <Badge variant={getPriorityColor(task.priority)} className="text-xs">
+                                {task.priority}
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-muted-foreground">Due: {task.due}</p>
                           </div>
-                          <Badge 
-                            variant={task.priority === 'high' ? 'destructive' : task.priority === 'medium' ? 'default' : 'secondary'}
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            onClick={() => handleTaskAction(task)}
+                            className="ml-2 shrink-0"
                           >
-                            {task.priority}
-                          </Badge>
+                            {getTaskActionText(task)}
+                          </Button>
                         </div>
                       ))}
                     </div>
