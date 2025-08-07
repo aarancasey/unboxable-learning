@@ -11,6 +11,7 @@ import { Upload, X, FileText, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
+import { AITextProcessor } from '@/utils/AITextProcessor';
 
 interface ContentUploadModalProps {
   isOpen: boolean;
@@ -119,6 +120,7 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
     setIsAnalyzing(true);
     
     try {
+      // Try edge function first
       const { data, error } = await supabase.functions.invoke('analyze-document-content', {
         body: {
           extractedContent: formData.extracted_content,
@@ -138,16 +140,104 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
         
         // Refresh categories list
         await fetchCategories();
+        return;
       } else {
         throw new Error(data.error || 'Analysis failed');
       }
     } catch (error: any) {
-      console.error('Document analysis error:', error);
-      toast({
-        title: "Analysis failed",
-        description: error.message || "Failed to analyze document content",
-        variant: "destructive"
-      });
+      console.error('Edge function analysis failed, trying browser fallback:', error);
+      
+      // Fallback to browser-based analysis
+      try {
+        console.log('Starting browser-based AI analysis...');
+        const processedText = await AITextProcessor.processDocument(
+          formData.extracted_content,
+          formData.title || 'Leadership Assessment Document'
+        );
+
+        // Create basic categories from extracted concepts
+        const createdCategories = [];
+        const uniqueTypes = [...new Set(processedText.concepts.map(c => c.type))];
+        
+        for (const type of uniqueTypes) {
+          const categoryName = type.charAt(0).toUpperCase() + type.slice(1) + 's';
+          const relatedConcepts = processedText.concepts.filter(c => c.type === type);
+          
+          const { data: categoryData, error: categoryError } = await supabase
+            .from('content_categories')
+            .upsert({
+              name: categoryName,
+              description: `${categoryName} extracted from ${formData.title}`,
+              framework_section: type === 'process' ? 'agility' : 'development',
+              ai_generated: true,
+              source_document_id: contentLibraryId || null,
+              confidence_score: Math.max(...relatedConcepts.map(c => c.confidence))
+            }, { 
+              onConflict: 'name',
+              ignoreDuplicates: false 
+            })
+            .select()
+            .single();
+
+          if (!categoryError && categoryData) {
+            createdCategories.push(categoryData);
+          }
+        }
+
+        // Create basic assessment rubrics from high-confidence concepts
+        const highConfidenceConcepts = processedText.concepts
+          .filter(c => c.confidence > 0.7)
+          .slice(0, 6); // Limit to 6 rubrics
+
+        const createdRubrics = [];
+        for (const concept of highConfidenceConcepts) {
+          const matchedCategory = createdCategories.find(cat => 
+            cat.name.toLowerCase().includes(concept.type)
+          );
+
+          const { data: rubricData, error: rubricError } = await supabase
+            .from('assessment_rubrics')
+            .insert({
+              name: concept.title,
+              criteria: {
+                description: concept.content,
+                indicators: [concept.title],
+                development_areas: [`${concept.type} development`]
+              },
+              scoring_scale: {
+                "1": "Needs significant development",
+                "2": "Below expectations", 
+                "3": "Meets expectations",
+                "4": "Exceeds expectations",
+                "5": "Outstanding performance"
+              },
+              category_id: matchedCategory?.id || null
+            })
+            .select()
+            .single();
+
+          if (!rubricError && rubricData) {
+            createdRubrics.push(rubricData);
+          }
+        }
+
+        toast({
+          title: "Browser AI Analysis Complete",
+          description: `Created ${createdCategories.length} categories and ${createdRubrics.length} rubrics using browser-based AI`,
+          duration: 5000
+        });
+        
+        // Refresh categories list
+        await fetchCategories();
+        
+      } catch (fallbackError: any) {
+        console.error('Browser fallback analysis also failed:', fallbackError);
+        toast({
+          title: "Analysis failed",
+          description: "Both cloud and browser AI analysis failed. Please try again.",
+          variant: "destructive"
+        });
+      }
     } finally {
       setIsAnalyzing(false);
     }
