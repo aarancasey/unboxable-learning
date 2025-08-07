@@ -24,6 +24,7 @@ import { supabase } from '@/integrations/supabase/client';
 import UserManagement from './UserManagement';
 import CourseManagement from './CourseManagement';
 import SurveyReviewer from './SurveyReviewer';
+import SurveyEditor from './SurveyEditor';
 import { CalendarView } from './calendar/CalendarView';
 import AnalyticsDashboard from './analytics/AnalyticsDashboard';
 import ActivitiesView from './ActivitiesView';
@@ -401,7 +402,18 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
           </TabsContent>
 
           <TabsContent value="surveys">
-            <SurveyReviewer />
+            <Tabs defaultValue="review" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="review">Review Submissions</TabsTrigger>
+                <TabsTrigger value="edit">Edit Survey</TabsTrigger>
+              </TabsList>
+              <TabsContent value="review" className="mt-6">
+                <SurveyReviewer />
+              </TabsContent>
+              <TabsContent value="edit" className="mt-6">
+                <SurveyEditor />
+              </TabsContent>
+            </Tabs>
           </TabsContent>
 
           <TabsContent value="content-library">
