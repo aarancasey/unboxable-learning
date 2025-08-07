@@ -180,7 +180,7 @@ const SurveyReviewer = () => {
   if (searchTerm) {
     processedSurveys = processedSurveys.filter(survey =>
       (survey.learner_name || survey.learner || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (survey.department || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (survey.team || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       (survey.title || '').toLowerCase().includes(searchTerm.toLowerCase())
     );
   }
@@ -414,7 +414,7 @@ const SurveyReviewer = () => {
               <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search by learner name, department, or title..."
+                placeholder="Search by learner name, team, or title..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -516,8 +516,8 @@ const SurveyReviewer = () => {
                       <span>Submitted {survey.submitted_at ? new Date(survey.submitted_at).toLocaleDateString() : survey.submittedDate}</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span className="text-gray-500">Department:</span>
-                      <span>{survey.department}</span>
+                      <span className="text-gray-500">Team:</span>
+                      <span>{survey.team}</span>
                     </div>
                   </div>
 

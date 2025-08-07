@@ -85,7 +85,7 @@ export const SummaryPreview = ({ summaryData, survey }: SummaryPreviewProps) => 
             />
             <h1 className="text-lg font-bold text-primary mb-1">AI Leadership Assessment Summary</h1>
             <p className="text-sm text-muted-foreground">
-              For {summaryData.learnerInfo?.name || 'Learner Name'} • {summaryData.learnerInfo?.department || 'Department'}
+              For {summaryData.learnerInfo?.name || 'Learner Name'} • {summaryData.learnerInfo?.team || 'Team'}
             </p>
             <p className="text-xs text-muted-foreground">
               Submitted: {summaryData.learnerInfo?.submittedDate ? 

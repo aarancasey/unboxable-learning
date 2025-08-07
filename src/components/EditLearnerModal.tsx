@@ -16,8 +16,8 @@ interface Learner {
   name: string;
   email: string;
   status: string;
-  department: string;
-  mobile: string;
+  team: string;
+  role: string;
 }
 
 interface EditLearnerModalProps {
@@ -34,8 +34,8 @@ const EditLearnerModal = ({ learner, isOpen, onClose, onSave }: EditLearnerModal
     name: '',
     email: '',
     status: '',
-    department: '',
-    mobile: '',
+    team: '',
+    role: '',
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -47,7 +47,7 @@ const EditLearnerModal = ({ learner, isOpen, onClose, onSave }: EditLearnerModal
   }, [learner]);
 
   const handleSave = async () => {
-    if (!formData.name || !formData.email || !formData.department || !formData.mobile) {
+    if (!formData.name || !formData.email || !formData.team || !formData.role) {
       toast({
         title: "Validation Error",
         description: "Please fill in all required fields.",
@@ -111,21 +111,21 @@ const EditLearnerModal = ({ learner, isOpen, onClose, onSave }: EditLearnerModal
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="department">Department *</Label>
+            <Label htmlFor="team">Team *</Label>
             <Input
-              id="department"
-              value={formData.department}
-              onChange={(e) => handleInputChange('department', e.target.value)}
-              placeholder="Enter department"
+              id="team"
+              value={formData.team}
+              onChange={(e) => handleInputChange('team', e.target.value)}
+              placeholder="Enter team"
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="mobile">Mobile *</Label>
+            <Label htmlFor="role">Role *</Label>
             <Input
-              id="mobile"
-              value={formData.mobile}
-              onChange={(e) => handleInputChange('mobile', e.target.value)}
-              placeholder="Enter mobile number"
+              id="role"
+              value={formData.role}
+              onChange={(e) => handleInputChange('role', e.target.value)}
+              placeholder="Enter role"
             />
           </div>
         </div>

@@ -350,8 +350,8 @@ export class DataService {
           name: learner.name,
           email: learner.email,
           status: learner.status,
-          department: learner.department,
-          mobile: learner.mobile,
+          team: learner.department || learner.team,  // Handle both old and new field names
+          role: learner.mobile || learner.role,       // Handle both old and new field names
           password: learner.password,
           requires_password_change: learner.requiresPasswordChange
         })));

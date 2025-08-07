@@ -24,8 +24,8 @@ interface Learner {
   name: string;
   email: string;
   status: string;
-  department: string;
-  mobile: string;
+  team: string;
+  role: string;
 }
 
 interface UserCardProps {
@@ -115,8 +115,8 @@ const UserCard = ({ learner, onActivate, onDelete, onResendInvite, onEdit }: Use
             <h4 className="text-sm font-medium text-gray-900 truncate">{learner.name}</h4>
             <p className="text-xs sm:text-sm text-gray-500 truncate">{learner.email}</p>
             <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mt-1 space-y-1 sm:space-y-0">
-              <span className="text-xs text-gray-500">{learner.mobile}</span>
-              <span className="text-xs text-gray-500">{learner.department}</span>
+              <span className="text-xs text-gray-500">{learner.role}</span>
+              <span className="text-xs text-gray-500">{learner.team}</span>
             </div>
           </div>
         </div>

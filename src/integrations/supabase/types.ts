@@ -841,38 +841,38 @@ export type Database = {
       learners: {
         Row: {
           created_at: string | null
-          department: string
           email: string
           id: number
-          mobile: string
           name: string
           password: string | null
           requires_password_change: boolean | null
+          role: string
           status: string
+          team: string
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
-          department: string
           email: string
           id?: number
-          mobile: string
           name: string
           password?: string | null
           requires_password_change?: boolean | null
+          role: string
           status?: string
+          team: string
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
-          department?: string
           email?: string
           id?: number
-          mobile?: string
           name?: string
           password?: string | null
           requires_password_change?: boolean | null
+          role?: string
           status?: string
+          team?: string
           updated_at?: string | null
         }
         Relationships: []

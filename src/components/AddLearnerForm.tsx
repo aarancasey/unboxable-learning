@@ -16,8 +16,8 @@ const AddLearnerForm = ({ isOpen, onClose, onAddLearner }: AddLearnerFormProps) 
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    mobile: '',
-    department: '',
+    role: '',
+    team: '',
   });
   const { toast } = useToast();
 
@@ -28,7 +28,7 @@ const AddLearnerForm = ({ isOpen, onClose, onAddLearner }: AddLearnerFormProps) 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.email || !formData.mobile || !formData.department) {
+    if (!formData.name || !formData.email || !formData.role || !formData.team) {
       toast({
         title: "Error",
         description: "Please fill in all fields",
@@ -41,10 +41,10 @@ const AddLearnerForm = ({ isOpen, onClose, onAddLearner }: AddLearnerFormProps) 
     const newLearner = {
       name: formData.name,
       email: formData.email,
-      mobile: formData.mobile,
+      role: formData.role,
       password: generatedPassword,
       status: 'pending',
-      department: formData.department,
+      team: formData.team,
       requires_password_change: true,
     };
 
@@ -56,7 +56,7 @@ const AddLearnerForm = ({ isOpen, onClose, onAddLearner }: AddLearnerFormProps) 
     });
 
     // Reset form and close modal
-    setFormData({ name: '', email: '', mobile: '', department: '' });
+    setFormData({ name: '', email: '', role: '', team: '' });
     onClose();
   };
 
@@ -96,25 +96,25 @@ const AddLearnerForm = ({ isOpen, onClose, onAddLearner }: AddLearnerFormProps) 
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="mobile">Mobile Number</Label>
+            <Label htmlFor="role">Role</Label>
             <Input
-              id="mobile"
-              type="tel"
-              value={formData.mobile}
-              onChange={(e) => handleInputChange('mobile', e.target.value)}
-              placeholder="Enter mobile number"
+              id="role"
+              type="text"
+              value={formData.role}
+              onChange={(e) => handleInputChange('role', e.target.value)}
+              placeholder="Enter role"
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="department">Department</Label>
+            <Label htmlFor="team">Team</Label>
             <Input
-              id="department"
+              id="team"
               type="text"
-              value={formData.department}
-              onChange={(e) => handleInputChange('department', e.target.value)}
-              placeholder="Enter department"
+              value={formData.team}
+              onChange={(e) => handleInputChange('team', e.target.value)}
+              placeholder="Enter team"
               required
             />
           </div>

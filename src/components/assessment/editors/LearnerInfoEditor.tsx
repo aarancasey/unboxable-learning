@@ -18,7 +18,7 @@ interface LearnerInfoEditorProps {
   learnerInfo: {
     name?: string;
     email?: string;
-    department?: string;
+    team?: string;
     submittedDate?: string;
     notes?: string;
   };

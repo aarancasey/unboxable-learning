@@ -8,8 +8,8 @@ interface Learner {
   name: string;
   email: string;
   status: string;
-  department: string;
-  mobile: string;
+  team: string;
+  role: string;
 }
 
 interface UsersListProps {

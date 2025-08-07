@@ -14,8 +14,8 @@ interface Learner {
   name: string;
   email: string;
   status: string;
-  department: string;
-  mobile: string;
+  team: string;
+  role: string;
 }
 
 interface SendInvitesModalProps {
@@ -72,7 +72,7 @@ const SendInvitesModal = ({ isOpen, onClose, learners, onInvitesSent }: SendInvi
           body: {
             learnerName: learner.name,
             learnerEmail: learner.email,
-            department: learner.department
+            team: learner.team
           }
         });
 
@@ -155,7 +155,7 @@ const SendInvitesModal = ({ isOpen, onClose, learners, onInvitesSent }: SendInvi
                           <h4 className="text-sm font-medium text-gray-900">{learner.name}</h4>
                           <p className="text-sm text-gray-500">{learner.email}</p>
                           <div className="flex items-center space-x-3 mt-1">
-                            <span className="text-xs text-gray-500">{learner.department}</span>
+                            <span className="text-xs text-gray-500">{learner.team}</span>
                             <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">
                               Pending
                             </Badge>

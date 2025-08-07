@@ -86,7 +86,7 @@ const UserManagement = () => {
         body: {
           learnerName: learner.name,
           learnerEmail: learner.email,
-          department: learner.department
+          team: learner.team
         }
       });
 
@@ -117,8 +117,8 @@ const UserManagement = () => {
     await DataService.updateLearner(updatedLearner.id, {
       name: updatedLearner.name,
       email: updatedLearner.email,
-      department: updatedLearner.department,
-      mobile: updatedLearner.mobile
+      team: updatedLearner.team,
+      role: updatedLearner.role
     });
     
     setLearners(prev => prev.map(learner => 
@@ -140,7 +140,7 @@ const UserManagement = () => {
   const filteredUsers = learners.filter(user =>
     user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.department.toLowerCase().includes(searchTerm.toLowerCase())
+    user.team.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const existingEmails = learners.map(learner => learner.email.toLowerCase());

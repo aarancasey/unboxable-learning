@@ -69,7 +69,7 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
               : learnerData.email || '',
             date: new Date().toISOString().split('T')[0],
             company: learnerData.company || '',
-            businessArea: learnerData.department || '',
+            businessArea: learnerData.team || '',
             role: learnerData.role || ''
           };
         }

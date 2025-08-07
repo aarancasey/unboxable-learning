@@ -80,7 +80,7 @@ export const AISummaryEditorModal = ({
     learnerInfo: {
       name: survey.learner_name || survey.learner || '',
       email: survey.email || '',
-      department: survey.department || '',
+      team: survey.team || '',
       submittedDate: survey.submitted_at || survey.submittedDate || new Date().toISOString()
     }
   };
@@ -95,7 +95,7 @@ export const AISummaryEditorModal = ({
           ...defaultSummary.learnerInfo,
           name: survey.learner_name || survey.learner || '',
           email: survey.email || '',
-          department: survey.department || '',
+          team: survey.team || '',
           submittedDate: survey.submitted_at || survey.submittedDate || new Date().toISOString()
         }
       };
