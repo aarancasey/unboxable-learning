@@ -175,6 +175,47 @@ export const SummaryPreview = ({ summaryData, survey }: SummaryPreviewProps) => 
             </Card>
           )}
 
+          {/* Confidence Level Analysis */}
+          {summaryData.visualizations?.confidenceBar?.enabled && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base font-medium">Confidence Level Analysis</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="text-center">
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Current Confidence Rating: <strong>{summaryData.confidenceRating || 'Developing Confidence (2.5–3.4)'}</strong>
+                    </p>
+                  </div>
+                  <ConfidenceLevelBar 
+                    confidenceRating={summaryData.confidenceRating || 'Developing Confidence (2.5–3.4)'}
+                  />
+                  <div className="text-xs text-muted-foreground text-center">
+                    Confidence progression from Low to Mastery level
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Strengths Comparison Chart */}
+          {summaryData.visualizations?.strengthsChart?.enabled && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base font-medium">Strengths vs Development Areas</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex justify-center">
+                  <StrengthsComparisonChart 
+                    strengths={summaryData.topStrengths || []}
+                    developmentAreas={summaryData.developmentAreas || []}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Leadership Sentiment Snapshot */}
           <Card>
             <CardHeader className="pb-3">
