@@ -26,6 +26,7 @@ import CourseManagement from './CourseManagement';
 import SurveyReviewer from './SurveyReviewer';
 import { CalendarView } from './calendar/CalendarView';
 import AnalyticsDashboard from './analytics/AnalyticsDashboard';
+import ActivitiesView from './ActivitiesView';
 
 import { EmailTemplateManager } from './email-management/EmailTemplateManager';
 import { ContentLibraryManager } from './content-library/ContentLibraryManager';
@@ -221,7 +222,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 h-auto p-1">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-9 h-auto p-1">
             <TabsTrigger value="overview" className="text-xs sm:text-sm px-2 py-2">Overview</TabsTrigger>
             <TabsTrigger value="users" className="text-xs sm:text-sm px-2 py-2">Learners</TabsTrigger>
             <TabsTrigger value="courses" className="text-xs sm:text-sm px-2 py-2">Courses</TabsTrigger>
@@ -229,6 +230,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
             <TabsTrigger value="content-library" className="text-xs sm:text-sm px-2 py-2">Content Library</TabsTrigger>
             <TabsTrigger value="calendar" className="text-xs sm:text-sm px-2 py-2">Calendar</TabsTrigger>
             <TabsTrigger value="emails" className="text-xs sm:text-sm px-2 py-2">Email Templates</TabsTrigger>
+            <TabsTrigger value="activities" className="text-xs sm:text-sm px-2 py-2">Activities</TabsTrigger>
             <TabsTrigger value="analytics" className="text-xs sm:text-sm px-2 py-2">Analytics</TabsTrigger>
           </TabsList>
 
@@ -333,7 +335,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                         <Button 
                           size="sm" 
                           variant="ghost" 
-                          onClick={() => navigateToTab('analytics')}
+                          onClick={() => navigateToTab('activities')}
                           className="text-xs"
                         >
                           View All Activities
@@ -411,6 +413,10 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
 
           <TabsContent value="emails">
             <EmailTemplateManager />
+          </TabsContent>
+
+          <TabsContent value="activities">
+            <ActivitiesView />
           </TabsContent>
 
           <TabsContent value="analytics">
