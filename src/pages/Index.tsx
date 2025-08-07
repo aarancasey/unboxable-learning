@@ -15,12 +15,8 @@ import { SettingsService } from '@/services/settingsService';
 
 
 const AppContent = () => {
-  const [userRole, setUserRole] = useState<'learner' | 'admin' | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [learnerData, setLearnerData] = useState<any>(null);
   const [showLearnerLogin, setShowLearnerLogin] = useState(false);
-  const [showSupabaseAuth, setShowSupabaseAuth] = useState(false);
-  const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
   const [learnMoreSettings, setLearnMoreSettings] = useState({
     enabled: false,
     title: 'Learn More About Our Program',
@@ -30,23 +26,9 @@ const AppContent = () => {
   const { user, session, signOut, isLoading } = useAuth();
   const { trackUserLogin, trackPageView } = useAnalytics();
 
-  // Handle Supabase authentication state changes
-  useEffect(() => {
-    if (user && session && !isAuthenticated) {
-      setUserRole('admin');
-      setIsAuthenticated(true);
-    } else if (!user && !session && isAuthenticated && userRole === 'admin') {
-      // Only log out admin users if they were authenticated via Supabase
-      // Don't affect hardcoded admin logins
-      const wasSupabaseAuth = sessionStorage.getItem('supabase-auth') === 'true';
-      if (wasSupabaseAuth) {
-        setUserRole(null);
-        setIsAuthenticated(false);
-        setLearnerData(null);
-        sessionStorage.removeItem('supabase-auth');
-      }
-    }
-  }, [user, session, isAuthenticated, userRole]);
+  // Determine user role and authentication status from Supabase auth
+  const isAuthenticated = !!user && !!session;
+  const userRole = learnerData ? 'learner' : (isAuthenticated ? 'admin' : null);
 
   // Load Learn More settings
   useEffect(() => {
@@ -62,8 +44,6 @@ const AppContent = () => {
   }, []);
 
   const handleLearnerLogin = (userData?: any) => {
-    setUserRole('learner');
-    setIsAuthenticated(true);
     if (userData) {
       setLearnerData(userData);
     }
@@ -72,34 +52,21 @@ const AppContent = () => {
     setShowLearnerLogin(false);
   };
 
-  const handleAdminLogin = (userData?: any) => {
-    setUserRole('admin');
-    setIsAuthenticated(true);
-    trackUserLogin('admin');
-    trackPageView('/dashboard');
-    setIsAdminModalOpen(false);
-  };
-
-  const handleSupabaseAuthSuccess = (authUser: User, authSession: Session) => {
-    sessionStorage.setItem('supabase-auth', 'true');
-    setUserRole('admin');
-    setIsAuthenticated(true);
-    trackUserLogin('supabase-admin');
-    trackPageView('/dashboard');
-    setShowSupabaseAuth(false);
-    console.log('Supabase auth successful:', authUser);
+  const handleAdminLogin = () => {
+    // Admin access is now controlled by Supabase auth
+    // If user is authenticated, they have admin access
+    if (isAuthenticated) {
+      trackUserLogin('admin');
+      trackPageView('/dashboard');
+    }
   };
 
   const handleLogout = async () => {
     if (user) {
       await signOut();
     }
-    sessionStorage.removeItem('supabase-auth');
-    setUserRole(null);
-    setIsAuthenticated(false);
     setLearnerData(null);
     setShowLearnerLogin(false);
-    setShowSupabaseAuth(false);
   };
 
   if (isLoading) {
@@ -110,8 +77,17 @@ const AppContent = () => {
     );
   }
 
-  if (showSupabaseAuth) {
-    return <AuthPage onAuthSuccess={handleSupabaseAuthSuccess} />;
+  // Show authentication page if not authenticated and trying to access admin
+  if (!isAuthenticated && !showLearnerLogin) {
+    // Check if this is an admin access attempt
+    const isAdminAccess = new URLSearchParams(window.location.search).get('admin') === 'true';
+    if (isAdminAccess) {
+      return <AuthPage onAuthSuccess={(authUser: User, authSession: Session) => {
+        trackUserLogin('admin');
+        trackPageView('/dashboard');
+        console.log('Admin authenticated via Supabase:', authUser.email);
+      }} />;
+    }
   }
 
 
@@ -238,47 +214,23 @@ const AppContent = () => {
               </div>
             </div>
             
-            <Dialog open={isAdminModalOpen} onOpenChange={setIsAdminModalOpen}>
-              <DialogTrigger asChild>
-                <Button variant="ghost" className="text-white/60 hover:text-white text-sm">
-                  Admin Portal
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                  <DialogTitle className="text-center text-unboxable-navy">Admin Portal</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div className="text-center">
-                    <Users className="mx-auto h-12 w-12 text-unboxable-orange mb-3" />
-                  </div>
-                  {user ? (
-                    <Button 
-                      className="w-full bg-unboxable-orange hover:bg-unboxable-orange/90" 
-                      onClick={handleAdminLogin}
-                    >
-                      Access Admin Dashboard
-                    </Button>
-                  ) : (
-                    <>
-                      <LoginForm role="admin" onLogin={handleAdminLogin} />
-                      <div className="text-center mt-2">
-                        <Button 
-                          variant="link" 
-                          onClick={() => {
-                            setIsAdminModalOpen(false);
-                            setShowSupabaseAuth(true);
-                          }}
-                          className="text-sm text-unboxable-navy"
-                        >
-                          Or sign in with Supabase Auth
-                        </Button>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </DialogContent>
-            </Dialog>
+            {user ? (
+              <Button 
+                variant="ghost" 
+                className="text-white/60 hover:text-white text-sm" 
+                onClick={handleAdminLogin}
+              >
+                Admin Dashboard
+              </Button>
+            ) : (
+              <Button 
+                variant="ghost" 
+                className="text-white/60 hover:text-white text-sm"
+                onClick={() => window.location.href = '/?admin=true'}
+              >
+                Admin Portal
+              </Button>
+            )}
           </div>
         </footer>
       </div>
