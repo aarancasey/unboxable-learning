@@ -86,6 +86,8 @@ const AppContent = () => {
         trackUserLogin('admin');
         trackPageView('/dashboard');
         console.log('Admin authenticated via Supabase:', authUser.email);
+        // Clear the admin parameter after successful login
+        window.history.replaceState({}, '', '/');
       }} />;
     }
   }
