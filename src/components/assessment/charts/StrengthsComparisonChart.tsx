@@ -1,5 +1,5 @@
 
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from 'recharts';
+import { CheckCircle, AlertCircle } from 'lucide-react';
 
 interface StrengthsComparisonChartProps {
   strengths: string[];
@@ -16,59 +16,61 @@ export const StrengthsComparisonChart = ({ strengths, developmentAreas }: Streng
     );
   }
 
-  // Create data combining both strengths and development areas
-  const allItems = [
-    ...strengths.map((item, index) => ({
-      name: item.length > 25 ? item.substring(0, 25) + '...' : item,
-      fullName: item,
-      value: 5, // Strengths get higher value
-      type: 'Strength',
-      fill: 'hsl(142 71% 45%)'
-    })),
-    ...developmentAreas.map((item, index) => ({
-      name: item.length > 25 ? item.substring(0, 25) + '...' : item,
-      fullName: item,
-      value: 3, // Development areas get lower value
-      type: 'Development Area',
-      fill: 'hsl(16 100% 50%)'
-    }))
-  ];
-
-  // Sort by type to group strengths and development areas
-  const sortedData = allItems.sort((a, b) => a.type.localeCompare(b.type));
-
   return (
-    <div className="w-full">
-      <ResponsiveContainer width="100%" height={Math.max(200, allItems.length * 30)}>
-        <BarChart data={sortedData} layout="horizontal" margin={{ top: 5, right: 30, left: 100, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="hsl(214.3 31.8% 91.4%)" />
-          <XAxis type="number" stroke="hsl(215.4 16.3% 46.9%)" />
-          <YAxis 
-            dataKey="name" 
-            type="category" 
-            stroke="hsl(215.4 16.3% 46.9%)" 
-            width={90}
-            fontSize={11}
-          />
-          <Tooltip 
-            contentStyle={{ 
-              backgroundColor: 'hsl(0 0% 100%)', 
-              border: '1px solid hsl(214.3 31.8% 91.4%)',
-              borderRadius: '6px',
-              fontSize: '12px'
-            }}
-            formatter={(value, name, props) => [
-              `${props.payload.type}: ${props.payload.fullName}`,
-              ''
-            ]}
-          />
-          <Bar dataKey="value" radius={[0, 4, 4, 0]}>
-            {sortedData.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.fill} />
+    <div className="w-full space-y-6">
+      {/* Strengths Section */}
+      {strengths.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <CheckCircle className="h-5 w-5 text-green-600" />
+            <h4 className="font-semibold text-green-700">Strengths ({strengths.length})</h4>
+          </div>
+          <div className="grid gap-2">
+            {strengths.map((strength, index) => (
+              <div 
+                key={index}
+                className="flex items-start gap-3 p-3 bg-green-50 border border-green-200 rounded-lg"
+              >
+                <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0" />
+                <p className="text-sm text-green-800 leading-relaxed">{strength}</p>
+              </div>
             ))}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
+          </div>
+        </div>
+      )}
+
+      {/* Development Areas Section */}
+      {developmentAreas.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="h-5 w-5 text-orange-600" />
+            <h4 className="font-semibold text-orange-700">Development Areas ({developmentAreas.length})</h4>
+          </div>
+          <div className="grid gap-2">
+            {developmentAreas.map((area, index) => (
+              <div 
+                key={index}
+                className="flex items-start gap-3 p-3 bg-orange-50 border border-orange-200 rounded-lg"
+              >
+                <div className="w-2 h-2 bg-orange-500 rounded-full mt-2 flex-shrink-0" />
+                <p className="text-sm text-orange-800 leading-relaxed">{area}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Summary Stats */}
+      <div className="flex justify-between items-center pt-4 border-t border-border">
+        <div className="text-center">
+          <div className="text-2xl font-bold text-green-600">{strengths.length}</div>
+          <div className="text-xs text-muted-foreground">Strengths</div>
+        </div>
+        <div className="text-center">
+          <div className="text-2xl font-bold text-orange-600">{developmentAreas.length}</div>
+          <div className="text-xs text-muted-foreground">Development Areas</div>
+        </div>
+      </div>
     </div>
   );
 };
