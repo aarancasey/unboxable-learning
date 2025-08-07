@@ -164,7 +164,7 @@ The Learning Team"
                 </TabsContent>
               </Tabs>
               <p className="text-xs text-muted-foreground">
-                Use {"{{learnerName}}"}, {"{{surveyTitle}}"}, {"{{completionDate}}"}, {"{{course_name}}"}, {"{{participant_name}}"}, {"{{course_start_date}}"} to personalize your message
+                Use {"{{learnerName}}"}, {"{{surveyTitle}}"}, {"{{completionDate}}"}, {"{{course_name}}"}, {"{{participant_name}}"}, {"{{course_start_date}}"} to personalise your message
               </p>
             </div>
           </div>

@@ -33,7 +33,7 @@ const LearnerWelcomeSection = ({ learnerName, surveyStatus }: LearnerWelcomeSect
       case 'completed':
         return [
           "Your pre-course assessment has been submitted successfully",
-          "Our team is reviewing your responses to personalize your learning experience", 
+          "Our team is reviewing your responses to personalise your learning experience", 
           "You'll receive notification once your learning modules are unlocked",
           "This usually takes 1-2 business days"
         ];
@@ -41,7 +41,7 @@ const LearnerWelcomeSection = ({ learnerName, surveyStatus }: LearnerWelcomeSect
         return [
           "Start by completing your pre-course assessment below",
           "This helps us understand your current knowledge and tailor your learning",
-          "Once submitted and approved, your personalized learning modules will unlock",
+          "Once submitted and approved, your personalised learning modules will unlock",
           "Complete all modules over 4 weeks, then take the post-course assessment"
         ];
     }

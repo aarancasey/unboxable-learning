@@ -498,7 +498,7 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
                 )}
                 <div className="text-sm text-muted-foreground">
                   /6 - Connected & gaining clarity
-                  <div className="text-xs">Strong alignment with personal values and organizational mission</div>
+                  <div className="text-xs">Strong alignment with personal values and organisational mission</div>
                 </div>
               </div>
             </div>

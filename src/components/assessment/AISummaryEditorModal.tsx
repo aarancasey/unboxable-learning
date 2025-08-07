@@ -234,7 +234,7 @@ export const AISummaryEditorModal = ({
                 Edit AI Assessment Summary
               </DialogTitle>
               <p className="text-sm text-muted-foreground mt-1">
-                Customize the AI-generated leadership assessment for {editedData.learnerInfo?.name || 'this learner'}
+                Customise the AI-generated leadership assessment for {editedData.learnerInfo?.name || 'this learner'}
               </p>
             </div>
             

@@ -12,12 +12,12 @@ interface TestResult {
 }
 
 export const RubricsTestButton: React.FC = () => {
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isAnalysing, setIsAnalysing] = useState(false);
   const [testResults, setTestResults] = useState<TestResult[]>([]);
   const { toast } = useToast();
 
   const testRubricsGeneration = async () => {
-    setIsAnalyzing(true);
+    setIsAnalysing(true);
     setTestResults([]);
 
     try {
@@ -48,10 +48,10 @@ export const RubricsTestButton: React.FC = () => {
       if (!contentData) {
         setTestResults(prev => [...prev, {
           status: 'error',
-          message: 'No documents found to analyze',
+          message: 'No documents found to analyse',
           details: { step: 'document_validation' }
         }]);
-        throw new Error('No documents found to analyze');
+        throw new Error('No documents found to analyse');
       }
 
       setTestResults(prev => [...prev, {
@@ -70,13 +70,13 @@ export const RubricsTestButton: React.FC = () => {
       
       setTestResults(prev => [...prev, {
         status: 'success',
-        message: 'Calling analyze-document-content edge function...',
+        message: 'Calling analyse-document-content edge function...',
         details: { step: 'edge_function_call' }
       }]);
 
       const startTime = Date.now();
       const { data: analysisResult, error: analysisError } = await supabase.functions.invoke(
-        'analyze-document-content',
+        'analyse-document-content',
         {
           body: {
             extractedContent: contentData.extracted_content,
@@ -149,7 +149,7 @@ export const RubricsTestButton: React.FC = () => {
         variant: "destructive"
       });
     } finally {
-      setIsAnalyzing(false);
+      setIsAnalysing(false);
     }
   };
 
@@ -167,10 +167,10 @@ export const RubricsTestButton: React.FC = () => {
       <CardContent className="space-y-4">
         <Button
           onClick={testRubricsGeneration}
-          disabled={isAnalyzing}
+          disabled={isAnalysing}
           className="w-full"
         >
-          {isAnalyzing ? (
+          {isAnalysing ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Analyzing Document...

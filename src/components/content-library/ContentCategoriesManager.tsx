@@ -190,7 +190,7 @@ export const ContentCategoriesManager: React.FC = () => {
             {isEditing ? 'Edit Category' : 'Create New Category'}
           </CardTitle>
           <CardDescription>
-            Organize your content library with categories
+            Organise your content library with categories
           </CardDescription>
         </CardHeader>
         <CardContent>

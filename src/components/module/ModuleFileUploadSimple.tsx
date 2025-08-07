@@ -237,7 +237,7 @@ export const ModuleFileUploadSimple = ({
               </Button>
             </div>
             <p className="text-xs text-muted-foreground">
-              Make sure the Google Doc is shared publicly or with your organization before adding the link.
+              Make sure the Google Doc is shared publicly or with your organisation before adding the link.
             </p>
           </div>
 

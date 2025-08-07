@@ -290,8 +290,8 @@ export const getRubricTemplates = (): RubricTemplate[] => [
     category: 'Management',
     criteria: [
       {
-        name: 'Planning & Organization',
-        description: 'Ability to plan and organize project activities',
+        name: 'Planning & Organisation',
+        description: 'Ability to plan and organise project activities',
         weight: 30
       },
       {

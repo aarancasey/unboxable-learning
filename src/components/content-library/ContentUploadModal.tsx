@@ -31,7 +31,7 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
   const [currentTag, setCurrentTag] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [autoGenerateRubrics, setAutoGenerateRubrics] = useState(false);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isAnalysing, setIsAnalysing] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -117,11 +117,11 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
       return;
     }
 
-    setIsAnalyzing(true);
+    setIsAnalysing(true);
     
     try {
       // Try edge function first
-      const { data, error } = await supabase.functions.invoke('analyze-document-content', {
+      const { data, error } = await supabase.functions.invoke('analyse-document-content', {
         body: {
           extractedContent: formData.extracted_content,
           documentTitle: formData.title || 'Leadership Assessment Document',
@@ -252,7 +252,7 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
         });
       }
     } finally {
-      setIsAnalyzing(false);
+      setIsAnalysing(false);
     }
   };
 
@@ -333,8 +333,8 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
         }
       }
 
-      // If auto-generate is enabled, analyze content for rubrics
-      if (autoGenerateRubrics && !isAnalyzing) {
+      // If auto-generate is enabled, analyse content for rubrics
+      if (autoGenerateRubrics && !isAnalysing) {
         await analyzeDocumentContent(contentData.id);
       }
 
@@ -475,7 +475,7 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
                     Auto-generate Assessment Rubrics & Categories
                   </Label>
                   <p className="text-xs text-muted-foreground">
-                    AI will analyze the document content and automatically create relevant categories and assessment rubrics for leadership evaluation
+                    AI will analyse the document content and automatically create relevant categories and assessment rubrics for leadership evaluation
                   </p>
                 </div>
               </div>
@@ -487,10 +487,10 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
                     variant="outline"
                     size="sm"
                     onClick={() => analyzeDocumentContent()}
-                    disabled={isAnalyzing}
+                    disabled={isAnalysing}
                     className="w-full"
                   >
-                    {isAnalyzing ? (
+                    {isAnalysing ? (
                       <>
                         <Sparkles className="h-4 w-4 mr-2 animate-spin" />
                         Analyzing Content...
@@ -538,7 +538,7 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading || isAnalyzing}>
+            <Button type="submit" disabled={isLoading || isAnalysing}>
               {isLoading ? (
                 autoGenerateRubrics ? 'Uploading & Generating...' : 'Uploading...'
               ) : (

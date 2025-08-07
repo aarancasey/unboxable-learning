@@ -148,7 +148,7 @@ export const RubricsGenerator = ({
           </Button>
           <div>
             <h1 className="text-2xl font-bold">
-              {mode === 'template' ? 'Customize Template' : 'Create Custom Rubric'}
+              {mode === 'template' ? 'Customise Template' : 'Create Custom Rubric'}
             </h1>
             <p className="text-gray-600">
               {currentRubric.name || 'New Assessment Rubric'}

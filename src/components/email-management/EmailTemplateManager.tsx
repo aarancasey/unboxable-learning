@@ -46,7 +46,7 @@ export const EmailTemplateManager = ({ onTemplateSelect }: EmailTemplateManagerP
         <div>
           <h2 className="text-2xl font-semibold">Email Template Management</h2>
           <p className="text-muted-foreground">
-            Create and customize email templates for course automation
+            Create and customise email templates for course automation
           </p>
         </div>
         

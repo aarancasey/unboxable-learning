@@ -125,7 +125,7 @@ export const CategorySuggestionDialog: React.FC<CategorySuggestionDialogProps> =
             AI Category Suggestions
           </DialogTitle>
           <DialogDescription>
-            Review and manage AI-generated categories to improve your content organization
+            Review and manage AI-generated categories to improve your content organisation
           </DialogDescription>
         </DialogHeader>
 
