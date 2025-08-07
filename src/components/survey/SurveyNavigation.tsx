@@ -13,6 +13,8 @@ interface SurveyNavigationProps {
   isSaving: boolean;
   lastSaved: Date | null;
   saveComplete: boolean;
+  isSubmitting?: boolean;
+  submissionComplete?: boolean;
 }
 
 export const SurveyNavigation = ({
@@ -25,7 +27,9 @@ export const SurveyNavigation = ({
   onSave,
   isSaving,
   lastSaved,
-  saveComplete
+  saveComplete,
+  isSubmitting = false,
+  submissionComplete = false
 }: SurveyNavigationProps) => {
   const { user } = useAuth();
   const formatLastSaved = (date: Date) => {
@@ -108,10 +112,10 @@ export const SurveyNavigation = ({
           
           <Button 
             onClick={onNext}
-            disabled={!isCurrentAnswered()}
+            disabled={!isCurrentAnswered() || isSubmitting || submissionComplete}
             className="flex items-center gap-2 px-6 py-3 bg-unboxable-orange hover:bg-unboxable-orange/90 hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
-            {isLastItem ? 'Complete Survey' : 'Next'}
+            {isSubmitting ? 'Submitting...' : submissionComplete ? 'Survey Complete' : isLastItem ? 'Complete Survey' : 'Next'}
             <ArrowRight className="w-4 h-4" />
           </Button>
         </div>

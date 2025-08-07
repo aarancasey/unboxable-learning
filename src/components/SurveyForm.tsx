@@ -18,6 +18,8 @@ interface SurveyFormProps {
 
 const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
   const [participantInfo, setParticipantInfo] = useState<ParticipantInfo | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionComplete, setSubmissionComplete] = useState(false);
   const survey = useSurveyData();
   const {
     currentSection,
@@ -54,6 +56,12 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
   const onNextClick = async () => {
     const isComplete = handleNext();
     if (isComplete) {
+      // Prevent double submission
+      if (isSubmitting || submissionComplete) {
+        return;
+      }
+      
+      setIsSubmitting(true);
       try {
         // Survey complete - save final submission and delete progress
         console.log('Survey submitted:', answers);
@@ -115,19 +123,22 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
         localStorage.setItem('surveySubmissions', JSON.stringify(existingSurveys));
         console.log('Survey saved to localStorage successfully');
 
-        // Try to save to database as backup
+        // Try to save to database using upsert to prevent duplicates
         try {
           const { error: dbError } = await supabase
             .from('survey_submissions')
-            .insert([{
+            .upsert([{
               learner_id: learnerData?.id || null,
               learner_name: finalParticipantInfo?.fullName || 'Unknown User',
               responses: submissionData as any, // Cast to Json type
               status: 'completed'
-            }]);
+            }], {
+              onConflict: 'learner_name',
+              ignoreDuplicates: false
+            });
           
           if (!dbError) {
-            console.log('Survey also saved to database');
+            console.log('Survey saved to database successfully');
           }
         } catch (error) {
           console.warn('Database save failed, but survey is saved locally:', error);
@@ -158,11 +169,14 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
         // Delete the progress since survey is complete
         await deleteSavedProgress();
         
+        setSubmissionComplete(true);
         onSubmit();
       } catch (error) {
         console.error('Error submitting survey:', error);
         // Still call onSubmit to proceed even if there was an error
         onSubmit();
+      } finally {
+        setIsSubmitting(false);
       }
     }
   };
@@ -258,6 +272,8 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
             isSaving={isSaving}
             lastSaved={lastSaved}
             saveComplete={saveComplete}
+            isSubmitting={isSubmitting}
+            submissionComplete={submissionComplete}
           />
         </div>
       </div>
