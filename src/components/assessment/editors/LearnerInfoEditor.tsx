@@ -101,15 +101,15 @@ export const LearnerInfoEditor = ({ learnerInfo, onChange }: LearnerInfoEditorPr
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="learner-department" className="flex items-center gap-2">
+              <Label htmlFor="learner-team" className="flex items-center gap-2">
                 <Building className="h-4 w-4" />
-                Department
+                Team
               </Label>
               <Input
-                id="learner-department"
-                value={localData.department || ''}
-                onChange={(e) => handleInputChange('department', e.target.value)}
-                placeholder="Enter department"
+                id="learner-team"
+                value={localData.team || ''}
+                onChange={(e) => handleInputChange('team', e.target.value)}
+                placeholder="Enter team"
                 className="w-full"
               />
             </div>
