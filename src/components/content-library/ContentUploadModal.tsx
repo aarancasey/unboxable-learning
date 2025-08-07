@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Upload, X, FileText, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/components/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 
 interface ContentUploadModalProps {
@@ -31,6 +32,7 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
   const [autoGenerateRubrics, setAutoGenerateRubrics] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   React.useEffect(() => {
     if (isOpen) {
@@ -164,7 +166,6 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
     }
 
     // Check authentication before proceeding
-    const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       toast({
         title: "Authentication required",
