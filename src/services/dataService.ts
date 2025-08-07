@@ -541,7 +541,10 @@ export class DataService {
           due: 'Overdue',
           priority: 'high',
           type: 'password_change',
-          dueDate: learner.created_at || learner.createdAt
+          dueDate: learner.created_at || learner.createdAt,
+          learnerEmail: learner.email,
+          learnerName: learner.name,
+          learnerId: learner.id
         });
       });
 

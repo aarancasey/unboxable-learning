@@ -19,6 +19,8 @@ import {
   ArrowLeft,
   Library
 } from 'lucide-react';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 import UserManagement from './UserManagement';
 import CourseManagement from './CourseManagement';
 import SurveyReviewer from './SurveyReviewer';
@@ -67,7 +69,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
   };
 
   // Action handlers for tasks
-  const handleTaskAction = (task: any) => {
+  const handleTaskAction = async (task: any) => {
     switch (task.type) {
       case 'pending_survey':
         navigateToTab('surveys');
@@ -76,10 +78,42 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
         navigateToTab('calendar');
         break;
       case 'password_change':
-        navigateToTab('users');
+        await handleSendPasswordReminder(task);
         break;
       default:
         break;
+    }
+  };
+
+  // Send password reminder function
+  const handleSendPasswordReminder = async (task: any) => {
+    try {
+      // Extract learner info from task (you might need to adjust this based on your task structure)
+      const learnerEmail = task.learnerEmail || task.email;
+      const learnerName = task.learnerName || task.name;
+      
+      if (!learnerEmail || !learnerName) {
+        toast.error("Missing learner information for password reminder");
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('send-password-reminder', {
+        body: {
+          learnerEmail,
+          learnerName
+        }
+      });
+
+      if (error) {
+        console.error('Error sending password reminder:', error);
+        toast.error("Failed to send password reminder");
+        return;
+      }
+
+      toast.success(`Password reminder sent to ${learnerName}`);
+    } catch (error) {
+      console.error('Error sending password reminder:', error);
+      toast.error("Failed to send password reminder");
     }
   };
 
