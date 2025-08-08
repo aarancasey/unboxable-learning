@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { EditableAISummary } from '@/components/assessment/EditableAISummary';
 import { useToast } from '@/hooks/use-toast';
+import { getQuestionText, getQuestionSection, formatAnswer } from '@/utils/surveyQuestionMapper';
 import { 
   FileText, 
   Clock, 
@@ -298,14 +299,25 @@ const SurveyReviewer = () => {
                 )}
                 
                 {/* Survey Answers */}
-                {selectedSurvey.responses?.answers && Object.entries(selectedSurvey.responses.answers).map(([questionId, answer], index) => (
-                  <div key={questionId} className="border-b border-gray-200 pb-4 last:border-b-0">
-                    <h4 className="font-medium text-gray-900 mb-2">{questionId}</h4>
-                    <p className="text-gray-700 bg-gray-50 p-3 rounded-lg">
-                      {Array.isArray(answer) ? answer.join(', ') : String(answer)}
-                    </p>
-                  </div>
-                ))}
+                {selectedSurvey.responses?.answers && Object.entries(selectedSurvey.responses.answers).map(([questionId, answer], index) => {
+                  const questionText = getQuestionText(questionId);
+                  const sectionName = getQuestionSection(questionId);
+                  const formattedAnswer = formatAnswer(questionId, answer);
+                  
+                  return (
+                    <div key={questionId} className="border-b border-gray-200 pb-4 last:border-b-0">
+                      <div className="mb-2">
+                        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                          {sectionName}
+                        </span>
+                      </div>
+                      <h4 className="font-medium text-gray-900 mb-2">{questionText}</h4>
+                      <p className="text-gray-700 bg-gray-50 p-3 rounded-lg">
+                        {formattedAnswer}
+                      </p>
+                    </div>
+                  );
+                })}
                 
                 {/* Fallback for old data structure */}
                 {(!selectedSurvey.responses?.answers && selectedSurvey.responses && Array.isArray(selectedSurvey.responses)) && 
