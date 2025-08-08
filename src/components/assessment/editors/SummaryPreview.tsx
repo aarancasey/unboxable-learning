@@ -28,9 +28,27 @@ interface SummaryPreviewProps {
 }
 
 export const SummaryPreview = ({ summaryData, survey }: SummaryPreviewProps) => {
+  // Check if we have the new format
+  const isNewFormat = summaryData.confidenceLevels !== undefined;
+  
+  // For backward compatibility, use old format fields if new format not available
+  const displayData = isNewFormat ? summaryData : {
+    currentLeadershipStyle: summaryData.currentLeadershipStyle,
+    confidenceRating: summaryData.confidenceRating,
+    strongestArea: summaryData.strongestArea,
+    focusArea: summaryData.focusArea,
+    leadershipAspirations: summaryData.leadershipAspirations,
+    purposeRating: summaryData.purposeRating,
+    agilityLevel: summaryData.agilityLevel,
+    topStrengths: summaryData.topStrengths,
+    developmentAreas: summaryData.developmentAreas,
+    overallAssessment: summaryData.overallAssessment,
+    rubricAssessments: summaryData.rubricAssessments || []
+  };
+
   // Prepare radar chart data for rubrics
-  const radarData = summaryData.rubricAssessments?.length > 0 
-    ? summaryData.rubricAssessments[0]?.criteriaScores?.map((criteria: any) => ({
+  const radarData = displayData.rubricAssessments?.length > 0 
+    ? displayData.rubricAssessments[0]?.criteriaScores?.map((criteria: any) => ({
         criterion: criteria.criterion.length > 20 ? criteria.criterion.substring(0, 20) + '...' : criteria.criterion,
         score: criteria.score,
         fullMark: criteria.maxScore || 5
@@ -51,18 +69,23 @@ export const SummaryPreview = ({ summaryData, survey }: SummaryPreviewProps) => 
     return levels[level as keyof typeof levels] || levels['Achiever'];
   };
 
-  const agilityBadge = getAgilityLevelBadge(summaryData.agilityLevel || 'Achiever');
+  const agilityBadge = getAgilityLevelBadge(displayData.agilityLevel || 'Achiever');
   const IconComponent = agilityBadge.icon;
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-lg font-semibold mb-2">Assessment Preview</h3>
-          <p className="text-sm text-muted-foreground">
-            Preview how the final assessment summary will appear to learners and administrators.
-          </p>
-        </div>
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Assessment Preview</h3>
+            <p className="text-sm text-muted-foreground">
+              Preview how the final assessment summary will appear to learners and administrators.
+              {!isNewFormat && (
+                <span className="ml-2 text-orange-600 font-medium">
+                  (Legacy Format - Consider refactoring for enhanced features)
+                </span>
+              )}
+            </p>
+          </div>
         
         <div className="flex gap-2">
           <Button variant="outline" size="sm">
@@ -109,11 +132,11 @@ export const SummaryPreview = ({ summaryData, survey }: SummaryPreviewProps) => 
                   <div className="text-xs text-muted-foreground mb-1">Purpose Connection</div>
                   <div className="bg-primary text-xs text-primary-foreground px-2 py-1 rounded inline-flex items-center gap-1">
                     <Target className="h-3 w-3" />
-                    {summaryData.purposeRating || 4}
+                    {displayData.purposeRating || 4}
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">
-                    {(summaryData.purposeRating || 4) >= 5 ? 'Highly Aligned' : 
-                     (summaryData.purposeRating || 4) >= 3 ? 'Developing Clarity' : 'Needs Focus'}
+                    {(displayData.purposeRating || 4) >= 5 ? 'Highly Aligned' : 
+                     (displayData.purposeRating || 4) >= 3 ? 'Developing Clarity' : 'Needs Focus'}
                   </div>
                 </div>
                 
@@ -121,7 +144,10 @@ export const SummaryPreview = ({ summaryData, survey }: SummaryPreviewProps) => 
                 <div className="text-center">
                   <div className="text-xs text-muted-foreground mb-1">Confidence Level</div>
                   <div className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
-                    {summaryData.confidenceRating || 'Developing'}
+                    {isNewFormat ? 
+                      `${displayData.overallConfidenceScore?.toFixed(1) || '3.4'}/5.0` :
+                      displayData.confidenceRating || 'Developing'
+                    }
                   </div>
                 </div>
                 
@@ -130,7 +156,7 @@ export const SummaryPreview = ({ summaryData, survey }: SummaryPreviewProps) => 
                   <div className="text-xs text-muted-foreground mb-1">Leadership Agility</div>
                   <div className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded ${agilityBadge.color}`}>
                     <IconComponent className="h-3 w-3" />
-                    {summaryData.agilityLevel || 'Achiever'}
+                    {displayData.agilityLevel || 'Achiever'}
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">{agilityBadge.description}</div>
                 </div>
@@ -139,8 +165,8 @@ export const SummaryPreview = ({ summaryData, survey }: SummaryPreviewProps) => 
                 <div className="text-center">
                   <div className="text-xs text-muted-foreground mb-1">Overall Score</div>
                   <div className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
-                    {summaryData.rubricAssessments?.[0]?.overallScore?.toFixed(1) || '2.8'}/
-                    {summaryData.rubricAssessments?.[0]?.maxScore || '4'}
+                    {displayData.rubricAssessments?.[0]?.overallScore?.toFixed(1) || '2.8'}/
+                    {displayData.rubricAssessments?.[0]?.maxScore || '4'}
                   </div>
                 </div>
               </div>

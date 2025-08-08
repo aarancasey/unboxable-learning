@@ -30,6 +30,7 @@ import AnalyticsDashboard from './analytics/AnalyticsDashboard';
 import ActivitiesView from './ActivitiesView';
 
 import { EmailTemplateManager } from './email-management/EmailTemplateManager';
+import { AssessmentRefactorTool } from './admin/AssessmentRefactorTool';
 import { ContentLibraryManager } from './content-library/ContentLibraryManager';
 import { DataService } from '@/services/dataService';
 import { dateHelpers } from '@/lib/dateUtils';
@@ -224,12 +225,13 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-9 h-auto p-1">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-10 h-auto p-1">
             <TabsTrigger value="overview" className="text-xs sm:text-sm px-2 py-2">Overview</TabsTrigger>
             <TabsTrigger value="users" className="text-xs sm:text-sm px-2 py-2">Learners</TabsTrigger>
             <TabsTrigger value="courses" className="text-xs sm:text-sm px-2 py-2">Courses</TabsTrigger>
             <TabsTrigger value="surveys" className="text-xs sm:text-sm px-2 py-2">Surveys</TabsTrigger>
             <TabsTrigger value="content-library" className="text-xs sm:text-sm px-2 py-2">Content Library</TabsTrigger>
+            <TabsTrigger value="refactor" className="text-xs sm:text-sm px-2 py-2">Refactor</TabsTrigger>
             <TabsTrigger value="calendar" className="text-xs sm:text-sm px-2 py-2">Calendar</TabsTrigger>
             <TabsTrigger value="emails" className="text-xs sm:text-sm px-2 py-2">Email Templates</TabsTrigger>
             <TabsTrigger value="activities" className="text-xs sm:text-sm px-2 py-2">Activities</TabsTrigger>
@@ -418,6 +420,10 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
 
           <TabsContent value="content-library">
             <ContentLibraryManager />
+          </TabsContent>
+
+          <TabsContent value="refactor">
+            <AssessmentRefactorTool />
           </TabsContent>
 
           <TabsContent value="calendar">
