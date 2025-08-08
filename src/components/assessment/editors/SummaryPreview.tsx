@@ -19,6 +19,8 @@ import { PurposeRatingGauge } from '../charts/PurposeRatingGauge';
 import { RubricScoresRadar } from '../charts/RubricScoresRadar';
 import { StrengthsComparisonChart } from '../charts/StrengthsComparisonChart';
 import { ConfidenceLevelBar } from '../charts/ConfidenceLevelBar';
+import { ConfidenceLevelsChart } from '../charts/ConfidenceLevelsChart';
+import { AgilityLevelIndicator } from '../charts/AgilityLevelIndicator';
 
 interface SummaryPreviewProps {
   summaryData: any;
@@ -239,34 +241,170 @@ export const SummaryPreview = ({ summaryData, survey }: SummaryPreviewProps) => 
                 Leadership Sentiment Snapshot
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div>
-                  <h4 className="text-sm font-medium mb-2">Current Leadership Style</h4>
-                  <div className="text-sm font-medium">{summaryData.currentLeadershipStyle || 'Not specified'}</div>
-                </div>
-                
-                <div>
-                  <h4 className="text-sm font-medium mb-2">Confidence Rating</h4>
-                  <div className="text-sm text-green-700">{summaryData.confidenceRating || 'Not specified'}</div>
+            <CardContent className="space-y-6">
+              {/* Current Leadership Style */}
+              <div>
+                <h4 className="text-sm font-medium mb-2">1. Current Leadership Style</h4>
+                <p className="text-sm">Based on your selection you see your current leadership style as:</p>
+                <div className="bg-muted rounded-lg p-3 mt-2">
+                  <p className="text-sm font-medium">{summaryData.currentLeadershipStyle || 'Not specified'}</p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                  <h4 className="text-sm font-medium text-green-800 mb-2 flex items-center gap-2">
-                    <Award className="h-4 w-4" />
-                    Strongest Area
-                  </h4>
-                  <p className="text-sm text-green-700">{summaryData.strongestArea || 'Not specified'}</p>
+              {/* Confidence Levels in Key Areas */}
+              {summaryData.confidenceLevels && (
+                <div>
+                  <h4 className="text-sm font-medium mb-2">2. Confidence Levels in Key Areas</h4>
+                  <p className="text-sm mb-4">Based on your assessment, you see your confidence in the following areas as follows:</p>
+                  <ConfidenceLevelsChart confidenceLevels={summaryData.confidenceLevels} />
+                  <div className="mt-4 bg-muted rounded-lg p-3">
+                    <p className="text-sm">
+                      <strong>From an overall perspective your aggregated average score is: {summaryData.overallConfidenceScore?.toFixed(1) || '3.2'}</strong>
+                    </p>
+                    <p className="text-sm mt-1">
+                      Based on this score, this indicates that: {summaryData.confidenceInterpretation || 'You are developing your capabilities with solid foundations in key areas.'}
+                    </p>
+                  </div>
                 </div>
-                
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                  <h4 className="text-sm font-medium text-blue-800 mb-2 flex items-center gap-2">
-                    <Target className="h-4 w-4" />
-                    Primary Focus Area
-                  </h4>
-                  <p className="text-sm text-blue-700">{summaryData.focusArea || 'Not specified'}</p>
+              )}
+
+              {/* Current Leadership Mindset */}
+              <div>
+                <h4 className="text-sm font-medium mb-2">3. Current Leadership Mindset</h4>
+                <p className="text-sm">You described your current leadership as the following:</p>
+                <div className="bg-muted rounded-lg p-3 mt-2">
+                  <p className="text-sm">{summaryData.currentLeadershipMindset || 'Not specified'}</p>
+                </div>
+              </div>
+
+              {/* Current Leadership Challenges */}
+              <div>
+                <h4 className="text-sm font-medium mb-2">4. Current Leadership Challenges</h4>
+                <p className="text-sm">You described your current leadership challenge as:</p>
+                <div className="bg-muted rounded-lg p-3 mt-2">
+                  <p className="text-sm">{summaryData.currentLeadershipChallenges || 'Not specified'}</p>
+                </div>
+              </div>
+
+              {/* What's Energising You Right Now */}
+              <div>
+                <h4 className="text-sm font-medium mb-2">5. What's Energising You Right Now</h4>
+                <p className="text-sm">You see yourself as being energised by:</p>
+                <div className="bg-muted rounded-lg p-3 mt-2">
+                  <p className="text-sm">{summaryData.energisingFactors || 'Not specified'}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Leadership Intent & Purpose */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base font-medium text-blue-600 flex items-center gap-2">
+                <div className="w-5 h-5 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">2</div>
+                Leadership Intent & Purpose
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* What Matters Most Right Now */}
+              <div>
+                <h4 className="text-sm font-medium mb-2">1. What Matters Most Right Now</h4>
+                <p className="text-sm">The following matters to you most right now as a leader:</p>
+                <div className="bg-muted rounded-lg p-3 mt-2">
+                  <p className="text-sm">{summaryData.whatMattersNow || 'Not specified'}</p>
+                </div>
+              </div>
+
+              {/* Leadership Aspirations */}
+              <div>
+                <h4 className="text-sm font-medium mb-2">2. Leadership Aspirations</h4>
+                <p className="text-sm mb-3">You identified the following attributes that you aspire to be as a leader are:</p>
+                <div className="flex flex-wrap gap-2">
+                  {(summaryData.leadershipAspirations || []).map((aspiration: string, index: number) => (
+                    <Badge key={index} variant="outline" className="text-xs">
+                      {aspiration}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              {/* Desired Impact */}
+              <div>
+                <h4 className="text-sm font-medium mb-2">3. Desired Impact</h4>
+                <p className="text-sm">When I think about my leadership, I want to have the following impact:</p>
+                <div className="bg-muted rounded-lg p-3 mt-2">
+                  <p className="text-sm">{summaryData.desiredImpact || 'Not specified'}</p>
+                </div>
+              </div>
+
+              {/* Leadership Stretch Goal */}
+              <div>
+                <h4 className="text-sm font-medium mb-2">4. Leadership Stretch Goal</h4>
+                <p className="text-sm">As part of this, you have identified the following stretch goal that you would like to work on over the next six to twelve months:</p>
+                <div className="bg-muted rounded-lg p-3 mt-2">
+                  <p className="text-sm">{summaryData.stretchGoal || 'Not specified'}</p>
+                </div>
+              </div>
+
+              {/* Connection to Purpose */}
+              <div>
+                <h4 className="text-sm font-medium mb-2">5. Connection to Purpose</h4>
+                <p className="text-sm">Purpose is a critical component at Douglas Pharmaceuticals, and you feel your current connection to purpose is that:</p>
+                <div className="bg-muted rounded-lg p-3 mt-2">
+                  <p className="text-sm">{summaryData.connectionToPurpose || 'Not specified'}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Adaptive & Agile Leadership Snapshot */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base font-medium text-purple-600 flex items-center gap-2">
+                <div className="w-5 h-5 bg-purple-600 text-white rounded-full flex items-center justify-center text-xs font-bold">3</div>
+                Adaptive &amp; Agile Leadership Snapshot
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-sm text-blue-800 leading-relaxed">
+                  Your self-assessed responses across six dimensions of adaptive leadership have been reviewed to highlight your current strengths and development areas. This includes how you navigate change, make decisions, empower others, and continue to learn and adapt.
+                </p>
+                <p className="text-sm text-blue-800 mt-3 leading-relaxed">
+                  This snapshot reflects your current preferences and patterns across the six dimensions, offering directional insight into how you typically operate as a leader.
+                </p>
+                <p className="text-sm text-blue-800 mt-3 leading-relaxed">
+                  Adaptive leadership is not a fixed state. It's dynamic and context-dependent. Many leaders shift between different levels of agility depending on the situation, pressure, or demands of their role. The key is to build awareness of how you lead in different conditions - so you can respond with greater intention, flexibility, and impact.
+                </p>
+              </div>
+
+              {/* Summary Leadership Agility Level */}
+              <div>
+                <h4 className="text-sm font-medium mb-2">1. Summary Leadership Agility Level</h4>
+                <p className="text-sm mb-4">Based on your scoring you have been assessed as a:</p>
+                <AgilityLevelIndicator agilityLevel={summaryData.agilityLevel || 'Achiever'} />
+                <div className="mt-4 bg-muted rounded-lg p-3">
+                  <p className="text-sm">
+                    <strong>This is considered:</strong> {summaryData.agilityLevelDescription || 'Results-oriented, strategic, effective manager'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Notable Strength */}
+              <div>
+                <h4 className="text-sm font-medium mb-2">2. Notable Strength</h4>
+                <p className="text-sm">Based on the responses recorded, your highest rating response was identified as:</p>
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3 mt-2">
+                  <p className="text-sm text-green-800 font-medium">{summaryData.notableStrength || 'Not specified'}</p>
+                </div>
+              </div>
+
+              {/* Potential Development Areas */}
+              <div>
+                <h4 className="text-sm font-medium mb-2">3. Potential Development Areas</h4>
+                <p className="text-sm">Based on the responses recorded, your lowest rating response was identified as:</p>
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mt-2">
+                  <p className="text-sm text-orange-800 font-medium">{summaryData.developmentAreas || 'Not specified'}</p>
                 </div>
               </div>
             </CardContent>
