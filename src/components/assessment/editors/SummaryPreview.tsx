@@ -187,22 +187,6 @@ export const SummaryPreview = ({ summaryData, survey }: SummaryPreviewProps) => 
             </Card>
           )}
 
-          {/* Purpose Alignment Analysis */}
-          {summaryData.visualizations?.purposeGauge?.enabled && (
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base font-medium">Purpose Alignment Analysis</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex justify-center">
-                  <PurposeRatingGauge 
-                    rating={summaryData.purposeRating || 4}
-                    maxRating={summaryData.visualizations?.purposeGauge?.maxRating || 6}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          )}
 
           {/* Confidence Level Analysis */}
           {summaryData.visualizations?.confidenceBar?.enabled && (

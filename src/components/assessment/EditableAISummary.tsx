@@ -342,31 +342,6 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
           </CardContent>
         </Card>
 
-        {/* Purpose Alignment Analysis */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base font-medium">Purpose Alignment Analysis</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-center">
-              <div className="text-center">
-                <div className="relative w-24 h-24 mx-auto mb-2">
-                  <div className="w-24 h-24 rounded-full border-8 border-secondary relative overflow-hidden">
-                    <div 
-                      className="absolute bottom-0 left-0 right-0 bg-primary transition-all duration-500"
-                      style={{ height: `${((currentSummary.purposeRating || 4) / 6) * 100}%` }}
-                    ></div>
-                  </div>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-lg font-bold text-foreground">{currentSummary.purposeRating || 4}</span>
-                  </div>
-                </div>
-                <div className="text-sm font-medium">Alignment Score</div>
-                <div className="text-lg font-bold text-primary">{((currentSummary.purposeRating || 4) / 6 * 100).toFixed(0)}%</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
 
         {/* Leadership Sentiment Snapshot */}
         <Card>
