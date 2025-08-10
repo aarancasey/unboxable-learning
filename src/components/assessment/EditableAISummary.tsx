@@ -49,30 +49,46 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
   // Get rubric templates for enhanced assessment
   const rubricTemplates = getRubricTemplates();
 
-  // Provide default AI summary structure with enhanced rubrics assessment
+  // Provide default summary structure following LEADForward document format
   const defaultSummary = {
     currentLeadershipStyle: "Managing, but close to overload",
-    confidenceRating: "Developing Confidence (2.5–3.4)",
-    strongestArea: "Motivate and align your team",
-    focusArea: "Lead through complexity and ambiguity",
+    confidenceLevels: {
+      complexityAmbiguity: 3.2,
+      motivateAlign: 3.8,
+      decisionMaking: 3.5,
+      empowerOthers: 2.9,
+      strategicOperational: 3.6,
+      learningExperimentation: 3.1,
+      resilientEnergy: 3.7
+    },
+    overallConfidenceScore: 3.4,
+    confidenceInterpretation: "you're generally confident and capable in most areas, though certain challenges or contexts may still affect your consistency. You have a solid foundation to build from—targeted growth could lift you into greater impact.",
+    currentLeadershipMindset: ["I'm feeling stretched but staying afloat", "I'm navigating change and finding my rhythm"],
+    currentLeadershipChallenges: "Navigating increased complexity and ambiguity in the business environment",
+    energisingFactors: "Seeing team members grow and develop their capabilities",
+    whatMattersNow: "Building resilient and adaptive teams that can thrive in uncertainty",
     leadershipAspirations: ["Empowering and people-centred", "Strategic and future-focused", "Curious and adaptive"],
-    purposeRating: 4,
+    desiredImpact: "Creating an environment where people feel valued, challenged, and empowered to do their best work",
+    stretchGoal: "Develop more confidence in leading through complex, ambiguous situations",
+    connectionToPurpose: 4,
+    connectionToPurposeDescription: "I feel connected and gaining clarity",
     agilityLevel: "Achiever",
-    topStrengths: ["Action Orientation & Delivery", "Decision-Making Agility", "Empowering Others & Collaboration"],
-    developmentAreas: ["Navigating Change & Uncertainty", "Strategic Agility & Systems Thinking", "Learning Agility & Growth Mindset"],
+    agilityLevelDescription: "operates with confidence and clarity, sets goals and delivers outcomes",
+    notableStrength: "Empowering Others & Collaboration",
+    developmentAreas: "Navigating Change & Uncertainty",
     overallAssessment: "This leader demonstrates strong operational capabilities with clear areas for strategic development. Focus on building confidence in navigating ambiguity while leveraging existing strengths in team motivation and decision-making.",
     rubricAssessments: [
       {
-        rubricId: 'leadership-assessment',
-        rubricName: 'Leadership Assessment',
-        overallScore: 2.8,
-        maxScore: 4,
+        rubricName: "Leadership Assessment",
+        overallScore: 3,
         criteriaScores: [
-          { criterion: 'Communication Skills', score: 3.2, maxScore: 4, weight: 25 },
-          { criterion: 'Decision Making', score: 2.8, maxScore: 4, weight: 25 },
-          { criterion: 'Team Management', score: 3.1, maxScore: 4, weight: 25 },
-          { criterion: 'Strategic Thinking', score: 2.1, maxScore: 4, weight: 25 }
-        ]
+          {
+            criterion: "Communication Skills",
+            score: 3,
+            justification: "Shows solid understanding of communication with room for enhancement"
+          }
+        ],
+        recommendations: ["Develop more structured communication processes", "Practice active listening techniques"]
       }
     ]
   };
@@ -237,184 +253,115 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
             alt="Unboxable Logo" 
             className="h-4 w-auto mx-auto mb-2"
           />
-          <h1 className="text-lg font-bold text-primary mb-1">AI Leadership Assessment Summary</h1>
-          <p className="text-sm text-muted-foreground">
-            Comprehensive analysis of leadership capabilities, sentiment, and development opportunities
-          </p>
+          <h1 className="text-lg font-bold text-primary mb-1">LEADForward Leadership Self-Assessment</h1>
+          <div className="text-sm text-muted-foreground space-y-2 max-w-4xl mx-auto leading-relaxed">
+            <p className="text-xs text-muted-foreground mb-4">
+              For: {survey.learner || survey.learner_name || 'Insert Name'}<br/>
+              From: {survey.company || 'Company'}<br/>
+              Assessment Prepared: {new Date().toLocaleDateString()}
+            </p>
+            
+            <p>This personalised summary reflects your self-assessment responses for the LEADForward program. This self-assessment is designed to help you explore your current leadership sentiment, intent, adaptability and agility.</p>
+            
+            <p>There are no right or wrong answers in this assessment - only insight. The purpose is not to evaluate or judge, but to help you build a deeper understanding of your leadership mindset, intent, and agility.</p>
+            
+            <p>This assessment explores how you currently feel in your leadership role, what drives you, and how you respond to complexity and change. It's designed to offer directional insight into the type of leader you are today, while laying the foundation for the kind of leader you want to become.</p>
+            
+            <p>The summary offers a practical and personal snapshot of your leadership - capturing what's present for you now, and what might evolve over time. It will support your growth throughout the LEADForward programme and guide your coaching conversations.</p>
+            
+            <p>Use it as a reference point, and insight for reflection. This is your starting line into moving your leadership forward.</p>
+          </div>
         </div>
       </div>
       
-      <div className="space-y-4">
-        {/* Leadership Assessment */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base font-medium">Leadership Assessment</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {/* Purpose Connection */}
-              <div className="text-center">
-                <div className="text-xs text-muted-foreground mb-1">Purpose Connection</div>
-                <div className="bg-primary text-xs text-primary-foreground px-2 py-1 rounded inline-flex items-center gap-1">
-                  <Target className="h-3 w-3" />
-                  4
-                </div>
-                <div className="text-xs text-muted-foreground mt-1">Connected & gaining clarity</div>
-              </div>
-              
-              {/* Confidence Level */}
-              <div className="text-center">
-                <div className="text-xs text-muted-foreground mb-1">Confidence Level</div>
-                <div className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
-                  Developing Confidence (2.5-3.4)
-                </div>
-              </div>
-              
-              {/* Leadership Agility */}
-              <div className="text-center">
-                <div className="text-xs text-muted-foreground mb-1">Leadership Agility</div>
-                {(() => {
-                  const agilityBadge = getAgilityLevelBadge(currentSummary.agilityLevel || 'Achiever');
-                  const IconComponent = agilityBadge.icon;
-                  return (
-                    <div className="inline-flex items-center gap-1 bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
-                      <IconComponent className="h-3 w-3" />
-                      {currentSummary.agilityLevel || 'Achiever'}
-                    </div>
-                  );
-                })()}
-                <div className="text-xs text-muted-foreground mt-1">Results oriented</div>
-              </div>
-              
-              {/* Focus Areas */}
-              <div className="text-center">
-                <div className="text-xs text-muted-foreground mb-1">Focus Areas Overview</div>
-                <div className="text-xs text-primary">Strengths vs Development</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Leadership Competency Analysis */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base font-medium">Leadership Competency Analysis</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div>
-                <h4 className="text-sm font-medium mb-2">Communication Skills</h4>
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 bg-secondary h-2 rounded">
-                    <div className="bg-orange-500 h-2 rounded" style={{ width: '80%' }}></div>
-                  </div>
-                  <span className="text-sm font-medium">3.2/4</span>
-                </div>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium mb-2">Decision Making</h4>
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 bg-secondary h-2 rounded">
-                    <div className="bg-orange-500 h-2 rounded" style={{ width: '70%' }}></div>
-                  </div>
-                  <span className="text-sm font-medium">2.8/4</span>
-                </div>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium mb-2">Team Management</h4>
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 bg-secondary h-2 rounded">
-                    <div className="bg-orange-500 h-2 rounded" style={{ width: '77.5%' }}></div>
-                  </div>
-                  <span className="text-sm font-medium">3.1/4</span>
-                </div>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium mb-2">Strategic Thinking</h4>
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 bg-secondary h-2 rounded">
-                    <div className="bg-orange-500 h-2 rounded" style={{ width: '52.5%' }}></div>
-                  </div>
-                  <span className="text-sm font-medium">2.1/4</span>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-
+      <div className="space-y-6">
         {/* Leadership Sentiment Snapshot */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base font-medium text-orange-600 flex items-center gap-2">
-              <div className="w-5 h-5 bg-orange-600 text-white rounded-full flex items-center justify-center text-xs font-bold">1</div>
-              Leadership Sentiment Snapshot
-            </CardTitle>
+            <CardTitle className="text-lg font-semibold text-primary">Leadership Sentiment Snapshot</CardTitle>
+            <p className="text-sm text-muted-foreground">This section reflects how you're currently experiencing your leadership role - your mindset, energy, and emotional connection to leading. It captures how you feel, how confident you are, and what's present for you right now as a leader.</p>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div>
-                <h4 className="text-sm font-medium mb-2">Current Leadership Style</h4>
-                {isEditing ? (
-                  <Input
-                    value={currentSummary.currentLeadershipStyle || ''}
-                    onChange={(e) => setEditedSummary({
-                      ...editedSummary,
-                      currentLeadershipStyle: e.target.value
-                    })}
-                  />
-                ) : (
-                  <div className="text-sm font-medium">Managing, but close to overload</div>
-                )}
-              </div>
-              
-              <div>
-                <h4 className="text-sm font-medium mb-2">Confidence Rating</h4>
-                {isEditing ? (
-                  <Input
-                    value={currentSummary.confidenceRating || ''}
-                    onChange={(e) => setEditedSummary({
-                      ...editedSummary,
-                      confidenceRating: e.target.value
-                    })}
-                  />
-                ) : (
-                  <div className="text-sm text-green-700">Developing Confidence (2.5-3.4)</div>
-                )}
+          <CardContent className="space-y-6">
+            {/* 1. Current Leadership Style */}
+            <div>
+              <h4 className="text-sm font-semibold mb-2">1. Current Leadership Style:</h4>
+              <p className="text-sm mb-2">Based on your selection you see your current leadership style as:</p>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p className="text-sm font-medium text-blue-800">{currentSummary.currentLeadershipStyle || 'Managing, but close to overload'}</p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                <h4 className="text-sm font-medium text-green-800 mb-2">Strongest Area</h4>
-                {isEditing ? (
-                  <Textarea
-                    value={currentSummary.strongestArea || ''}
-                    onChange={(e) => setEditedSummary({
-                      ...editedSummary,
-                      strongestArea: e.target.value
-                    })}
-                    rows={2}
-                  />
-                ) : (
-                  <p className="text-sm text-green-700">Motivate and align your team</p>
-                )}
-              </div>
+            {/* 2. Confidence Levels in Key Areas */}
+            <div>
+              <h4 className="text-sm font-semibold mb-2">2. Confidence Levels in Key Areas:</h4>
+              <p className="text-sm mb-3">Based on your assessment, you see your confidence in the following areas as follows:</p>
               
+              <div className="space-y-3">
+                {Object.entries(currentSummary.confidenceLevels || {}).map(([key, value], index) => {
+                  const labels = {
+                    complexityAmbiguity: 'Lead through complexity and ambiguity',
+                    motivateAlign: 'Motivate and align your team',
+                    decisionMaking: 'Make decisions with pace and clarity',
+                    empowerOthers: 'Empower others to take ownership and lead',
+                    strategicOperational: 'Balance strategic and operational demands',
+                    learningExperimentation: 'Create space for learning and experimentation',
+                    resilientEnergy: 'Stay resilient and maintain personal energy'
+                  };
+                  const label = labels[key as keyof typeof labels] || key;
+                  const score = Number(value);
+                  
+                  return (
+                    <div key={key} className="flex items-center justify-between">
+                      <span className="text-xs flex-1">{label}</span>
+                      <div className="flex items-center gap-2 w-32">
+                        <div className="flex-1 bg-secondary h-2 rounded">
+                          <div 
+                            className="bg-primary h-2 rounded transition-all" 
+                            style={{ width: `${(score / 6) * 100}%` }}
+                          />
+                        </div>
+                        <span className="text-xs font-medium w-8 text-right">{score}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                <p className="text-sm">From an overall perspective your aggregated average score is: <span className="font-semibold">{currentSummary.overallConfidenceScore || '3.4'}</span></p>
+                <p className="text-sm mt-2">Based on this score, this indicates that {currentSummary.confidenceInterpretation || 'you\'re generally confident and capable in most areas, though certain challenges or contexts may still affect your consistency. You have a solid foundation to build from—targeted growth could lift you into greater impact.'}</p>
+              </div>
+            </div>
+
+            {/* 3. Current Leadership Mindset */}
+            <div>
+              <h4 className="text-sm font-semibold mb-2">3. Current Leadership Mindset:</h4>
+              <p className="text-sm mb-2">You described your current leadership as the following:</p>
+              <div className="space-y-1">
+                {Array.isArray(currentSummary.currentLeadershipMindset) 
+                  ? currentSummary.currentLeadershipMindset.map((mindset, index) => (
+                      <div key={index} className="text-sm">• {mindset}</div>
+                    ))
+                  : <div className="text-sm">• {currentSummary.currentLeadershipMindset || 'I\'m feeling stretched but staying afloat'}</div>
+                }
+              </div>
+            </div>
+
+            {/* 4. Current Leadership Challenges */}
+            <div>
+              <h4 className="text-sm font-semibold mb-2">4. Current Leadership Challenges:</h4>
+              <p className="text-sm mb-2">You described your current leadership challenge as:</p>
               <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-                <h4 className="text-sm font-medium text-orange-800 mb-2">Area to Focus On</h4>
-                {isEditing ? (
-                  <Textarea
-                    value={currentSummary.focusArea || ''}
-                    onChange={(e) => setEditedSummary({
-                      ...editedSummary,
-                      focusArea: e.target.value
-                    })}
-                    rows={2}
-                  />
-                ) : (
-                  <p className="text-sm text-orange-700">Lead through complexity and ambiguity</p>
-                )}
+                <p className="text-sm text-orange-800">{currentSummary.currentLeadershipChallenges || 'Navigating increased complexity and ambiguity in the business environment'} Consider this challenge as we go through the LEADForward program.</p>
+              </div>
+            </div>
+
+            {/* 5. What's Energising You Right Now */}
+            <div>
+              <h4 className="text-sm font-semibold mb-2">5. What's Energising You Right Now:</h4>
+              <p className="text-sm mb-2">You see yourself as being energised by:</p>
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                <p className="text-sm text-green-800">{currentSummary.energisingFactors || 'Seeing team members grow and develop their capabilities'} As you go through the program, consider how this can be leveraged to build energy in other areas of your role and leadership.</p>
               </div>
             </div>
           </CardContent>
@@ -423,204 +370,154 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
         {/* Leadership Intent & Purpose */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base font-medium text-blue-600 flex items-center gap-2">
-              <div className="w-5 h-5 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">2</div>
-              Leadership Intent & Purpose
-            </CardTitle>
+            <CardTitle className="text-lg font-semibold text-primary">Leadership Intent & Purpose</CardTitle>
+            <p className="text-sm text-muted-foreground">This section explores what drives you - your values, aspirations, and the impact you want your leadership to have. It provides insight into the kind of leader you want to be and what matters most to you in your role.</p>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6">
+            {/* 1. What Matters Most Right Now */}
             <div>
-              <h4 className="text-sm font-medium mb-3">Leadership Aspirations</h4>
-              {isEditing ? (
-                <Textarea
-                  value={Array.isArray(currentSummary.leadershipAspirations) 
-                    ? currentSummary.leadershipAspirations.join(', ')
-                    : currentSummary.leadershipAspirations || ''
-                  }
-                  onChange={(e) => setEditedSummary({
-                    ...editedSummary,
-                    leadershipAspirations: e.target.value.split(', ').filter(item => item.trim())
-                  })}
-                  rows={3}
-                  placeholder="Enter aspirations separated by commas"
-                />
-              ) : (
-                <div className="space-y-2">
-                  <div className="text-xs text-muted-foreground">Empowering and people-centred</div>
-                  <div className="text-xs text-muted-foreground">Strategic and future-focused</div>
-                  <div className="text-xs text-muted-foreground">Curious and adaptive</div>
-                </div>
-              )}
+              <h4 className="text-sm font-semibold mb-2">1. What Matters Most Right Now:</h4>
+              <p className="text-sm mb-2">The following matters to you most right now as a leader:</p>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p className="text-sm text-blue-800">{currentSummary.whatMattersNow || 'Building resilient and adaptive teams that can thrive in uncertainty'} Consider these identified aspects as you are working through the LEADForward program and how you can leverage, optimise or work on.</p>
+              </div>
             </div>
 
+            {/* 2. Leadership Aspirations */}
             <div>
-              <h4 className="text-sm font-medium mb-2">Connection to Purpose Rating</h4>
-              <div className="flex items-center gap-3">
-                {isEditing ? (
-                  <Input
-                    type="number"
-                    min="1"
-                    max="6"
-                    value={currentSummary.purposeRating || ''}
-                    onChange={(e) => setEditedSummary({
-                      ...editedSummary,
-                      purposeRating: parseInt(e.target.value) || 0
-                    })}
-                    className="w-20"
-                  />
-                ) : (
-                  <div className="text-lg font-bold">4</div>
-                )}
-                <div className="text-sm text-muted-foreground">
-                  /6 - Connected & gaining clarity
-                  <div className="text-xs">Strong alignment with personal values and organisational mission</div>
+              <h4 className="text-sm font-semibold mb-2">2. Leadership Aspirations:</h4>
+              <p className="text-sm mb-2">You identified the following attributes that you aspire to be as a leader are:</p>
+              <div className="space-y-1">
+                {Array.isArray(currentSummary.leadershipAspirations) 
+                  ? currentSummary.leadershipAspirations.map((aspiration, index) => (
+                      <div key={index} className="text-sm">• {aspiration}</div>
+                    ))
+                  : <div className="text-sm">• {currentSummary.leadershipAspirations || 'Empowering and people-centred'}</div>
+                }
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">Keep these front of mind as you go through the leadership days and coaching sessions.</p>
+            </div>
+
+            {/* 3. Desired Impact */}
+            <div>
+              <h4 className="text-sm font-semibold mb-2">3. Desired Impact:</h4>
+              <p className="text-sm mb-2">When I think about my leadership I want to have the following impact:</p>
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                <p className="text-sm text-green-800">{currentSummary.desiredImpact || 'Creating an environment where people feel valued, challenged, and empowered to do their best work'} As you go through the leadership and coaching process we will explore that impact further.</p>
+              </div>
+            </div>
+
+            {/* 4. Leadership Stretch Goal */}
+            <div>
+              <h4 className="text-sm font-semibold mb-2">4. Leadership Stretch Goal:</h4>
+              <p className="text-sm mb-2">As part of this, you have identified the following stretch goal that you would like to work on over the next six to twelve months:</p>
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                <p className="text-sm text-purple-800">{currentSummary.stretchGoal || 'Develop more confidence in leading through complex, ambiguous situations'}</p>
+              </div>
+            </div>
+
+            {/* 5. Connection to Purpose */}
+            <div>
+              <h4 className="text-sm font-semibold mb-2">5. Connection to Purpose:</h4>
+              <p className="text-sm mb-2">Purpose is a critical component at Douglas Pharmaceuticals, and you feel your current connection to purpose is that:</p>
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg font-bold">{currentSummary.connectionToPurpose || 4}</span>
+                  <span className="text-sm text-muted-foreground">/6</span>
+                </div>
+                <div className="text-sm">
+                  <span className="font-medium">{currentSummary.connectionToPurposeDescription || 'I feel connected and gaining clarity'}</span>
                 </div>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Adaptive & Agile Leadership */}
+        {/* Adaptive & Agile Leadership Snapshot */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base font-medium text-orange-600 flex items-center gap-2">
-              <div className="w-5 h-5 bg-orange-600 text-white rounded-full flex items-center justify-center text-xs font-bold">3</div>
-              Adaptive & Agile Leadership
-            </CardTitle>
+            <CardTitle className="text-lg font-semibold text-primary">Adaptive & Agile Leadership Snapshot</CardTitle>
+            <p className="text-sm text-muted-foreground">Your self-assessed responses across six dimensions of adaptive leadership have been reviewed to highlight your current strengths and development areas. This includes how you navigate change, make decisions, empower others, and continue to learn and adapt.</p>
+            <p className="text-sm text-muted-foreground mt-2">This snapshot reflects your current preferences and patterns across the six dimensions, offering directional insight into how you typically operate as a leader.</p>
+            <p className="text-sm text-muted-foreground mt-2">Adaptive leadership is not a fixed state. It's dynamic and context-dependent. Many leaders shift between different levels of agility depending on the situation, pressure, or demands of their role. The key is to build awareness of how you lead in different conditions - so you can respond with greater intention, flexibility, and impact.</p>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6">
+            {/* 1. Summary Leadership Agility Level */}
             <div>
-              <h4 className="text-sm font-medium mb-3">Current Agility Level</h4>
-              {isEditing ? (
-                <Input
-                  value={currentSummary.agilityLevel || ''}
-                  onChange={(e) => setEditedSummary({
-                    ...editedSummary,
-                    agilityLevel: e.target.value
-                  })}
-                  placeholder="e.g., Achiever, Strategist, etc."
-                />
-              ) : (
-                <div className="text-center py-2">
-                  {(() => {
-                    const agilityBadge = getAgilityLevelBadge(currentSummary.agilityLevel || 'Achiever');
-                    const IconComponent = agilityBadge.icon;
-                    return (
-                      <>
-                        <div className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-3 py-1 rounded">
-                          <IconComponent className="h-4 w-4" />
-                          {currentSummary.agilityLevel || 'Achiever'}
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1">Results oriented</p>
-                      </>
-                    );
-                  })()}
-                </div>
-              )}
+              <h4 className="text-sm font-semibold mb-2">1. Summary Leadership Agility Level:</h4>
+              <p className="text-sm mb-2">Based on your scoring you have been assessed as:</p>
+              <div className="text-center py-4">
+                {(() => {
+                  const agilityBadge = getAgilityLevelBadge(currentSummary.agilityLevel || 'Achiever');
+                  const IconComponent = agilityBadge.icon;
+                  return (
+                    <>
+                      <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-lg text-lg font-semibold">
+                        <IconComponent className="h-5 w-5" />
+                        {currentSummary.agilityLevel || 'Achiever'}
+                      </div>
+                      <p className="text-sm mt-3 text-muted-foreground">This is considered: {currentSummary.agilityLevelDescription || 'operates with confidence and clarity, sets goals and delivers outcomes'}</p>
+                    </>
+                  );
+                })()}
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div>
-                <h4 className="text-sm font-medium text-green-800 mb-3">Top Strengths</h4>
-                {isEditing ? (
-                  <Textarea
-                    value={Array.isArray(currentSummary.topStrengths) 
-                      ? currentSummary.topStrengths.join('\n')
-                      : currentSummary.topStrengths || ''
-                    }
-                    onChange={(e) => setEditedSummary({
-                      ...editedSummary,
-                      topStrengths: e.target.value.split('\n').filter(item => item.trim())
-                    })}
-                    rows={4}
-                    placeholder="Enter strengths, one per line"
-                  />
-                ) : (
-                  <ul className="space-y-1 text-sm">
-                    <li>• Action Orientation & Delivery</li>
-                    <li>• Decision-Making Agility</li>
-                    <li>• Empowering Others & Collaboration</li>
-                  </ul>
-                )}
+            {/* 2. Notable Strength */}
+            <div>
+              <h4 className="text-sm font-semibold mb-2">2. Notable Strength:</h4>
+              <p className="text-sm mb-2">Based on the responses recorded, your highest rating response was identified as:</p>
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                <p className="text-sm font-medium text-green-800">{currentSummary.notableStrength || 'Empowering Others & Collaboration'}</p>
               </div>
+            </div>
+
+            {/* 3. Potential Development Area */}
+            <div>
+              <h4 className="text-sm font-semibold mb-2">3. Potential Development Area:</h4>
+              <p className="text-sm mb-2">Based on the responses recorded, your lowest rating response was identified as:</p>
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                <p className="text-sm font-medium text-orange-800">{currentSummary.developmentAreas || 'Navigating Change & Uncertainty'}</p>
+              </div>
+            </div>
+
+            {/* Overall Summary */}
+            <div>
+              <h4 className="text-sm font-semibold mb-2">Overall Summary:</h4>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-sm text-blue-800">{currentSummary.overallAssessment || 'This leader demonstrates strong operational capabilities with clear areas for strategic development. Focus on building confidence in navigating ambiguity while leveraging existing strengths in team motivation and decision-making.'}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Your Growth Journey */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-semibold text-primary">Your Growth Journey</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="text-sm text-muted-foreground leading-relaxed space-y-3">
+              <p>This report is private and has been created specifically for you. It's designed to support your learning, spark reflection, and guide your leadership growth throughout the LEADForward experience.</p>
               
-              <div>
-                <h4 className="text-sm font-medium text-orange-800 mb-3">Development Areas</h4>
-                {isEditing ? (
-                  <Textarea
-                    value={Array.isArray(currentSummary.developmentAreas) 
-                      ? currentSummary.developmentAreas.join('\n')
-                      : currentSummary.developmentAreas || ''
-                    }
-                    onChange={(e) => setEditedSummary({
-                      ...editedSummary,
-                      developmentAreas: e.target.value.split('\n').filter(item => item.trim())
-                    })}
-                    rows={4}
-                    placeholder="Enter development areas, one per line"
-                  />
-                ) : (
-                  <ul className="space-y-1 text-sm">
-                    <li>• Navigating Change & Uncertainty</li>
-                    <li>• Strategic Agility & Systems Thinking</li>
-                    <li>• Learning Agility & Growth Mindset</li>
-                  </ul>
-                )}
-              </div>
+              <p>Your responses offer a personal snapshot of how you currently lead, what drives you, and where you may want to grow. Your facilitator and coach will use this summary to support deeper conversations and tailor your experience to help you move forward with clarity and confidence. This is your space to explore and evolve as leader.</p>
+              
+              <p>Treat this as your starting line - not a finish line. Leadership is a practice, and these insights are an enabler for that.</p>
             </div>
           </CardContent>
         </Card>
 
-        {/* Comprehensive Assessment & Rubrics Analysis */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base font-medium text-blue-600 flex items-center gap-2">
-              <div className="w-5 h-5 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">4</div>
-              Comprehensive Assessment & Rubrics Analysis
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Executive Summary */}
-            <div>
-              <h4 className="text-sm font-medium mb-3">Executive Summary & Development Pathway</h4>
-              {isEditing ? (
-                <Textarea
-                  value={currentSummary.overallAssessment || ''}
-                  onChange={(e) => setEditedSummary({
-                    ...editedSummary,
-                    overallAssessment: e.target.value
-                  })}
-                  rows={4}
-                  placeholder="Enter overall assessment and recommendations"
-                />
-              ) : (
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  This leader demonstrates strong operational capabilities with clear areas for strategic development. Focus on building confidence in navigating ambiguity while leveraging existing strengths in team motivation and decision-making.
-                </p>
-              )}
+        {/* Footer */}
+        <div className="text-center pt-6 border-t border-border">
+          <div className="flex items-center justify-between">
+            <div className="text-xs text-muted-foreground">
+              www.unboxable.co.nz
             </div>
-            
-            {/* Enhanced Recommendations based on Rubrics */}
-            {currentSummary.rubricAssessments && currentSummary.rubricAssessments.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                  <h5 className="text-sm font-medium text-green-800 mb-2">Leverage These Strengths</h5>
-                  <ul className="text-xs text-green-700 space-y-1">
-                    <li>• Communication Skills</li>
-                    <li>• Team Management</li>
-                  </ul>
-                </div>
-                <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-                  <h5 className="text-sm font-medium text-orange-800 mb-2">Priority Development Areas</h5>
-                  <ul className="text-xs text-orange-700 space-y-1">
-                    <li>• Decision Making</li>
-                    <li>• Strategic Thinking</li>
-                  </ul>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+            <div className="text-xs text-muted-foreground">
+              Prepared in Confidence for: {survey.learner || survey.learner_name || 'Name'}
+            </div>
+          </div>
+        </div>
 
       </div>
       
@@ -632,7 +529,7 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
               {/* Main Actions - Always Visible */}
               <Button onClick={() => setShowEditorModal(true)} variant="default" size="sm">
                 <Brain className="h-4 w-4 mr-1" />
-                Edit AI Summary
+                Edit Summary
               </Button>
               <Button onClick={handleExportPDF} disabled={isExporting} size="sm">
                 <Download className="h-4 w-4 mr-1" />

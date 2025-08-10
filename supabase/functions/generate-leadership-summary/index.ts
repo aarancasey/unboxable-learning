@@ -139,98 +139,112 @@ ${surveyResponses.map((r: any) => `Q: ${r.question}\nA: ${r.answer}`).join('\n\n
 
 Please provide a comprehensive analysis following this EXACT structure from the LEADForward document:
 
+ASSESSMENT SCORING GUIDELINES:
+- Confidence Levels: Rate each area 1-6 scale (1=Not confident at all, 6=Highly confident)
+- Leadership Style: Choose from (Stuck and or disengaged, Uncertain and reactive, Managing but close to overload, Confident but stretched, Calm focused and consistent, Energised and clear)
+- Purpose Connection: Rate 1-6 scale (1=I feel disconnected or unclear, 6=I feel deeply purposeful and driven)
+- Agility Level: Assess as Expert, Achiever, Catalyst, or Co-Creator based on scoring ranges
+- Extract actual responses for challenges, energy sources, aspirations, and goals
+
 ## Leadership Sentiment Snapshot
 This section reflects how you're currently experiencing your leadership role - your mindset, energy, and emotional connection to leading.
 
 ### 1. Current Leadership Style
-Based on your selection you see your current leadership style as: [Describe their leadership style based on their responses - 2-3 sentences about their approach]
+Based on your responses, you see your current leadership style as: [Choose ONE from: Stuck and or disengaged / Uncertain and reactive / Managing, but close to overload / Confident but stretched / Calm, focused and consistent / Energised and clear]
 
 ### 2. Confidence Levels in Key Areas
 Based on your assessment, you see your confidence in the following areas as follows:
-- Strategic Vision & Direction: [score 1.0-5.0]
-- Team Leadership & Motivation: [score 1.0-5.0] 
-- Decision Making Under Pressure: [score 1.0-5.0]
-- Managing Change & Uncertainty: [score 1.0-5.0]
-- Communication & Influence: [score 1.0-5.0]
-- Personal Leadership Presence: [score 1.0-5.0]
-- Building & Maintaining Relationships: [score 1.0-5.0]
+- Lead through complexity and ambiguity: [score 1-6]
+- Motivate and align your team: [score 1-6]
+- Make decisions with pace and clarity: [score 1-6]
+- Empower others to take ownership and lead: [score 1-6]
+- Balance strategic and operational demands: [score 1-6]
+- Create space for learning and experimentation: [score 1-6]
+- Stay resilient and maintain personal energy: [score 1-6]
 
-From an overall perspective your aggregated average score is: [average of above scores]
-Based on this score, this indicates that: [interpretation based on ranges: 1.0–2.4 = "You're in early stages", 2.5–3.4 = "You're developing your capabilities", 3.5–4.4 = "You have solid foundations", 4.5–5.0 = "You demonstrate strong confidence"]
+From an overall perspective your aggregated average score is: [average of above scores to 1 decimal]
+Based on this score, this indicates that [choose interpretation]:
+- 1.0–2.4: "you're likely feeling overwhelmed or unsure in several aspects of your leadership. There may be areas where you're struggling to stay energized or lead with clarity. This is a powerful opportunity to build awareness and focus on specific development areas."
+- 2.5–3.4: "you're gaining traction but may still feel stretched or inconsistent. You might be managing but not thriving yet. Consider where you feel most capable and where support or tools could build your leadership muscle."
+- 3.5–4.4: "you're generally confident and capable in most areas, though certain challenges or contexts may still affect your consistency. You have a solid foundation to build from—targeted growth could lift you into greater impact."
+- 4.5–5.4: "you're leading with competence and clarity across most domains. You're likely trusted, consistent, and resilient. You're in a strong place to coach others or stretch into more strategic leadership."
+- 5.5–6.0: "you demonstrate consistently high confidence across all areas. You're operating with ease, clarity, and adaptability. Focus may shift from personal development to empowering others, shaping culture, or building collective capability."
 
 ### 3. Current Leadership Mindset
-You described your current leadership as the following: [extracted from responses]
+You described your current leadership as the following: [Select all that apply from their responses: I'm in constant problem-solving mode / I'm feeling stretched but staying afloat / I'm navigating change and finding my rhythm / I'm actively exploring how to lead differently / I'm leading with confidence and growing in impact / I'm thriving and evolving as a leader]
 
 ### 4. Current Leadership Challenges
-You described your current leadership challenge as: [extracted from responses]
+You described your current leadership challenge as: [Extract open text response]
 
 ### 5. What's Energising You Right Now
-You see yourself as being energised by: [extracted from responses]
+You see yourself as being energised by: [Extract open text response]
 
 ## Leadership Intent & Purpose
 This section explores what drives you - your values, aspirations, and the impact you want your leadership to have.
 
 ### 1. What Matters Most Right Now
-The following matters to you most right now as a leader: [extracted from responses]
+The following matters to you most right now as a leader: [Extract open text response]
 
 ### 2. Leadership Aspirations
-You identified the following attributes that you aspire to be as a leader are: [array of aspirations]
+You identified the following attributes that you aspire to be as a leader are: [Extract up to 3 selections from: Strategic and future-focused / Empowering and people-centred / Bold and transformational / Calm and composed under pressure / Curious and adaptive / Purpose-led and values-driven / High-performing and results-oriented / Trusted and respected across the organisation / Creative and innovative / Other]
 
 ### 3. Desired Impact
-When I think about my leadership, I want to have the following impact: [extracted from responses]
+When I think about my leadership I want to have the following impact: [Extract open text response]
 
 ### 4. Leadership Stretch Goal
-As part of this, you have identified the following stretch goal that you would like to work on over the next six to twelve months: [extracted from responses]
+As part of this, you have identified the following stretch goal that you would like to work on over the next six to twelve months: [Extract open text response]
 
 ### 5. Connection to Purpose
-Purpose is a critical component at Douglas Pharmaceuticals, and you feel your current connection to purpose is that: [extracted from responses]
+Purpose is a critical component at Douglas Pharmaceuticals, and you feel your current connection to purpose is that: [Rate 1-6 and include description: 1=I feel disconnected or unclear, 2=I'm going through the motions, 3=I feel somewhat engaged but not fully aligned, 4=I feel connected and gaining clarity, 5=I feel mostly aligned and on track, 6=I feel deeply purposeful and driven]
 
 ## Adaptive & Agile Leadership Snapshot
 Your self-assessed responses across six dimensions of adaptive leadership have been reviewed to highlight your current strengths and development areas.
 
 ### 1. Summary Leadership Agility Level
-Based on your scoring you have been assessed as: [Opportunist/Diplomat/Expert/Achiever/Individualist/Strategist/Alchemist]
-This is considered: [description of level]
+Based on your scoring you have been assessed as: [Choose from Expert/Achiever/Catalyst/Co-Creator based on analysis]
+This is considered: [Include corresponding description:
+- Expert: highly skilled and confident in technical expertise, leads through precision and structure
+- Achiever: operates with confidence and clarity, sets goals and delivers outcomes
+- Catalyst: leads with adaptability, learning, and vision, comfortable in ambiguity
+- Co-Creator: leads through partnership, systems thinking, and shared purpose]
 
 ### 2. Notable Strength
-Based on the responses recorded, your highest rating response was identified as: [specific strength area]
+Based on the responses recorded, your highest rating response was identified as: [Identify strongest area from: Navigating Change & Uncertainty / Strategic Agility & Systems Thinking / Learning Agility & Growth Mindset / Empowering Others & Collaboration / Action Orientation & Delivery / Decision-Making Agility]
 
-### 3. Potential Development Areas
-Based on the responses recorded, your lowest rating response was identified as: [specific development area]
+### 3. Potential Development Area
+Based on the responses recorded, your lowest rating response was identified as: [Identify development area from same list above]
 
 ### Overall Summary
-[Comprehensive 2-3 sentence summary of their leadership profile and readiness for development]
-
-## Assessment Rubric Scores
-Based on the assessment rubrics provided, evaluate the person against each rubric and provide specific scores for each criterion.
+[2-3 sentence summary of their leadership profile and development recommendations]
 
 Return your analysis as a JSON object with this structure:
 {
-  "currentLeadershipStyle": "string",
+  "currentLeadershipStyle": "string - one of the 6 options",
   "confidenceLevels": {
-    "strategicVision": "number 1.0-5.0",
-    "teamLeadership": "number 1.0-5.0",
-    "decisionMaking": "number 1.0-5.0",
-    "changeManagement": "number 1.0-5.0",
-    "communication": "number 1.0-5.0",
-    "leadershipPresence": "number 1.0-5.0",
-    "relationships": "number 1.0-5.0"
+    "complexityAmbiguity": "number 1-6",
+    "motivateAlign": "number 1-6",
+    "decisionMaking": "number 1-6",
+    "empowerOthers": "number 1-6",
+    "strategicOperational": "number 1-6",
+    "learningExperimentation": "number 1-6",
+    "resilientEnergy": "number 1-6"
   },
-  "overallConfidenceScore": "number (average of above)",
+  "overallConfidenceScore": "number (average of above to 1 decimal)",
   "confidenceInterpretation": "string based on score ranges",
-  "currentLeadershipMindset": "string",
-  "currentLeadershipChallenges": "string",
-  "energisingFactors": "string",
-  "whatMattersNow": "string",
-  "leadershipAspirations": ["array", "of", "aspirations"],
-  "desiredImpact": "string",
-  "stretchGoal": "string",
-  "connectionToPurpose": "string",
-  "agilityLevel": "Opportunist|Diplomat|Expert|Achiever|Individualist|Strategist|Alchemist",
-  "agilityLevelDescription": "string",
-  "notableStrength": "string",
-  "developmentAreas": "string",
-  "overallAssessment": "string with comprehensive summary",
+  "currentLeadershipMindset": "array of selected mindset options",
+  "currentLeadershipChallenges": "string - open text response",
+  "energisingFactors": "string - open text response",
+  "whatMattersNow": "string - open text response",
+  "leadershipAspirations": ["array", "of", "up to 3 aspirations"],
+  "desiredImpact": "string - open text response",
+  "stretchGoal": "string - open text response",
+  "connectionToPurpose": "number 1-6",
+  "connectionToPurposeDescription": "string description for the rating",
+  "agilityLevel": "Expert|Achiever|Catalyst|Co-Creator",
+  "agilityLevelDescription": "string description of the level",
+  "notableStrength": "string - specific strength area",
+  "developmentAreas": "string - specific development area",
+  "overallAssessment": "string with 2-3 sentence summary",
   "rubricAssessments": [
     {
       "rubricName": "string",
@@ -281,43 +295,44 @@ Make the analysis personal, specific to their responses, and professionally writ
       console.error('Failed to parse AI response as JSON:', content);
       // Fallback to basic summary if JSON parsing fails
       aiSummary = {
-        currentLeadershipStyle: "Balanced approach combining strategic thinking with people-centered values",
+        currentLeadershipStyle: "Managing, but close to overload",
         confidenceLevels: {
-          strategicVision: 3.2,
-          teamLeadership: 3.8,
+          complexityAmbiguity: 3.2,
+          motivateAlign: 3.8,
           decisionMaking: 3.5,
-          changeManagement: 2.9,
-          communication: 3.6,
-          leadershipPresence: 3.1,
-          relationships: 3.7
+          empowerOthers: 2.9,
+          strategicOperational: 3.6,
+          learningExperimentation: 3.1,
+          resilientEnergy: 3.7
         },
         overallConfidenceScore: 3.4,
-        confidenceInterpretation: "You are developing your capabilities with solid foundations in key areas",
-        currentLeadershipMindset: "Focused on delivering results while building strong team relationships",
+        confidenceInterpretation: "you're generally confident and capable in most areas, though certain challenges or contexts may still affect your consistency. You have a solid foundation to build from—targeted growth could lift you into greater impact.",
+        currentLeadershipMindset: ["I'm feeling stretched but staying afloat", "I'm navigating change and finding my rhythm"],
         currentLeadershipChallenges: "Navigating increased complexity and ambiguity in the business environment",
         energisingFactors: "Seeing team members grow and develop their capabilities",
         whatMattersNow: "Building resilient and adaptive teams that can thrive in uncertainty",
         leadershipAspirations: ["Empowering and people-centred", "Strategic and future-focused", "Curious and adaptive"],
         desiredImpact: "Creating an environment where people feel valued, challenged, and empowered to do their best work",
         stretchGoal: "Develop more confidence in leading through complex, ambiguous situations",
-        connectionToPurpose: "Feel connected to the organization's mission and see how my leadership contributes to meaningful outcomes",
+        connectionToPurpose: 4,
+        connectionToPurposeDescription: "I feel connected and gaining clarity",
         agilityLevel: "Achiever",
-        agilityLevelDescription: "Results-oriented, strategic, effective manager",
-        notableStrength: "Team motivation and collaborative decision-making",
-        developmentAreas: "Leading through complexity and ambiguity",
+        agilityLevelDescription: "operates with confidence and clarity, sets goals and delivers outcomes",
+        notableStrength: "Empowering Others & Collaboration",
+        developmentAreas: "Navigating Change & Uncertainty",
         overallAssessment: "This leader demonstrates strong operational capabilities with clear areas for strategic development. Focus on building confidence in navigating ambiguity while leveraging existing strengths in team motivation and decision-making.",
         rubricAssessments: [
           {
-            rubricName: "Strategic Thinking & Vision",
+            rubricName: "Leadership Assessment",
             overallScore: 3,
             criteriaScores: [
               {
-                criterion: "Develops and communicates clear organizational vision",
+                criterion: "Communication Skills",
                 score: 3,
-                justification: "Shows solid understanding of strategic direction with room for enhancement"
+                justification: "Shows solid understanding of communication with room for enhancement"
               }
             ],
-            recommendations: ["Develop more structured strategic planning processes", "Practice articulating vision more clearly"]
+            recommendations: ["Develop more structured communication processes", "Practice active listening techniques"]
           }
         ]
       };
