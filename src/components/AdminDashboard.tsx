@@ -196,11 +196,11 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
               <Button 
                 variant="ghost" 
                 size="sm" 
-                onClick={() => window.location.href = '/'}
+                onClick={() => window.location.href = 'https://unboxable.co.nz'}
                 className="hover:bg-slate-100 text-unboxable-navy hover:text-unboxable-navy mr-2"
               >
                 <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                <span className="hidden sm:inline">Back to Main Site</span>
+                <span className="hidden sm:inline">Back to Unboxable</span>
                 <span className="sm:hidden">Back</span>
               </Button>
               <img 
