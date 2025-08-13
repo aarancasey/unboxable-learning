@@ -45,6 +45,8 @@ const BulkUploadModal = ({ isOpen, onClose, onBulkImport, existingEmails }: Bulk
         rawUsers = await parseExcel(selectedFile);
       }
       
+      console.log('Successfully parsed users:', rawUsers.length);
+      
       console.log('Raw users from parser:', rawUsers);
       
       // Validate users and check for duplicates within the file
