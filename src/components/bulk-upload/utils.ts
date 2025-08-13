@@ -79,25 +79,57 @@ export const parseExcel = (file: File): Promise<any[]> => {
           return;
         }
         
-        const headers = (jsonData[0] as string[]).map(h => h?.toString().toLowerCase().trim());
-        console.log('Parsed headers:', headers);
+        const firstRow = jsonData[0] as string[];
+        const hasHeaders = firstRow.some(cell => 
+          cell?.toString().toLowerCase().includes('name') ||
+          cell?.toString().toLowerCase().includes('email') ||
+          cell?.toString().toLowerCase().includes('role') ||
+          cell?.toString().toLowerCase().includes('team')
+        );
+        
+        console.log('Has proper headers:', hasHeaders);
+        
+        let startRow = 0;
+        let headers: string[] = [];
+        
+        if (hasHeaders) {
+          // File has proper headers
+          headers = firstRow.map(h => h?.toString().toLowerCase().trim());
+          startRow = 1;
+        } else {
+          // File has no headers, assume standard order: Name, Email, Team, Role
+          headers = ['name', 'email', 'team', 'role'];
+          startRow = 0;
+          console.log('No headers detected, assuming order: Name, Email, Team, Role');
+        }
+        
+        console.log('Using headers:', headers);
         const users = [];
         
-        for (let i = 1; i < jsonData.length; i++) {
+        for (let i = startRow; i < jsonData.length; i++) {
           const row = jsonData[i] as any[];
           if (!row || row.length === 0) continue; // Skip empty rows
           
           const user: any = {};
           
-          headers.forEach((header, index) => {
-            const cellValue = row[index]?.toString().trim();
-            if (!cellValue) return;
-            
-            if (header.includes('name')) user.name = cellValue;
-            else if (header.includes('email')) user.email = cellValue;
-            else if (header.includes('role')) user.role = cellValue;
-            else if (header.includes('team')) user.team = cellValue;
-          });
+          if (hasHeaders) {
+            // Parse with header matching
+            headers.forEach((header, index) => {
+              const cellValue = row[index]?.toString().trim();
+              if (!cellValue) return;
+              
+              if (header.includes('name')) user.name = cellValue;
+              else if (header.includes('email')) user.email = cellValue;
+              else if (header.includes('role')) user.role = cellValue;
+              else if (header.includes('team')) user.team = cellValue;
+            });
+          } else {
+            // Parse with fixed order: Name, Email, Team, Role
+            user.name = row[0]?.toString().trim();
+            user.email = row[1]?.toString().trim();
+            user.team = row[2]?.toString().trim();
+            user.role = row[3]?.toString().trim();
+          }
           
           // Only add user if they have at least name and email
           if (user.name && user.email) {
