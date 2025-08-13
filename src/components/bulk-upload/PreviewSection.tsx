@@ -54,6 +54,8 @@ export const PreviewSection = ({ parsedUsers, onImport, onUploadDifferent, onCan
                 <TableHead>Row</TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Email</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead>Team</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
@@ -63,6 +65,8 @@ export const PreviewSection = ({ parsedUsers, onImport, onUploadDifferent, onCan
                   <TableCell>{user.rowNumber}</TableCell>
                   <TableCell>{user.name}</TableCell>
                   <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.role}</TableCell>
+                  <TableCell>{user.team}</TableCell>
                   <TableCell>
                     {user.isValid ? (
                       <Badge variant="default">

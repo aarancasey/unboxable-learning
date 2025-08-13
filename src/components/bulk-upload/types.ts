@@ -1,6 +1,8 @@
 export interface ParsedUser {
   name: string;
   email: string;
+  role: string;
+  team: string;
   isValid: boolean;
   errors: string[];
   rowNumber: number;

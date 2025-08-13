@@ -7,6 +7,8 @@ export const validateUser = (user: any, rowNumber: number, existingEmails: strin
   // Required fields validation
   if (!user.name?.trim()) errors.push('Name is required');
   if (!user.email?.trim()) errors.push('Email is required');
+  if (!user.role?.trim()) errors.push('Role is required');
+  if (!user.team?.trim()) errors.push('Team is required');
   
   // Email format validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -22,6 +24,8 @@ export const validateUser = (user: any, rowNumber: number, existingEmails: strin
   return {
     name: user.name?.trim() || '',
     email: user.email?.toLowerCase()?.trim() || '',
+    role: user.role?.trim() || '',
+    team: user.team?.trim() || '',
     isValid: errors.length === 0,
     errors,
     rowNumber
@@ -42,6 +46,8 @@ export const parseCSV = (text: string): any[] => {
     headers.forEach((header, index) => {
       if (header.includes('name')) user.name = values[index];
       else if (header.includes('email')) user.email = values[index];
+      else if (header.includes('role')) user.role = values[index];
+      else if (header.includes('team')) user.team = values[index];
     });
     
     if (user.name || user.email) {
@@ -78,6 +84,8 @@ export const parseExcel = (file: File): Promise<any[]> => {
           headers.forEach((header, index) => {
             if (header.includes('name')) user.name = row[index];
             else if (header.includes('email')) user.email = row[index];
+            else if (header.includes('role')) user.role = row[index];
+            else if (header.includes('team')) user.team = row[index];
           });
           
           if (user.name || user.email) {
@@ -95,7 +103,7 @@ export const parseExcel = (file: File): Promise<any[]> => {
 };
 
 export const downloadTemplate = () => {
-  const csvContent = 'Name,Email\nJohn Doe,john.doe@example.com\nJane Smith,jane.smith@example.com';
+  const csvContent = 'Name,Email,Role,Team\nJohn Doe,john.doe@example.com,Manager,Development\nJane Smith,jane.smith@example.com,Developer,Engineering';
   const blob = new Blob([csvContent], { type: 'text/csv' });
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');

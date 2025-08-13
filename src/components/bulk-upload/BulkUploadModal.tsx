@@ -78,8 +78,8 @@ const BulkUploadModal = ({ isOpen, onClose, onBulkImport, existingEmails }: Bulk
       id: Date.now() + index,
       name: user.name,
       email: user.email,
-      mobile: '',
-      department: 'General',
+      role: user.role,
+      team: user.team,
       status: 'pending',
       requires_password_change: true,
       password: Math.random().toString(36).slice(-8)
