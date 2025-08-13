@@ -1393,6 +1393,13 @@ export type Database = {
             foreignKeyName: "survey_submissions_learner_id_fkey"
             columns: ["learner_id"]
             isOneToOne: false
+            referencedRelation: "learner_auth_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "survey_submissions_learner_id_fkey"
+            columns: ["learner_id"]
+            isOneToOne: false
             referencedRelation: "learners"
             referencedColumns: ["id"]
           },
@@ -1544,7 +1551,27 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      learner_auth_view: {
+        Row: {
+          email: string | null
+          id: number | null
+          name: string | null
+          status: string | null
+        }
+        Insert: {
+          email?: string | null
+          id?: number | null
+          name?: string | null
+          status?: string | null
+        }
+        Update: {
+          email?: string | null
+          id?: number | null
+          name?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       check_admin_users: {
@@ -1577,6 +1604,10 @@ export type Database = {
         Args:
           | { _user_id: string; _role: Database["public"]["Enums"]["app_role"] }
           | { role_name: string }
+        Returns: boolean
+      }
+      is_learner_owner: {
+        Args: { learner_email: string }
         Returns: boolean
       }
     }
