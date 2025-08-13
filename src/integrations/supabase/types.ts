@@ -1557,6 +1557,10 @@ export type Database = {
         Args: { _page_slug: string; _content: Json; _change_summary?: string }
         Returns: string
       }
+      get_current_user_email: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       has_cms_access: {
         Args: { _user_id: string }
         Returns: boolean
