@@ -117,7 +117,7 @@ const AppContent = () => {
   }
 
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated && !learnerData) {
     return showLearnerLogin ? (
       <LoginPage 
         role="learner" 
