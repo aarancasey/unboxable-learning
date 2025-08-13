@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { BulkUploadModalProps, ParsedUser } from './types';
-import { validateUser, parseCSV, parseExcel } from './utils';
+import { validateUser } from './utils';
 import { FileUploadSection } from './FileUploadSection';
 import { PreviewSection } from './PreviewSection';
 
@@ -11,15 +11,27 @@ const BulkUploadModal = ({ isOpen, onClose, onBulkImport, existingEmails }: Bulk
   const [parsedUsers, setParsedUsers] = useState<ParsedUser[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [step, setStep] = useState<'upload' | 'preview'>('upload');
+  const [progress, setProgress] = useState(0);
+  const [progressMessage, setProgressMessage] = useState('');
+  const workerRef = useRef<Worker | null>(null);
   const { toast } = useToast();
+
+  // Cleanup worker on unmount
+  useEffect(() => {
+    return () => {
+      if (workerRef.current) {
+        workerRef.current.terminate();
+      }
+    };
+  }, []);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
     if (!selectedFile) return;
     
-    const fileType = selectedFile.type;
     const fileName = selectedFile.name.toLowerCase();
     
+    // File type validation
     if (!fileName.endsWith('.csv') && !fileName.endsWith('.xlsx') && !fileName.endsWith('.xls')) {
       toast({
         title: "Invalid file type",
@@ -28,31 +40,87 @@ const BulkUploadModal = ({ isOpen, onClose, onBulkImport, existingEmails }: Bulk
       });
       return;
     }
+
+    // File size validation (limit to 10MB for mobile performance)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (selectedFile.size > maxSize) {
+      toast({
+        title: "File too large",
+        description: "Please upload a file smaller than 10MB for optimal performance.",
+        variant: "destructive"
+      });
+      return;
+    }
     
     setFile(selectedFile);
     setIsProcessing(true);
+    setProgress(0);
+    setProgressMessage('Initializing...');
     
     try {
-      console.log('Processing file:', selectedFile.name, 'Type:', selectedFile.type);
-      let rawUsers: any[] = [];
+      // Terminate existing worker if any
+      if (workerRef.current) {
+        workerRef.current.terminate();
+      }
+
+      // Create new worker
+      workerRef.current = new Worker('/bulk-upload-worker.js');
       
+      // Set up worker message handler
+      workerRef.current.onmessage = (e) => {
+        const { type, progress, message, users, error } = e.data;
+        
+        if (type === 'progress') {
+          setProgress(progress);
+          setProgressMessage(message);
+        } else if (type === 'success') {
+          // Process validation in chunks to avoid blocking UI
+          processValidationInChunks(users);
+        } else if (type === 'error') {
+          throw new Error(error);
+        }
+      };
+
+      // Start processing based on file type
       if (fileName.endsWith('.csv')) {
-        console.log('Parsing as CSV');
         const text = await selectedFile.text();
-        rawUsers = parseCSV(text);
+        workerRef.current.postMessage({
+          type: 'parseCSV',
+          data: { text }
+        });
       } else {
-        console.log('Parsing as Excel');
-        rawUsers = await parseExcel(selectedFile);
+        workerRef.current.postMessage({
+          type: 'parseExcel',
+          data: { file: selectedFile, fileName: selectedFile.name }
+        });
       }
       
-      console.log('Successfully parsed users:', rawUsers.length);
+    } catch (error) {
+      console.error('Error processing file:', error);
+      toast({
+        title: "Error processing file",
+        description: `Unable to parse the uploaded file. Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        variant: "destructive"
+      });
+      setIsProcessing(false);
+      setProgress(0);
+      setProgressMessage('');
+    }
+  };
+
+  const processValidationInChunks = async (rawUsers: any[]) => {
+    setProgressMessage('Validating users...');
+    
+    const fileEmails = new Set();
+    const validatedUsers: ParsedUser[] = [];
+    const chunkSize = 25;
+    
+    for (let i = 0; i < rawUsers.length; i += chunkSize) {
+      const chunk = rawUsers.slice(i, i + chunkSize);
       
-      console.log('Raw users from parser:', rawUsers);
-      
-      // Validate users and check for duplicates within the file
-      const fileEmails = new Set();
-      const validatedUsers = rawUsers.map((user, index) => {
-        const validated = validateUser(user, index + 2, existingEmails); // +2 because row 1 is headers and we start from 0
+      chunk.forEach((user, chunkIndex) => {
+        const globalIndex = i + chunkIndex;
+        const validated = validateUser(user, globalIndex + 2, existingEmails);
         
         // Check for duplicates within the file
         if (fileEmails.has(validated.email)) {
@@ -62,22 +130,23 @@ const BulkUploadModal = ({ isOpen, onClose, onBulkImport, existingEmails }: Bulk
           fileEmails.add(validated.email);
         }
         
-        return validated;
+        validatedUsers.push(validated);
       });
       
-      console.log('Validated users:', validatedUsers);
-      setParsedUsers(validatedUsers);
-      setStep('preview');
-    } catch (error) {
-      console.error('Error processing file:', error);
-      toast({
-        title: "Error processing file",
-        description: `Unable to parse the uploaded file. Please check the format. Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        variant: "destructive"
-      });
-    } finally {
-      setIsProcessing(false);
+      // Update progress
+      const progress = Math.floor((i + chunk.length) / rawUsers.length * 100);
+      setProgress(progress);
+      setProgressMessage(`Validating users... ${validatedUsers.length}/${rawUsers.length}`);
+      
+      // Yield control to prevent UI blocking
+      await new Promise(resolve => setTimeout(resolve, 1));
     }
+    
+    setParsedUsers(validatedUsers);
+    setStep('preview');
+    setIsProcessing(false);
+    setProgress(0);
+    setProgressMessage('');
   };
 
   const handleImport = () => {
@@ -105,9 +174,18 @@ const BulkUploadModal = ({ isOpen, onClose, onBulkImport, existingEmails }: Bulk
   };
 
   const handleClose = () => {
+    // Terminate worker when closing
+    if (workerRef.current) {
+      workerRef.current.terminate();
+      workerRef.current = null;
+    }
+    
     setFile(null);
     setParsedUsers([]);
     setStep('upload');
+    setIsProcessing(false);
+    setProgress(0);
+    setProgressMessage('');
     onClose();
   };
 
@@ -125,6 +203,8 @@ const BulkUploadModal = ({ isOpen, onClose, onBulkImport, existingEmails }: Bulk
           <FileUploadSection
             onFileUpload={handleFileUpload}
             isProcessing={isProcessing}
+            progress={progress}
+            progressMessage={progressMessage}
           />
         )}
 
