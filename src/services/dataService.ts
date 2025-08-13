@@ -1,7 +1,16 @@
 import { supabase } from '@/integrations/supabase/client';
 
-// Data service to handle both Supabase and localStorage with migration
+// Data service to handle both Supabase and localStorage with migration control
 export class DataService {
+  // Migration tracking to prevent automatic restoration of deleted data
+  private static getMigrationFlag(key: string): boolean {
+    return localStorage.getItem(`migration_completed_${key}`) === 'true';
+  }
+
+  private static setMigrationFlag(key: string): void {
+    localStorage.setItem(`migration_completed_${key}`, 'true');
+  }
+
   // Learners management
   static async getLearners() {
     try {
@@ -12,19 +21,12 @@ export class DataService {
 
       if (error) throw error;
 
-      // If no data in Supabase, try to migrate from localStorage
-      if (!data || data.length === 0) {
-        const localLearners = JSON.parse(localStorage.getItem('learners') || '[]');
-        if (localLearners.length > 0) {
-          await this.migrateLearners(localLearners);
-          return localLearners;
-        }
-      }
-
+      // Always prioritize Supabase data - don't auto-migrate if empty
+      // This prevents deleted users from being restored
       return data || [];
     } catch (error) {
       console.error('Error getting learners:', error);
-      // Fallback to localStorage
+      // Only fallback to localStorage if there's a genuine connection error
       return JSON.parse(localStorage.getItem('learners') || '[]');
     }
   }
@@ -99,10 +101,15 @@ export class DataService {
 
       if (error) throw error;
 
-      // Also update localStorage as backup
+      // Remove from localStorage to prevent restoration
       const localLearners = JSON.parse(localStorage.getItem('learners') || '[]');
       const filtered = localLearners.filter((l: any) => l.id !== id);
       localStorage.setItem('learners', JSON.stringify(filtered));
+
+      // Track deleted users to prevent re-migration
+      const deletedUsers = JSON.parse(localStorage.getItem('deleted_learners') || '[]');
+      deletedUsers.push({ id, deletedAt: new Date().toISOString() });
+      localStorage.setItem('deleted_learners', JSON.stringify(deletedUsers));
 
       return true;
     } catch (error) {
@@ -111,6 +118,12 @@ export class DataService {
       const localLearners = JSON.parse(localStorage.getItem('learners') || '[]');
       const filtered = localLearners.filter((l: any) => l.id !== id);
       localStorage.setItem('learners', JSON.stringify(filtered));
+      
+      // Track deletion even in fallback
+      const deletedUsers = JSON.parse(localStorage.getItem('deleted_learners') || '[]');
+      deletedUsers.push({ id, deletedAt: new Date().toISOString() });
+      localStorage.setItem('deleted_learners', JSON.stringify(deletedUsers));
+      
       return true;
     }
   }
@@ -125,14 +138,8 @@ export class DataService {
 
       if (error) throw error;
 
-      // If no data in Supabase, try to migrate from localStorage
-      if (!data || data.length === 0) {
-        const localCourses = JSON.parse(localStorage.getItem('courses') || '[]');
-        if (localCourses.length > 0) {
-          await this.migrateCourses(localCourses);
-          return localCourses;
-        }
-      }
+      // Always prioritize Supabase data - don't auto-migrate if empty
+      // This prevents deleted courses from being restored
 
       return data || [];
     } catch (error) {
@@ -240,14 +247,8 @@ export class DataService {
 
       if (error) throw error;
 
-      // If no data in Supabase, try to migrate from localStorage
-      if (!data || data.length === 0) {
-        const localSurveys = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
-        if (localSurveys.length > 0) {
-          await this.migrateSurveySubmissions(localSurveys);
-          return localSurveys;
-        }
-      }
+      // Always prioritize Supabase data - don't auto-migrate if empty
+      // This prevents deleted submissions from being restored
 
       return data || [];
     } catch (error) {
@@ -340,7 +341,23 @@ export class DataService {
     }
   }
 
-  // Migration helpers
+  // Manual migration methods for admin use only
+  static async manualMigrateLearners() {
+    const localLearners = JSON.parse(localStorage.getItem('learners') || '[]');
+    const deletedUsers = JSON.parse(localStorage.getItem('deleted_learners') || '[]');
+    const deletedIds = deletedUsers.map((u: any) => u.id);
+    
+    // Filter out deleted users before migration
+    const validLearners = localLearners.filter((l: any) => !deletedIds.includes(l.id));
+    
+    if (validLearners.length > 0) {
+      await this.migrateLearners(validLearners);
+      this.setMigrationFlag('learners');
+      return { migrated: validLearners.length, skipped: localLearners.length - validLearners.length };
+    }
+    return { migrated: 0, skipped: 0 };
+  }
+
   private static async migrateLearners(localLearners: any[]) {
     try {
       console.log('Migrating learners to Supabase...');
