@@ -86,7 +86,7 @@ const handler = async (req: Request): Promise<Response> => {
       learner_email: learnerEmail,
       team: team,
       platform_name: 'Unboxable Learning',
-      portal_url: 'https://48c14c99-8023-4c6d-af1c-7d89636d5488.lovableproject.com'
+      portal_url: 'https://learn.unboxable.co.nz'
     };
 
     let subject = template.subject_template;
