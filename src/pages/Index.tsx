@@ -30,6 +30,30 @@ const AppContent = () => {
   const isAuthenticated = !!user && !!session;
   const userRole = learnerData ? 'learner' : (isAuthenticated ? 'admin' : null);
 
+  // Check if authenticated user is a learner and fetch their data
+  useEffect(() => {
+    const checkLearnerStatus = async () => {
+      if (isAuthenticated && user?.email && !learnerData) {
+        try {
+          // Import DataService to check if user is a learner
+          const { DataService } = await import('@/services/dataService');
+          const learners = await DataService.getLearners();
+          const learner = learners.find(l => l.email.toLowerCase() === user.email.toLowerCase());
+          
+          if (learner) {
+            setLearnerData(learner);
+            trackUserLogin('learner');
+            trackPageView('/dashboard');
+          }
+        } catch (error) {
+          console.error('Error checking learner status:', error);
+        }
+      }
+    };
+
+    checkLearnerStatus();
+  }, [isAuthenticated, user?.email, learnerData, trackUserLogin, trackPageView]);
+
   // Load Learn More settings
   useEffect(() => {
     const loadLearnMoreSettings = async () => {
