@@ -33,14 +33,19 @@ const BulkUploadModal = ({ isOpen, onClose, onBulkImport, existingEmails }: Bulk
     setIsProcessing(true);
     
     try {
+      console.log('Processing file:', selectedFile.name, 'Type:', selectedFile.type);
       let rawUsers: any[] = [];
       
       if (fileName.endsWith('.csv')) {
+        console.log('Parsing as CSV');
         const text = await selectedFile.text();
         rawUsers = parseCSV(text);
       } else {
+        console.log('Parsing as Excel');
         rawUsers = await parseExcel(selectedFile);
       }
+      
+      console.log('Raw users from parser:', rawUsers);
       
       // Validate users and check for duplicates within the file
       const fileEmails = new Set();
@@ -58,12 +63,14 @@ const BulkUploadModal = ({ isOpen, onClose, onBulkImport, existingEmails }: Bulk
         return validated;
       });
       
+      console.log('Validated users:', validatedUsers);
       setParsedUsers(validatedUsers);
       setStep('preview');
     } catch (error) {
+      console.error('Error processing file:', error);
       toast({
         title: "Error processing file",
-        description: "Unable to parse the uploaded file. Please check the format.",
+        description: `Unable to parse the uploaded file. Please check the format. Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
         variant: "destructive"
       });
     } finally {
