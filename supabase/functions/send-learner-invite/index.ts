@@ -35,7 +35,7 @@ const handler = async (req: Request): Promise<Response> => {
     );
 
     const resend = new Resend(resendApiKey);
-    const { learnerName, learnerEmail, department } = await req.json();
+    const { learnerName, learnerEmail, team } = await req.json();
 
     if (!learnerEmail || !learnerName) {
       return new Response(
@@ -84,7 +84,7 @@ const handler = async (req: Request): Promise<Response> => {
     const variables = {
       learner_name: learnerName,
       learner_email: learnerEmail,
-      department: department,
+      team: team,
       platform_name: 'Unboxable Learning',
       portal_url: 'https://dntowvxkzsvqsykoranf.supabase.co'
     };
