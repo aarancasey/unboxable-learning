@@ -1393,13 +1393,6 @@ export type Database = {
             foreignKeyName: "survey_submissions_learner_id_fkey"
             columns: ["learner_id"]
             isOneToOne: false
-            referencedRelation: "learner_auth_view"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "survey_submissions_learner_id_fkey"
-            columns: ["learner_id"]
-            isOneToOne: false
             referencedRelation: "learners"
             referencedColumns: ["id"]
           },
@@ -1551,27 +1544,7 @@ export type Database = {
       }
     }
     Views: {
-      learner_auth_view: {
-        Row: {
-          email: string | null
-          id: number | null
-          name: string | null
-          status: string | null
-        }
-        Insert: {
-          email?: string | null
-          id?: number | null
-          name?: string | null
-          status?: string | null
-        }
-        Update: {
-          email?: string | null
-          id?: number | null
-          name?: string | null
-          status?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       check_admin_users: {
@@ -1587,6 +1560,15 @@ export type Database = {
       get_current_user_email: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      get_learner_for_auth: {
+        Args: { email_input: string }
+        Returns: {
+          id: number
+          email: string
+          status: string
+          name: string
+        }[]
       }
       has_cms_access: {
         Args: { _user_id: string }
