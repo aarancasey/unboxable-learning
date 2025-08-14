@@ -1,6 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import UserCard from './UserCard';
 import EmptyUsersState from './EmptyUsersState';
 
@@ -30,8 +31,8 @@ const UsersList = ({ learners, filteredUsers, onAddLearner, onActivateLearner, o
   const cohortALearners = filteredUsers.filter(learner => learner.cohort === 'A');
   const cohortBLearners = filteredUsers.filter(learner => learner.cohort === 'B');
 
-  const renderCohort = (cohort: string, cohortLearners: Learner[], title: string) => (
-    <Card className="mb-6">
+  const renderCohortContent = (cohort: string, cohortLearners: Learner[], title: string) => (
+    <Card>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span>{title} ({cohortLearners.length})</span>
@@ -87,10 +88,18 @@ const UsersList = ({ learners, filteredUsers, onAddLearner, onActivateLearner, o
   }
 
   return (
-    <div className="space-y-6">
-      {renderCohort('A', cohortALearners, 'Cohort A')}
-      {renderCohort('B', cohortBLearners, 'Cohort B')}
-    </div>
+    <Tabs defaultValue="A" className="w-full">
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="A">Cohort A ({cohortALearners.length})</TabsTrigger>
+        <TabsTrigger value="B">Cohort B ({cohortBLearners.length})</TabsTrigger>
+      </TabsList>
+      <TabsContent value="A" className="mt-6">
+        {renderCohortContent('A', cohortALearners, 'Cohort A')}
+      </TabsContent>
+      <TabsContent value="B" className="mt-6">
+        {renderCohortContent('B', cohortBLearners, 'Cohort B')}
+      </TabsContent>
+    </Tabs>
   );
 };
 
