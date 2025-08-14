@@ -59,14 +59,35 @@ const LoginForm = ({ role, onLogin }: LoginFormProps) => {
         return;
       }
 
-      // Check if learner is active
-      if (learner.status !== 'active') {
+      // Check if learner is active (allow 'pending' for first-time activation)
+      if (learner.status !== 'active' && learner.status !== 'pending') {
         toast({
           title: "Account Inactive",
           description: "Your account is not active. Please contact support.",
           variant: "destructive",
         });
         return;
+      }
+
+      // If learner is pending, activate them on first login
+      if (learner.status === 'pending') {
+        try {
+          const { DataService } = await import('@/services/dataService');
+          await DataService.updateLearner(learner.id, { 
+            status: 'active',
+            requires_password_change: true 
+          });
+          learner.status = 'active';
+          learner.requires_password_change = true;
+        } catch (error) {
+          console.error('Error activating learner:', error);
+          toast({
+            title: "Activation Error",
+            description: "Unable to activate account. Please try again.",
+            variant: "destructive",
+          });
+          return;
+        }
       }
 
       // Check if learner requires password change (first time login)
