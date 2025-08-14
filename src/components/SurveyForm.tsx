@@ -305,7 +305,7 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
         {currentSectionData.description && (
           <Card className="mb-8 survey-card-shadow border-0 survey-fade-in">
             <CardContent className="p-8">
-              <p className="text-muted-foreground text-lg leading-relaxed">{currentSectionData.description}</p>
+              <p className="text-muted-foreground text-lg leading-relaxed font-bold">{currentSectionData.description}</p>
             </CardContent>
           </Card>
         )}
