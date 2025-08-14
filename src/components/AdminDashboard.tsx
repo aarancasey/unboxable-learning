@@ -30,9 +30,10 @@ import AnalyticsDashboard from './analytics/AnalyticsDashboard';
 import ActivitiesView from './ActivitiesView';
 
 import { EmailTemplateManager } from './email-management/EmailTemplateManager';
+import { EmailTemplateSettings } from './admin/EmailTemplateSettings';
 import { AssessmentRefactorTool } from './admin/AssessmentRefactorTool';
 import { ContentLibraryManager } from './content-library/ContentLibraryManager';
-import { SurveyEmailSettings } from './admin/SurveyEmailSettings';
+
 import { DataService } from '@/services/dataService';
 import { dateHelpers } from '@/lib/dateUtils';
 
@@ -437,7 +438,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
           </TabsContent>
 
           <TabsContent value="settings">
-            <SurveyEmailSettings />
+            <EmailTemplateSettings />
           </TabsContent>
 
           <TabsContent value="activities">

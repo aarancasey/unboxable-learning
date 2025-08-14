@@ -93,4 +93,58 @@ export class SettingsService {
   static async setSurveyEmailEnabled(enabled: boolean): Promise<boolean> {
     return this.setSetting('survey_completion_email_enabled', enabled.toString());
   }
+
+  static async getEmailTemplateSettings(): Promise<Record<string, boolean>> {
+    try {
+      const templateTypes = ['survey_completion', 'learner_invitation', 'module_unlock', 'pre_survey'];
+      const settingKeys = templateTypes.map(type => `${type}_email_enabled`);
+      
+      const { data, error } = await supabase
+        .from('settings')
+        .select('key, value')
+        .in('key', settingKeys);
+
+      if (error) throw error;
+
+      const settings = data?.reduce((acc, item) => {
+        acc[item.key] = item.value;
+        return acc;
+      }, {} as Record<string, string>) || {};
+
+      // Return defaults (all enabled) if settings don't exist
+      return templateTypes.reduce((acc, type) => {
+        const key = `${type}_email_enabled`;
+        acc[type] = settings[key] === null ? true : settings[key] === 'true';
+        return acc;
+      }, {} as Record<string, boolean>);
+    } catch (error) {
+      console.error('Error getting email template settings:', error);
+      // Return defaults on error
+      return {
+        survey_completion: true,
+        learner_invitation: true,
+        module_unlock: true,
+        pre_survey: true
+      };
+    }
+  }
+
+  static async setEmailTemplateSettings(settings: Record<string, boolean>): Promise<boolean> {
+    try {
+      const updates = Object.entries(settings).map(([templateType, enabled]) => ({
+        key: `${templateType}_email_enabled`,
+        value: enabled.toString()
+      }));
+
+      const { error } = await supabase
+        .from('settings')
+        .upsert(updates, { onConflict: 'key' });
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error('Error setting email template settings:', error);
+      return false;
+    }
+  }
 }
