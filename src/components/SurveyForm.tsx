@@ -6,6 +6,7 @@ import { InstructionsSection } from './survey/InstructionsSection';
 import { QuestionRenderer } from './survey/QuestionRenderer';
 import { ParticipantInfoForm, ParticipantInfo } from './survey/ParticipantInfoForm';
 import { SurveyCompletedMessage } from './survey/SurveyCompletedMessage';
+import { SurveyThankYouModal } from './survey/SurveyThankYouModal';
 import { useSurveyData } from './survey/useSurveyData';
 import { useSurveyProgressEnhanced } from './survey/useSurveyProgressEnhanced';
 import { useSurveyCompletion } from '@/hooks/useSurveyCompletion';
@@ -24,6 +25,7 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
   const [participantInfo, setParticipantInfo] = useState<ParticipantInfo | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionComplete, setSubmissionComplete] = useState(false);
+  const [showThankYouModal, setShowThankYouModal] = useState(false);
   const survey = useSurveyData();
   const { isCompleted, submission, loading } = useSurveyCompletion(learnerData);
   const {
@@ -188,15 +190,20 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
         await deleteSavedProgress();
         
         setSubmissionComplete(true);
-        onSubmit();
+        setShowThankYouModal(true);
       } catch (error) {
         console.error('Error submitting survey:', error);
-        // Still call onSubmit to proceed even if there was an error
-        onSubmit();
+        // Still show thank you modal even if there was an error
+        setShowThankYouModal(true);
       } finally {
         setIsSubmitting(false);
       }
     }
+  };
+
+  const handleThankYouModalClose = () => {
+    setShowThankYouModal(false);
+    onSubmit();
   };
 
   const renderContent = () => {
@@ -334,6 +341,11 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
           />
         </div>
       </div>
+
+      <SurveyThankYouModal 
+        isOpen={showThankYouModal} 
+        onClose={handleThankYouModalClose} 
+      />
     </div>
   );
 };
