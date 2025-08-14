@@ -16,10 +16,15 @@ import {
   MoreHorizontal,
   Trash2,
   Send,
-  Edit2
+  Edit2,
+  Eye,
+  FileText,
+  RotateCcw
 } from 'lucide-react';
 import SurveyProgressBadge from './survey/SurveyProgressBadge';
-import SurveyActionButton from './survey/SurveyActionButton';
+import { 
+  DropdownMenuSeparator
+} from '@/components/ui/dropdown-menu';
 
 interface Learner {
   id: number;
@@ -142,12 +147,6 @@ const UserCard = ({ learner, onActivate, onDelete, onResendInvite, onEdit, onSen
             />
           </div>
           <div className="flex items-center space-x-2">
-            <SurveyActionButton
-              surveyStatus={learner.surveyStatus || 'not_started'}
-              learnerName={learner.name}
-              learnerEmail={learner.email}
-              onSendReminder={onSendSurveyReminder ? () => onSendSurveyReminder(learner.email, learner.name) : undefined}
-            />
             {learner.status === 'pending' && (
               <Button 
                 size="sm" 
@@ -165,17 +164,30 @@ const UserCard = ({ learner, onActivate, onDelete, onResendInvite, onEdit, onSen
                   <MoreHorizontal className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-40 sm:w-48 bg-white border shadow-lg z-50">
+              <DropdownMenuContent align="end" className="w-48 bg-white border shadow-lg z-50">
+                {/* Survey Actions */}
+                {learner.surveyStatus !== 'completed' && onSendSurveyReminder && (
+                  <DropdownMenuItem onClick={() => onSendSurveyReminder(learner.email, learner.name)}>
+                    <Send className="h-4 w-4 mr-2" />
+                    Send Survey Reminder
+                  </DropdownMenuItem>
+                )}
+                
+                {/* Learner Management Actions */}
                 <DropdownMenuItem onClick={() => onEdit(learner)}>
                   <Edit2 className="h-4 w-4 mr-2" />
                   Edit Details
                 </DropdownMenuItem>
+                
                 {learner.status === 'invited' && (
                   <DropdownMenuItem onClick={() => onResendInvite(learner.id)}>
                     <Send className="h-4 w-4 mr-2" />
                     Resend Invite
                   </DropdownMenuItem>
                 )}
+                
+                <DropdownMenuSeparator />
+                
                 <DropdownMenuItem 
                   onClick={() => onDelete(learner.id)}
                   className="text-red-600 focus:text-red-600"
