@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import LearnerDashboard from '@/components/LearnerDashboard';
 import AdminDashboard from '@/components/AdminDashboard';
 import LoginPage from '@/components/LoginPage';
+import PasswordCreationPage from '@/components/PasswordCreationPage';
 import AuthPage from '@/components/auth/AuthPage';
 import { AuthProvider, useAuth } from '@/components/auth/AuthProvider';
 import { Card, CardContent } from '@/components/ui/card';
@@ -17,6 +18,7 @@ import { SettingsService } from '@/services/settingsService';
 const AppContent = () => {
   const [learnerData, setLearnerData] = useState<any>(null);
   const [showLearnerLogin, setShowLearnerLogin] = useState(false);
+  const [pendingPasswordCreation, setPendingPasswordCreation] = useState(null);
   const [learnMoreSettings, setLearnMoreSettings] = useState({
     enabled: false,
     title: 'Learn More About Our Program',
@@ -67,13 +69,33 @@ const AppContent = () => {
     loadLearnMoreSettings();
   }, []);
 
-  const handleLearnerLogin = (userData?: any) => {
+  const handleLearnerLogin = (userData?: any, requiresPasswordChange?: boolean) => {
     if (userData) {
-      setLearnerData(userData);
+      if (requiresPasswordChange) {
+        // Don't set learnerData yet, show password creation first
+        setPendingPasswordCreation(userData);
+        setShowLearnerLogin(false);
+      } else {
+        setLearnerData(userData);
+        trackUserLogin('learner');
+        trackPageView('/dashboard');
+        setShowLearnerLogin(false);
+      }
+    } else {
+      setShowLearnerLogin(false);
     }
+  };
+
+  const handlePasswordCreated = (userData: any) => {
+    setPendingPasswordCreation(null);
+    setLearnerData(userData);
     trackUserLogin('learner');
     trackPageView('/dashboard');
-    setShowLearnerLogin(false);
+  };
+
+  const handleBackToLogin = () => {
+    setPendingPasswordCreation(null);
+    setShowLearnerLogin(true);
   };
 
   const handleAdminLogin = () => {
@@ -126,6 +148,17 @@ const AppContent = () => {
     }
   }
 
+
+  // Show password creation page for first-time users
+  if (pendingPasswordCreation) {
+    return (
+      <PasswordCreationPage
+        learnerData={pendingPasswordCreation}
+        onPasswordCreated={handlePasswordCreated}
+        onBack={handleBackToLogin}
+      />
+    );
+  }
 
   if (!isAuthenticated && !learnerData) {
     return showLearnerLogin ? (

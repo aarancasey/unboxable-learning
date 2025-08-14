@@ -8,7 +8,7 @@ import LoginForm from './login/LoginForm';
 
 interface LoginPageProps {
   role: 'learner' | 'admin';
-  onLogin: (userData?: any) => void;
+  onLogin: (userData?: any, requiresPasswordChange?: boolean) => void;
   onBack: () => void;
 }
 

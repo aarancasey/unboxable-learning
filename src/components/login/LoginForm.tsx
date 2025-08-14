@@ -8,7 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface LoginFormProps {
   role: 'learner' | 'admin';
-  onLogin: (userData?: any) => void;
+  onLogin: (userData?: any, requiresPasswordChange?: boolean) => void;
 }
 
 const LoginForm = ({ role, onLogin }: LoginFormProps) => {
@@ -128,6 +128,12 @@ const LoginForm = ({ role, onLogin }: LoginFormProps) => {
         return;
       }
 
+      // If learner requires password change, don't allow dashboard access
+      if (learner.requires_password_change) {
+        onLogin(learner, true); // Pass flag indicating password change needed
+        return;
+      }
+
       // If learner is pending, activate them on first login
       if (learner.status === 'pending') {
         try {
@@ -205,19 +211,19 @@ const LoginForm = ({ role, onLogin }: LoginFormProps) => {
         </div>
       )}
 
-      {/* Show password field for learners - simplified since we handle logic in submit */}
+      {/* Show password field for learners */}
       {isLearner && (
         <div>
-          <Label htmlFor="password" className="text-unboxable-navy">Password (if not first time login)</Label>
+          <Label htmlFor="password" className="text-unboxable-navy">Password</Label>
           <Input
             id="password"
             type="password"
-            placeholder="Enter your password"
+            placeholder="Enter your password (leave blank for first-time login)"
             value={credentials.password}
             onChange={(e) => setCredentials(prev => ({ ...prev, password: e.target.value }))}
             className="border-slate-300 focus:border-unboxable-navy focus:ring-unboxable-navy"
           />
-          <p className="text-sm text-gray-600 mt-1">Leave blank for first-time login</p>
+          <p className="text-sm text-gray-600 mt-1">First-time users: leave password blank and proceed</p>
         </div>
       )}
 
