@@ -234,21 +234,25 @@ export class DataService {
   // Survey submissions management
   static async getSurveySubmissions() {
     try {
+      console.log('Attempting to fetch survey submissions from Supabase...');
       const { data, error } = await supabase
         .from('survey_submissions')
         .select('*')
         .order('submitted_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error when fetching survey submissions:', error);
+        throw error;
+      }
 
-      // Always prioritize Supabase data - don't auto-migrate if empty
-      // This prevents deleted submissions from being restored
-
+      console.log('Successfully fetched survey submissions:', data);
       return data || [];
     } catch (error) {
       console.error('Error getting survey submissions:', error);
       // Fallback to localStorage
-      return JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
+      const localData = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
+      console.log('Falling back to localStorage data:', localData);
+      return localData;
     }
   }
 
