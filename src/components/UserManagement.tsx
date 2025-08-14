@@ -164,9 +164,16 @@ const UserManagement = () => {
     setLearners(data);
   };
 
-  // Auto-refresh every 5 seconds to ensure data is current
+  // Auto-refresh every 10 seconds to ensure data is current, but handle errors gracefully
   useEffect(() => {
-    const interval = setInterval(refreshLearners, 5000);
+    const interval = setInterval(async () => {
+      try {
+        await refreshLearners();
+      } catch (error) {
+        // Silently handle refresh errors to avoid spam
+        console.log('Background refresh failed, will retry next interval');
+      }
+    }, 10000);
     return () => clearInterval(interval);
   }, []);
 
