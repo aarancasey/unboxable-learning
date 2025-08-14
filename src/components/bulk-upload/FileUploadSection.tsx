@@ -42,14 +42,11 @@ export const FileUploadSection = ({ onFileUpload, isProcessing, progress = 0, pr
                 <div className="space-y-2">
                   <p className="text-lg font-medium">Choose a file to upload</p>
                   <p className="text-gray-500">CSV or Excel files accepted (max 10MB)</p>
-                  <label htmlFor="file-upload" className="inline-block">
-                    <Button 
-                      asChild
-                      disabled={isProcessing}
-                      className="cursor-pointer"
-                    >
-                      <span>Select File</span>
-                    </Button>
+                  <label
+                    htmlFor="file-upload"
+                    className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 cursor-pointer"
+                  >
+                    Select File
                   </label>
                   <input
                     type="file"

@@ -26,8 +26,12 @@ const BulkUploadModal = ({ isOpen, onClose, onBulkImport, existingEmails }: Bulk
   }, []);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('File upload triggered:', event.target.files);
     const selectedFile = event.target.files?.[0];
-    if (!selectedFile) return;
+    if (!selectedFile) {
+      console.log('No file selected');
+      return;
+    }
     
     const fileName = selectedFile.name.toLowerCase();
     
