@@ -47,6 +47,10 @@ const LoginForm = ({ role, onLogin }: LoginFormProps) => {
       const { DataService } = await import('@/services/dataService');
       const learners = await DataService.getLearners();
       
+      console.log('Found learners:', learners.length);
+      console.log('Looking for email:', credentials.email.toLowerCase());
+      console.log('Available emails:', learners.map(l => l.email.toLowerCase()));
+      
       // Find learner by email
       const learner = learners.find((l: any) => l.email.toLowerCase() === credentials.email.toLowerCase());
       
