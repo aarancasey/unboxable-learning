@@ -213,13 +213,22 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
 
     if (!currentQ) return null;
 
+    const isSingleChoice = currentQ.type === 'radio' || currentQ.type === 'scale';
+
     return (
-      <QuestionRenderer
-        question={currentQ}
-        answers={answers}
-        onAnswerChange={handleAnswerChange}
-        onScaleGridChange={handleScaleGridChange}
-      />
+      <div className="space-y-4">
+        {isSingleChoice && (
+          <p className="text-muted-foreground text-sm font-medium">
+            Choose one that applies
+          </p>
+        )}
+        <QuestionRenderer
+          question={currentQ}
+          answers={answers}
+          onAnswerChange={handleAnswerChange}
+          onScaleGridChange={handleScaleGridChange}
+        />
+      </div>
     );
   };
 
