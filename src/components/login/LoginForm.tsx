@@ -19,14 +19,48 @@ const LoginForm = ({ role, onLogin }: LoginFormProps) => {
     e.preventDefault();
     
     if (role === 'admin') {
-      // Check admin credentials
-      if (credentials.email === 'fiona@unboxable.co.nz' && credentials.password === 'Netball1974#') {
+      // Secure admin authentication
+      if (!credentials.email || !credentials.password) {
+        toast({
+          title: "Credentials Required",
+          description: "Please enter both email and password",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      try {
+        const { data: isValidAdmin, error } = await supabase.rpc('authenticate_admin', {
+          email_input: credentials.email.toLowerCase(),
+          password_input: credentials.password
+        });
+
+        if (error) {
+          console.error('Admin authentication error:', error);
+          toast({
+            title: "Authentication Error",
+            description: "Unable to verify admin credentials. Please try again.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        if (!isValidAdmin) {
+          toast({
+            title: "Invalid Credentials",
+            description: "Please check your email and password",
+            variant: "destructive",
+          });
+          return;
+        }
+
         onLogin();
         return;
-      } else {
+      } catch (error) {
+        console.error('Admin login error:', error);
         toast({
-          title: "Invalid Credentials",
-          description: "Please check your email and password",
+          title: "Login Error",
+          description: "An error occurred during admin login. Please try again.",
           variant: "destructive",
         });
         return;
@@ -46,9 +80,10 @@ const LoginForm = ({ role, onLogin }: LoginFormProps) => {
     try {
       console.log('Attempting to authenticate learner:', credentials.email);
       
-      // Use the secure authentication function
+      // Use the secure authentication function with password verification
       const { data: learnerData, error } = await supabase.rpc('authenticate_learner', {
-        email_input: credentials.email.toLowerCase()
+        email_input: credentials.email.toLowerCase(),
+        password_input: credentials.password || null
       });
       
       if (error) {
@@ -73,11 +108,21 @@ const LoginForm = ({ role, onLogin }: LoginFormProps) => {
       const learner = learnerData[0];
       console.log('Found learner:', learner);
 
-      // Check if learner is active (allow 'pending' for first-time activation)
-      if (learner.status !== 'active' && learner.status !== 'pending') {
+      // Check if password validation failed for returning users
+      if (!learner.password_valid && !learner.requires_password_change) {
         toast({
-          title: "Account Inactive",
-          description: "Your account is not active. Please contact support.",
+          title: "Invalid Password",
+          description: "The password you entered is incorrect",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // For returning users without password, require password
+      if (!learner.requires_password_change && !credentials.password) {
+        toast({
+          title: "Password Required",
+          description: "Please enter your password",
           variant: "destructive",
         });
         return;
@@ -104,39 +149,8 @@ const LoginForm = ({ role, onLogin }: LoginFormProps) => {
         }
       }
 
-      // Check if learner requires password change (first time login)
-      if (learner.requires_password_change) {
-        // For first-time login, just email is enough
-        onLogin(learner);
-        return;
-      }
-
-      // For returning users, check password
-      if (!credentials.password) {
-        toast({
-          title: "Password Required",
-          description: "Please enter your password",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Get full learner data for password verification
-      const { DataService } = await import('@/services/dataService');
-      const fullLearnerData = await DataService.getLearners();
-      const fullLearner = fullLearnerData.find((l: any) => l.id === learner.id);
-      
-      if (!fullLearner || credentials.password !== fullLearner.password) {
-        toast({
-          title: "Invalid Password",
-          description: "The password you entered is incorrect",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Successful login - merge data
-      onLogin({ ...learner, ...fullLearner });
+      // Successful login
+      onLogin(learner);
     } catch (error) {
       console.error('Login error:', error);
       toast({

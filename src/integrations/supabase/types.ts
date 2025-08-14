@@ -56,6 +56,27 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_credentials: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          password_hash: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          password_hash: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          password_hash?: string
+        }
+        Relationships: []
+      }
       ai_conversations: {
         Row: {
           created_at: string
@@ -1547,6 +1568,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      authenticate_admin: {
+        Args: { email_input: string; password_input: string }
+        Returns: boolean
+      }
       authenticate_learner: {
         Args: { email_input: string; password_input?: string }
         Returns: {
@@ -1555,6 +1580,7 @@ export type Database = {
           name: string
           status: string
           requires_password_change: boolean
+          password_valid: boolean
         }[]
       }
       check_admin_users: {
