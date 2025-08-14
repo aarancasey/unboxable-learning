@@ -57,18 +57,39 @@ const UserManagement = () => {
   const handleBulkImport = async (newLearners: any[]) => {
     console.log('Bulk importing learners:', newLearners);
     
-    // Clear localStorage first to prevent any interference
-    localStorage.removeItem('learners');
-    
-    // Add each learner to Supabase
-    for (const learner of newLearners) {
-      console.log('Adding learner to Supabase:', learner);
-      await DataService.addLearner(learner);
+    try {
+      // Clear localStorage first to prevent any interference
+      localStorage.removeItem('learners');
+      
+      // Add each learner to Supabase with proper error handling
+      const results = [];
+      for (const learner of newLearners) {
+        console.log('Adding learner to Supabase:', learner);
+        try {
+          const result = await DataService.addLearner(learner);
+          results.push(result);
+        } catch (error) {
+          console.error('Failed to add learner:', learner.email, error);
+          throw new Error(`Failed to add learner ${learner.email}: ${error.message}`);
+        }
+      }
+      
+      // Refresh the learners list from Supabase
+      const updatedLearners = await DataService.getLearners();
+      setLearners(updatedLearners);
+      
+      toast({
+        title: "Bulk import successful",
+        description: `Successfully imported ${results.length} learners to Supabase.`,
+      });
+    } catch (error) {
+      console.error('Bulk import failed:', error);
+      toast({
+        title: "Bulk import failed",
+        description: error.message || "Failed to save learners to database. Please check permissions.",
+        variant: "destructive",
+      });
     }
-    
-    // Refresh the learners list from Supabase
-    const updatedLearners = await DataService.getLearners();
-    setLearners(updatedLearners);
   };
 
   const handleDeleteLearner = async (learnerId: number) => {

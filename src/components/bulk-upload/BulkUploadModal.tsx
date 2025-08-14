@@ -157,7 +157,7 @@ const BulkUploadModal = ({ isOpen, onClose, onBulkImport, existingEmails }: Bulk
     setProgressMessage('');
   };
 
-  const handleImport = () => {
+  const handleImport = async () => {
     const validUsers = parsedUsers.filter(user => user.isValid);
     
     const newLearners = validUsers.map((user, index) => ({
@@ -171,14 +171,17 @@ const BulkUploadModal = ({ isOpen, onClose, onBulkImport, existingEmails }: Bulk
       password: Math.random().toString(36).slice(-8)
     }));
     
-    onBulkImport(newLearners);
-    
-    toast({
-      title: "Bulk import successful",
-      description: `Successfully imported ${validUsers.length} learners.`,
-    });
-    
-    handleClose();
+    try {
+      await onBulkImport(newLearners);
+      handleClose();
+    } catch (error) {
+      console.error('Bulk import failed:', error);
+      toast({
+        title: "Import failed",
+        description: error.message || "Failed to import learners. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleClose = () => {
