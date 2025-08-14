@@ -1547,6 +1547,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      authenticate_learner: {
+        Args: { email_input: string; password_input?: string }
+        Returns: {
+          id: number
+          email: string
+          name: string
+          status: string
+          requires_password_change: boolean
+        }[]
+      }
       check_admin_users: {
         Args: Record<PropertyKey, never>
         Returns: {

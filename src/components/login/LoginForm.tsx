@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface LoginFormProps {
   role: 'learner' | 'admin';
@@ -43,18 +44,24 @@ const LoginForm = ({ role, onLogin }: LoginFormProps) => {
     }
 
     try {
-      // Get learners from DataService (checks both Supabase and localStorage)
-      const { DataService } = await import('@/services/dataService');
-      const learners = await DataService.getLearners();
+      console.log('Attempting to authenticate learner:', credentials.email);
       
-      console.log('Found learners:', learners.length);
-      console.log('Looking for email:', credentials.email.toLowerCase());
-      console.log('Available emails:', learners.map(l => l.email.toLowerCase()));
+      // Use the secure authentication function
+      const { data: learnerData, error } = await supabase.rpc('authenticate_learner', {
+        email_input: credentials.email.toLowerCase()
+      });
       
-      // Find learner by email
-      const learner = learners.find((l: any) => l.email.toLowerCase() === credentials.email.toLowerCase());
+      if (error) {
+        console.error('Authentication error:', error);
+        toast({
+          title: "Authentication Error",
+          description: "Unable to verify credentials. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
       
-      if (!learner) {
+      if (!learnerData || learnerData.length === 0) {
         toast({
           title: "Learner Not Found",
           description: "No learner found with this email address",
@@ -62,6 +69,9 @@ const LoginForm = ({ role, onLogin }: LoginFormProps) => {
         });
         return;
       }
+      
+      const learner = learnerData[0];
+      console.log('Found learner:', learner);
 
       // Check if learner is active (allow 'pending' for first-time activation)
       if (learner.status !== 'active' && learner.status !== 'pending') {
@@ -95,7 +105,7 @@ const LoginForm = ({ role, onLogin }: LoginFormProps) => {
       }
 
       // Check if learner requires password change (first time login)
-      if (learner.requires_password_change || learner.requiresPasswordChange) {
+      if (learner.requires_password_change) {
         // For first-time login, just email is enough
         onLogin(learner);
         return;
@@ -111,7 +121,12 @@ const LoginForm = ({ role, onLogin }: LoginFormProps) => {
         return;
       }
 
-      if (credentials.password !== learner.password) {
+      // Get full learner data for password verification
+      const { DataService } = await import('@/services/dataService');
+      const fullLearnerData = await DataService.getLearners();
+      const fullLearner = fullLearnerData.find((l: any) => l.id === learner.id);
+      
+      if (!fullLearner || credentials.password !== fullLearner.password) {
         toast({
           title: "Invalid Password",
           description: "The password you entered is incorrect",
@@ -120,8 +135,8 @@ const LoginForm = ({ role, onLogin }: LoginFormProps) => {
         return;
       }
 
-      // Successful login
-      onLogin(learner);
+      // Successful login - merge data
+      onLogin({ ...learner, ...fullLearner });
     } catch (error) {
       console.error('Login error:', error);
       toast({
