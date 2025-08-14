@@ -4,10 +4,12 @@ import UnboxableLogo from '@/components/login/UnboxableLogo';
 interface SurveyHeaderProps {
   title: string;
   onBack: () => void;
+  learnerName?: string;
 }
 export const SurveyHeader = ({
   title,
-  onBack
+  onBack,
+  learnerName
 }: SurveyHeaderProps) => {
   return <header className="survey-header-gradient px-4 sm:px-6 lg:px-8 py-8">
       <div className="max-w-4xl mx-auto">
@@ -26,6 +28,16 @@ export const SurveyHeader = ({
           </Button>
         </div>
         
+        {learnerName && (
+          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+            <p className="text-white/90 text-sm font-medium">
+              Welcome to your assessment,
+            </p>
+            <p className="text-white text-lg font-bold">
+              {learnerName}
+            </p>
+          </div>
+        )}
         
       </div>
     </header>;

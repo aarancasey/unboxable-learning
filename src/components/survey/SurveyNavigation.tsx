@@ -15,6 +15,7 @@ interface SurveyNavigationProps {
   saveComplete: boolean;
   isSubmitting?: boolean;
   submissionComplete?: boolean;
+  learnerName?: string;
 }
 
 export const SurveyNavigation = ({
@@ -29,7 +30,8 @@ export const SurveyNavigation = ({
   lastSaved,
   saveComplete,
   isSubmitting = false,
-  submissionComplete = false
+  submissionComplete = false,
+  learnerName
 }: SurveyNavigationProps) => {
   const { user } = useAuth();
   const formatLastSaved = (date: Date) => {
@@ -47,6 +49,21 @@ export const SurveyNavigation = ({
 
   return (
     <div className="flex flex-col gap-4 mt-8">
+      {/* Completion Message */}
+      {submissionComplete && learnerName && (
+        <div className="mb-4 p-6 bg-gradient-to-r from-unboxable-navy to-unboxable-orange rounded-lg text-white">
+          <div className="text-center">
+            <h3 className="text-xl font-bold mb-2">Assessment Complete!</h3>
+            <p className="text-lg">
+              Thank you, <span className="font-bold">{learnerName}</span>, for completing your LEADForward Assessment.
+            </p>
+            <p className="text-sm opacity-90 mt-2">
+              Your responses have been submitted and you will receive your results soon.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Save Success Message */}
       {saveComplete && (
         <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3 animate-fade-in">

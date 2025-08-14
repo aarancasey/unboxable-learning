@@ -199,11 +199,20 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
     );
   };
 
+  const learnerFullName = learnerData?.name || 
+    (learnerData?.first_name && learnerData?.last_name 
+      ? `${learnerData.first_name} ${learnerData.last_name}` 
+      : learnerData?.email || '');
+
   // Show participant info form first
   if (!participantInfo) {
     return (
       <div className="min-h-screen bg-background">
-        <SurveyHeader title={survey.title} onBack={onBack} />
+        <SurveyHeader 
+          title={survey.title} 
+          onBack={onBack} 
+          learnerName={learnerFullName}
+        />
         
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
@@ -227,7 +236,11 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
 
   return (
     <div className="min-h-screen bg-background">
-      <SurveyHeader title={survey.title} onBack={onBack} />
+      <SurveyHeader 
+        title={survey.title} 
+        onBack={onBack} 
+        learnerName={learnerFullName}
+      />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <SurveyProgress
@@ -275,6 +288,7 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
             saveComplete={saveComplete}
             isSubmitting={isSubmitting}
             submissionComplete={submissionComplete}
+            learnerName={learnerFullName}
           />
         </div>
       </div>
