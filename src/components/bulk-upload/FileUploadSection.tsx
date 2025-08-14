@@ -42,45 +42,24 @@ export const FileUploadSection = ({ onFileUpload, isProcessing, progress = 0, pr
                 <div className="space-y-2">
                   <p className="text-lg font-medium">Choose a file to upload</p>
                   <p className="text-gray-500">CSV or Excel files accepted (max 10MB)</p>
-                  <div className="space-y-2">
-                    <Button 
-                      onClick={() => {
-                        const input = document.createElement('input');
-                        input.type = 'file';
-                        input.accept = 'text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-                        input.multiple = false;
-                        input.style.position = 'absolute';
-                        input.style.left = '-9999px';
-                        input.style.opacity = '0';
-                        
-                        input.onchange = (e) => {
-                          const event = e as unknown as React.ChangeEvent<HTMLInputElement>;
-                          onFileUpload(event);
-                          document.body.removeChild(input);
-                        };
-                        
-                        document.body.appendChild(input);
-                        
-                        // Force focus and click for iPad
-                        setTimeout(() => {
-                          input.focus();
-                          input.click();
-                        }, 100);
-                      }}
-                      disabled={isProcessing}
-                      className="w-full"
-                    >
-                      Choose File
-                    </Button>
-                    
-                    {/* Fallback file input for iPad */}
+                  <div className="relative">
                     <input
                       type="file"
-                      accept="text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.csv,.xlsx,.xls"
+                      accept=".csv,.xlsx,.xls"
                       onChange={onFileUpload}
-                      className="w-full p-2 border border-dashed border-gray-300 rounded text-sm file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                       disabled={isProcessing}
+                      id="file-upload-direct"
                     />
+                    <Button 
+                      disabled={isProcessing}
+                      className="w-full relative z-0"
+                      asChild
+                    >
+                      <div>
+                        Choose File
+                      </div>
+                    </Button>
                   </div>
                 </div>
               </>
