@@ -220,13 +220,15 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
             />
           </div>
 
-          {/* Learning Modules - Takes 2/3 of the space */}
-          <div className="lg:col-span-2">
-            <ModulesSection
-              modules={modules}
-              onModuleClick={handleModuleClick}
-            />
-          </div>
+          {/* Learning Modules - Hidden for learners for now */}
+          {false && (
+            <div className="lg:col-span-2">
+              <ModulesSection
+                modules={modules}
+                onModuleClick={handleModuleClick}
+              />
+            </div>
+          )}
         </div>
       </div>
 
