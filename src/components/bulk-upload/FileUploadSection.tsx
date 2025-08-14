@@ -42,21 +42,22 @@ export const FileUploadSection = ({ onFileUpload, isProcessing, progress = 0, pr
                 <div className="space-y-2">
                   <p className="text-lg font-medium">Choose a file to upload</p>
                   <p className="text-gray-500">CSV or Excel files accepted (max 10MB)</p>
-                  <Button 
-                    onClick={() => document.getElementById('file-upload')?.click()}
-                    disabled={isProcessing}
-                    className="relative"
-                  >
-                    Select File
-                  </Button>
+                  <label htmlFor="file-upload" className="inline-block">
+                    <Button 
+                      asChild
+                      disabled={isProcessing}
+                      className="cursor-pointer"
+                    >
+                      <span>Select File</span>
+                    </Button>
+                  </label>
                   <input
                     type="file"
                     accept=".csv,.xlsx,.xls"
                     onChange={onFileUpload}
-                    className="absolute opacity-0 w-0 h-0 overflow-hidden"
+                    className="sr-only"
                     id="file-upload"
                     disabled={isProcessing}
-                    style={{ position: 'absolute', left: '-9999px' }}
                   />
                 </div>
               </>
