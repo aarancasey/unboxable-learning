@@ -148,7 +148,8 @@ const UserManagement = () => {
       name: updatedLearner.name,
       email: updatedLearner.email,
       team: updatedLearner.team,
-      role: updatedLearner.role
+      role: updatedLearner.role,
+      cohort: updatedLearner.cohort
     });
     
     setLearners(prev => prev.map(learner => 
@@ -156,6 +157,36 @@ const UserManagement = () => {
         ? { ...learner, ...updatedLearner }
         : learner
     ));
+  };
+
+  const handleToggleSurveyAccess = async (cohort: string, enabled: boolean) => {
+    try {
+      const cohortLearners = learners.filter(l => l.cohort === cohort);
+      
+      for (const learner of cohortLearners) {
+        await DataService.updateLearner(learner.id, { 
+          survey_access_enabled: enabled 
+        });
+      }
+      
+      setLearners(prev => prev.map(learner => 
+        learner.cohort === cohort 
+          ? { ...learner, survey_access_enabled: enabled }
+          : learner
+      ));
+      
+      toast({
+        title: `Cohort ${cohort} Survey Access ${enabled ? 'Enabled' : 'Disabled'}`,
+        description: `Survey access has been ${enabled ? 'enabled' : 'disabled'} for all learners in Cohort ${cohort}.`,
+      });
+    } catch (error) {
+      console.error('Error updating survey access:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update survey access. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   // Load learners from Supabase on component mount
@@ -215,6 +246,7 @@ const UserManagement = () => {
         onDeleteLearner={handleDeleteLearner}
         onResendInvite={handleResendInvite}
         onEditLearner={handleEditLearner}
+        onToggleSurveyAccess={handleToggleSurveyAccess}
       />
 
       <AddLearnerForm

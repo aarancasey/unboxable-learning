@@ -861,6 +861,7 @@ export type Database = {
       }
       learners: {
         Row: {
+          cohort: string | null
           created_at: string | null
           email: string
           id: number
@@ -869,10 +870,12 @@ export type Database = {
           requires_password_change: boolean | null
           role: string
           status: string
+          survey_access_enabled: boolean | null
           team: string
           updated_at: string | null
         }
         Insert: {
+          cohort?: string | null
           created_at?: string | null
           email: string
           id?: number
@@ -881,10 +884,12 @@ export type Database = {
           requires_password_change?: boolean | null
           role: string
           status?: string
+          survey_access_enabled?: boolean | null
           team: string
           updated_at?: string | null
         }
         Update: {
+          cohort?: string | null
           created_at?: string | null
           email?: string
           id?: number
@@ -893,6 +898,7 @@ export type Database = {
           requires_password_change?: boolean | null
           role?: string
           status?: string
+          survey_access_enabled?: boolean | null
           team?: string
           updated_at?: string | null
         }

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 
@@ -18,6 +19,7 @@ const AddLearnerForm = ({ isOpen, onClose, onAddLearner }: AddLearnerFormProps) 
     email: '',
     role: '',
     team: '',
+    cohort: 'A',
   });
   const { toast } = useToast();
 
@@ -28,7 +30,7 @@ const AddLearnerForm = ({ isOpen, onClose, onAddLearner }: AddLearnerFormProps) 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.email || !formData.role || !formData.team) {
+    if (!formData.name || !formData.email || !formData.role || !formData.team || !formData.cohort) {
       toast({
         title: "Error",
         description: "Please fill in all fields",
@@ -45,6 +47,8 @@ const AddLearnerForm = ({ isOpen, onClose, onAddLearner }: AddLearnerFormProps) 
       password: generatedPassword,
       status: 'pending',
       team: formData.team,
+      cohort: formData.cohort,
+      survey_access_enabled: formData.cohort === 'A',
       requires_password_change: true,
     };
 
@@ -56,7 +60,7 @@ const AddLearnerForm = ({ isOpen, onClose, onAddLearner }: AddLearnerFormProps) 
     });
 
     // Reset form and close modal
-    setFormData({ name: '', email: '', role: '', team: '' });
+    setFormData({ name: '', email: '', role: '', team: '', cohort: 'A' });
     onClose();
   };
 
@@ -117,6 +121,19 @@ const AddLearnerForm = ({ isOpen, onClose, onAddLearner }: AddLearnerFormProps) 
               placeholder="Enter team"
               required
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="cohort">Cohort</Label>
+            <Select value={formData.cohort} onValueChange={(value) => handleInputChange('cohort', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select cohort" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="A">Cohort A (Current)</SelectItem>
+                <SelectItem value="B">Cohort B (Future)</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="bg-blue-50 p-3 rounded-md">

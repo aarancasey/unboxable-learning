@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   Dialog,
   DialogContent,
@@ -18,6 +19,7 @@ interface Learner {
   status: string;
   team: string;
   role: string;
+  cohort?: string;
 }
 
 interface EditLearnerModalProps {
@@ -36,6 +38,7 @@ const EditLearnerModal = ({ learner, isOpen, onClose, onSave }: EditLearnerModal
     status: '',
     team: '',
     role: '',
+    cohort: 'A',
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -127,6 +130,18 @@ const EditLearnerModal = ({ learner, isOpen, onClose, onSave }: EditLearnerModal
               onChange={(e) => handleInputChange('role', e.target.value)}
               placeholder="Enter role"
             />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="cohort">Cohort</Label>
+            <Select value={formData.cohort || 'A'} onValueChange={(value) => handleInputChange('cohort' as keyof Learner, value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select cohort" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="A">Cohort A (Current)</SelectItem>
+                <SelectItem value="B">Cohort B (Future)</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
         <DialogFooter>

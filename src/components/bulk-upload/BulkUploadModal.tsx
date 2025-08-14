@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { BulkUploadModalProps, ParsedUser } from './types';
 import { validateUser } from './utils';
@@ -13,6 +15,7 @@ const BulkUploadModal = ({ isOpen, onClose, onBulkImport, existingEmails }: Bulk
   const [step, setStep] = useState<'upload' | 'preview'>('upload');
   const [progress, setProgress] = useState(0);
   const [progressMessage, setProgressMessage] = useState('');
+  const [selectedCohort, setSelectedCohort] = useState<string>('A');
   const workerRef = useRef<Worker | null>(null);
   const { toast } = useToast();
 
@@ -175,6 +178,8 @@ const BulkUploadModal = ({ isOpen, onClose, onBulkImport, existingEmails }: Bulk
       role: user.role,
       team: user.team,
       status: 'pending',
+      cohort: selectedCohort,
+      survey_access_enabled: selectedCohort === 'A',
       requires_password_change: true,
       password: Math.random().toString(36).slice(-8)
     }));
@@ -202,6 +207,7 @@ const BulkUploadModal = ({ isOpen, onClose, onBulkImport, existingEmails }: Bulk
     setIsProcessing(false);
     setProgress(0);
     setProgressMessage('');
+    setSelectedCohort('A');
     onClose();
   };
 
@@ -214,6 +220,21 @@ const BulkUploadModal = ({ isOpen, onClose, onBulkImport, existingEmails }: Bulk
             Upload multiple users at once using a CSV or Excel file
           </DialogDescription>
         </DialogHeader>
+
+        <div className="space-y-4 mb-6">
+          <div className="space-y-2">
+            <Label htmlFor="cohort">Target Cohort</Label>
+            <Select value={selectedCohort} onValueChange={setSelectedCohort}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select cohort" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="A">Cohort A (Current)</SelectItem>
+                <SelectItem value="B">Cohort B (Future)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
 
         {step === 'upload' && (
           <FileUploadSection
