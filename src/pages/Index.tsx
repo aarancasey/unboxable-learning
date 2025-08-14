@@ -35,7 +35,7 @@ const AppContent = () => {
   // Check if authenticated user is a learner and fetch their data
   useEffect(() => {
     const checkLearnerStatus = async () => {
-      if (isAuthenticated && user?.email && !learnerData) {
+      if (isAuthenticated && user?.email && !learnerData && !pendingPasswordCreation) {
         try {
           // Import DataService to check if user is a learner
           const { DataService } = await import('@/services/dataService');
@@ -43,9 +43,14 @@ const AppContent = () => {
           const learner = learners.find(l => l.email.toLowerCase() === user.email.toLowerCase());
           
           if (learner) {
-            setLearnerData(learner);
-            trackUserLogin('learner');
-            trackPageView('/dashboard');
+            // Check if the learner requires a password change
+            if (learner.requires_password_change) {
+              setPendingPasswordCreation(learner);
+            } else {
+              setLearnerData(learner);
+              trackUserLogin('learner');
+              trackPageView('/dashboard');
+            }
           }
         } catch (error) {
           console.error('Error checking learner status:', error);
@@ -54,7 +59,7 @@ const AppContent = () => {
     };
 
     checkLearnerStatus();
-  }, [isAuthenticated, user?.email, learnerData, trackUserLogin, trackPageView]);
+  }, [isAuthenticated, user?.email, learnerData, pendingPasswordCreation, trackUserLogin, trackPageView]);
 
   // Load Learn More settings
   useEffect(() => {
