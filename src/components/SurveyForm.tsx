@@ -5,8 +5,10 @@ import { SurveyNavigation } from './survey/SurveyNavigation';
 import { InstructionsSection } from './survey/InstructionsSection';
 import { QuestionRenderer } from './survey/QuestionRenderer';
 import { ParticipantInfoForm, ParticipantInfo } from './survey/ParticipantInfoForm';
+import { SurveyCompletedMessage } from './survey/SurveyCompletedMessage';
 import { useSurveyData } from './survey/useSurveyData';
 import { useSurveyProgress } from './survey/useSurveyProgress';
+import { useSurveyCompletion } from '@/hooks/useSurveyCompletion';
 import { supabase } from '@/integrations/supabase/client';
 import { dateHelpers } from '@/lib/dateUtils';
 import { useState } from 'react';
@@ -22,6 +24,7 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionComplete, setSubmissionComplete] = useState(false);
   const survey = useSurveyData();
+  const { isCompleted, submission, loading } = useSurveyCompletion(learnerData);
   const {
     currentSection,
     currentQuestion,
@@ -203,6 +206,30 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
     (learnerData?.first_name && learnerData?.last_name 
       ? `${learnerData.first_name} ${learnerData.last_name}` 
       : learnerData?.email || '');
+
+  // Show loading state while checking completion
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-unboxable-orange mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Checking survey status...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show completed message if survey is already submitted
+  if (isCompleted && submission) {
+    return (
+      <SurveyCompletedMessage
+        onBack={onBack}
+        submissionDate={submission.submitted_at}
+        status={submission.status}
+        learnerName={learnerFullName}
+      />
+    );
+  }
 
   // Show participant info form first
   if (!participantInfo) {

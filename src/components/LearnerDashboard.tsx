@@ -164,6 +164,13 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
     trackModuleStart(module.id || 'unknown', module.title || 'Unknown Module', module.courseId || 'unknown');
   };
 
+  const handleStartSurvey = () => {
+    // Only allow survey start if not already completed
+    if (surveyStatus === 'not_started') {
+      setActiveView('survey');
+    }
+  };
+
   if (activeView === 'module' && selectedModule) {
     return (
       <ModuleViewer 
@@ -215,8 +222,8 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
           {/* Assessment Card - Left aligned */}
           <AssessmentCard
             surveyStatus={surveyStatus}
-            onStartSurvey={() => setActiveView('survey')}
-            onStartPostSurvey={() => setActiveView('survey')}
+            onStartSurvey={handleStartSurvey}
+            onStartPostSurvey={handleStartSurvey}
             hasCompletedModules={displayData.completedModules > 0}
             courseName={currentCourse?.title}
           />
