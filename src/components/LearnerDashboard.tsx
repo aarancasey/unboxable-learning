@@ -203,11 +203,12 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-        {/* Welcome Section */}
-        <LearnerWelcomeSection 
-          learnerName={displayData.name}
-          surveyStatus={surveyStatus}
-        />
+        {/* Simple Welcome Heading */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-unboxable-navy">
+            Welcome, {displayData.name}
+          </h1>
+        </div>
 
         {/* Main Content Grid */}
         <div className="max-w-4xl mx-auto">

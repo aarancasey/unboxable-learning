@@ -24,8 +24,8 @@ export const AssessmentCard: React.FC<AssessmentCardProps> = ({
     switch (surveyStatus) {
       case 'not_started':
         return {
-          title: 'Pre-Course Assessment',
-          description: 'Complete your leadership self-assessment to unlock course modules',
+          title: 'Leadership Assessment',
+          description: '',
           status: 'Required',
           statusVariant: 'destructive' as const,
           icon: AlertCircle,
@@ -36,8 +36,8 @@ export const AssessmentCard: React.FC<AssessmentCardProps> = ({
         };
       case 'completed':
         return {
-          title: 'Assessment Under Review',
-          description: 'Your assessment has been submitted and is being reviewed',
+          title: 'Leadership Assessment',
+          description: '',
           status: 'Pending Review',
           statusVariant: 'secondary' as const,
           icon: Clock,
@@ -48,10 +48,8 @@ export const AssessmentCard: React.FC<AssessmentCardProps> = ({
         };
       case 'approved':
         return {
-          title: hasCompletedModules ? 'Post-Course Assessment' : 'Assessment Approved',
-          description: hasCompletedModules 
-            ? 'Complete your final assessment to review your progress'
-            : 'Your assessment has been approved. Course modules are now unlocked!',
+          title: hasCompletedModules ? 'Post-Course Assessment' : 'Leadership Assessment',
+          description: '',
           status: hasCompletedModules ? 'Available' : 'Approved',
           statusVariant: 'default' as const,
           icon: CheckCircle,
@@ -72,9 +70,11 @@ export const AssessmentCard: React.FC<AssessmentCardProps> = ({
         <div className="flex items-start justify-between">
           <div className="space-y-1">
             <CardTitle className="text-xl">{config.title}</CardTitle>
-            <CardDescription className="text-base">
-              {config.description}
-            </CardDescription>
+            {config.description && (
+              <CardDescription className="text-base">
+                {config.description}
+              </CardDescription>
+            )}
           </div>
           <Badge variant={config.statusVariant} className="ml-4">
             {config.status}
