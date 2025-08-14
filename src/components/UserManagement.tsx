@@ -189,14 +189,18 @@ const UserManagement = () => {
     }
   };
 
-  // Load learners from Supabase on component mount
+  // Load learners with survey status from Supabase on component mount
   useEffect(() => {
     const loadLearners = async () => {
       try {
         console.log('Loading learners from Supabase...');
         const data = await DataService.getLearners();
         console.log('Loaded learners:', data);
-        setLearners(data);
+        
+        // Enhance with survey status
+        const learnersWithSurveyStatus = await DataService.getSurveyStatusForLearners(data);
+        console.log('Learners with survey status:', learnersWithSurveyStatus);
+        setLearners(learnersWithSurveyStatus);
       } catch (error) {
         console.error('Error loading learners:', error);
         // Set empty array on error instead of crashing
@@ -211,9 +215,29 @@ const UserManagement = () => {
     try {
       const data = await DataService.getLearners();
       console.log('Refreshed learners from Supabase:', data);
-      setLearners(data);
+      
+      // Enhance with survey status
+      const learnersWithSurveyStatus = await DataService.getSurveyStatusForLearners(data);
+      setLearners(learnersWithSurveyStatus);
     } catch (error) {
       console.error('Error refreshing learners:', error);
+    }
+  };
+
+  const handleSendSurveyReminder = async (learnerEmail: string, learnerName: string) => {
+    try {
+      await DataService.sendSurveyReminder(learnerEmail, learnerName);
+      toast({
+        title: "Survey Reminder Sent",
+        description: `A survey reminder has been sent to ${learnerName}.`,
+      });
+    } catch (error) {
+      console.error('Error sending survey reminder:', error);
+      toast({
+        title: "Error",
+        description: "Failed to send survey reminder. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -247,6 +271,7 @@ const UserManagement = () => {
         onResendInvite={handleResendInvite}
         onEditLearner={handleEditLearner}
         onToggleSurveyAccess={handleToggleSurveyAccess}
+        onSendSurveyReminder={handleSendSurveyReminder}
       />
 
       <AddLearnerForm

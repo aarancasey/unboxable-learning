@@ -14,6 +14,9 @@ interface Learner {
   role: string;
   cohort?: string;
   survey_access_enabled?: boolean;
+  surveyStatus?: 'not_started' | 'in_progress' | 'completed';
+  surveySubmission?: any;
+  lastSurveyActivity?: string;
 }
 
 interface UsersListProps {
@@ -25,57 +28,66 @@ interface UsersListProps {
   onResendInvite: (learnerId: number) => void;
   onEditLearner: (learner: Learner) => void;
   onToggleSurveyAccess: (cohort: string, enabled: boolean) => void;
+  onSendSurveyReminder?: (learnerEmail: string, learnerName: string) => void;
 }
 
-const UsersList = ({ learners, filteredUsers, onAddLearner, onActivateLearner, onDeleteLearner, onResendInvite, onEditLearner, onToggleSurveyAccess }: UsersListProps) => {
+const UsersList = ({ learners, filteredUsers, onAddLearner, onActivateLearner, onDeleteLearner, onResendInvite, onEditLearner, onToggleSurveyAccess, onSendSurveyReminder }: UsersListProps) => {
   const cohortALearners = filteredUsers.filter(learner => learner.cohort === 'A');
   const cohortBLearners = filteredUsers.filter(learner => learner.cohort === 'B');
 
-  const renderCohortContent = (cohort: string, cohortLearners: Learner[], title: string) => (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <span>{title} ({cohortLearners.length})</span>
-          <div className="flex items-center gap-4">
-            <div className="text-sm text-gray-600">
-              {cohortLearners.filter(l => l.status === 'active').length} active users
+  const renderCohortContent = (cohort: string, cohortLearners: Learner[], title: string) => {
+    const completedSurveys = cohortLearners.filter(l => l.surveyStatus === 'completed').length;
+    const inProgressSurveys = cohortLearners.filter(l => l.surveyStatus === 'in_progress').length;
+    
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span>{title} ({cohortLearners.length})</span>
+            <div className="flex items-center gap-4">
+              <div className="text-sm text-muted-foreground space-x-4">
+                <span>{cohortLearners.filter(l => l.status === 'active').length} active</span>
+                <span>{completedSurveys} surveys completed</span>
+                <span>{inProgressSurveys} in progress</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Survey Access:</span>
+                <Button
+                  variant={cohortLearners.some(l => l.survey_access_enabled) ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => onToggleSurveyAccess(cohort, !cohortLearners.some(l => l.survey_access_enabled))}
+                >
+                  {cohortLearners.some(l => l.survey_access_enabled) ? 'Enabled' : 'Disabled'}
+                </Button>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600">Survey Access:</span>
-              <Button
-                variant={cohortLearners.some(l => l.survey_access_enabled) ? "default" : "outline"}
-                size="sm"
-                onClick={() => onToggleSurveyAccess(cohort, !cohortLearners.some(l => l.survey_access_enabled))}
-              >
-                {cohortLearners.some(l => l.survey_access_enabled) ? 'Enabled' : 'Disabled'}
-              </Button>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          {cohortLearners.length === 0 ? (
+            <div className="p-6 text-center text-gray-500">
+              No learners in {title} yet. 
+              {cohort === 'A' && <button onClick={onAddLearner} className="text-primary hover:underline ml-1">Add learners</button>}
             </div>
-          </div>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-0">
-        {cohortLearners.length === 0 ? (
-          <div className="p-6 text-center text-gray-500">
-            No learners in {title} yet. 
-            {cohort === 'A' && <button onClick={onAddLearner} className="text-primary hover:underline ml-1">Add learners</button>}
-          </div>
-        ) : (
-          <div className="divide-y divide-gray-200">
-            {cohortLearners.map((learner) => (
-              <UserCard
-                key={learner.id}
-                learner={learner}
-                onActivate={onActivateLearner}
-                onDelete={onDeleteLearner}
-                onResendInvite={onResendInvite}
-                onEdit={onEditLearner}
-              />
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
+          ) : (
+            <div className="divide-y divide-gray-200">
+              {cohortLearners.map((learner) => (
+                <UserCard
+                  key={learner.id}
+                  learner={learner}
+                  onActivate={onActivateLearner}
+                  onDelete={onDeleteLearner}
+                  onResendInvite={onResendInvite}
+                  onEdit={onEditLearner}
+                  onSendSurveyReminder={onSendSurveyReminder}
+                />
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
 
   if (learners.length === 0) {
     return (

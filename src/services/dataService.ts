@@ -426,6 +426,81 @@ export class DataService {
     }
   }
 
+  // Survey status methods
+  static async getSurveyStatusForLearners(learners: any[]) {
+    try {
+      const submissions = await this.getSurveySubmissions();
+      const { data: progressData } = await supabase
+        .from('survey_progress')
+        .select('*');
+
+      return learners.map(learner => {
+        // Check for completed submission
+        const submission = submissions.find(sub => 
+          sub.learner_id === learner.id ||
+          sub.learner_name === learner.name ||
+          sub.learner_name === learner.email
+        );
+
+        if (submission) {
+          return {
+            ...learner,
+            surveyStatus: 'completed',
+            surveySubmission: submission,
+            lastSurveyActivity: submission.submitted_at
+          };
+        }
+
+        // Check for in-progress survey
+        const progress = progressData?.find(p => {
+          const participantInfo = p.participant_info as any;
+          return participantInfo?.email === learner.email ||
+                 participantInfo?.name === learner.name;
+        });
+
+        if (progress) {
+          return {
+            ...learner,
+            surveyStatus: 'in_progress',
+            surveyProgress: progress,
+            lastSurveyActivity: progress.updated_at
+          };
+        }
+
+        return {
+          ...learner,
+          surveyStatus: 'not_started',
+          lastSurveyActivity: null
+        };
+      });
+    } catch (error) {
+      console.error('Error getting survey status for learners:', error);
+      return learners.map(learner => ({
+        ...learner,
+        surveyStatus: 'not_started',
+        lastSurveyActivity: null
+      }));
+    }
+  }
+
+  static async sendSurveyReminder(learnerEmail: string, learnerName: string) {
+    try {
+      const { error } = await supabase.functions.invoke('send-password-reminder', {
+        body: {
+          email: learnerEmail,
+          name: learnerName,
+          type: 'survey_reminder'
+        }
+      });
+
+      if (error) throw error;
+      return { success: true };
+    } catch (error) {
+      console.error('Error sending survey reminder:', error);
+      throw error;
+    }
+  }
+
   // Recent Activities
   static async getRecentActivities(days: number = 14) {
     try {

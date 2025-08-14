@@ -18,6 +18,8 @@ import {
   Send,
   Edit2
 } from 'lucide-react';
+import SurveyProgressBadge from './survey/SurveyProgressBadge';
+import SurveyActionButton from './survey/SurveyActionButton';
 
 interface Learner {
   id: number;
@@ -26,6 +28,10 @@ interface Learner {
   status: string;
   team: string;
   role: string;
+  surveyStatus?: 'not_started' | 'in_progress' | 'completed';
+  surveySubmission?: any;
+  surveyProgress?: any;
+  lastSurveyActivity?: string;
 }
 
 interface UserCardProps {
@@ -34,9 +40,10 @@ interface UserCardProps {
   onDelete: (learnerId: number) => void;
   onResendInvite: (learnerId: number) => void;
   onEdit: (learner: Learner) => void;
+  onSendSurveyReminder?: (learnerEmail: string, learnerName: string) => void;
 }
 
-const UserCard = ({ learner, onActivate, onDelete, onResendInvite, onEdit }: UserCardProps) => {
+const UserCard = ({ learner, onActivate, onDelete, onResendInvite, onEdit, onSendSurveyReminder }: UserCardProps) => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'active':
@@ -117,6 +124,11 @@ const UserCard = ({ learner, onActivate, onDelete, onResendInvite, onEdit }: Use
             <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mt-1 space-y-1 sm:space-y-0">
               <span className="text-xs text-gray-500">{learner.role}</span>
               <span className="text-xs text-gray-500">{learner.team}</span>
+              {learner.lastSurveyActivity && (
+                <span className="text-xs text-gray-400">
+                  Last survey: {new Date(learner.lastSurveyActivity).toLocaleDateString()}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -124,8 +136,18 @@ const UserCard = ({ learner, onActivate, onDelete, onResendInvite, onEdit }: Use
           <div className="flex items-center space-x-2">
             <div className="hidden sm:block">{getStatusIcon(learner.status)}</div>
             {getStatusBadge(learner.status)}
+            <SurveyProgressBadge 
+              status={learner.surveyStatus || 'not_started'} 
+              className="text-xs"
+            />
           </div>
           <div className="flex items-center space-x-2">
+            <SurveyActionButton
+              surveyStatus={learner.surveyStatus || 'not_started'}
+              learnerName={learner.name}
+              learnerEmail={learner.email}
+              onSendReminder={onSendSurveyReminder ? () => onSendSurveyReminder(learner.email, learner.name) : undefined}
+            />
             {learner.status === 'pending' && (
               <Button 
                 size="sm" 
