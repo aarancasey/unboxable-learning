@@ -210,9 +210,9 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
           </h1>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="max-w-4xl mx-auto">
-          {/* Assessment Card - Full width since modules are hidden */}
+        {/* Main Content */}
+        <div className="max-w-2xl">
+          {/* Assessment Card - Left aligned */}
           <AssessmentCard
             surveyStatus={surveyStatus}
             onStartSurvey={() => setActiveView('survey')}
