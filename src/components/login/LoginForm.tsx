@@ -131,13 +131,24 @@ const LoginForm = ({ role, onLogin }: LoginFormProps) => {
       // If learner is pending, activate them on first login
       if (learner.status === 'pending') {
         try {
-          const { DataService } = await import('@/services/dataService');
-          await DataService.updateLearner(learner.id, { 
-            status: 'active',
-            requires_password_change: true 
+          const { data: activationResult, error: activationError } = await supabase.rpc('activate_learner', {
+            learner_id_input: learner.id
           });
-          learner.status = 'active';
-          learner.requires_password_change = true;
+          
+          if (activationError) {
+            console.error('Error activating learner:', activationError);
+            toast({
+              title: "Activation Error",
+              description: "Unable to activate account. Please try again.",
+              variant: "destructive",
+            });
+            return;
+          }
+          
+          if (activationResult) {
+            learner.status = 'active';
+            learner.requires_password_change = true;
+          }
         } catch (error) {
           console.error('Error activating learner:', error);
           toast({

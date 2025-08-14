@@ -1632,6 +1632,10 @@ export type Database = {
         Args: { learner_email: string }
         Returns: boolean
       }
+      update_learner_password: {
+        Args: { learner_id_input: number; new_password_input: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role:
