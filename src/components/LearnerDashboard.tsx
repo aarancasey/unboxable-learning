@@ -210,17 +210,15 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
         />
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          {/* Assessment Card - Takes 1/3 of the space */}
-          <div className="lg:col-span-1">
-            <AssessmentCard
-              surveyStatus={surveyStatus}
-              onStartSurvey={() => setActiveView('survey')}
-              onStartPostSurvey={() => setActiveView('survey')}
-              hasCompletedModules={displayData.completedModules > 0}
-              courseName={currentCourse?.title}
-            />
-          </div>
+        <div className="max-w-4xl mx-auto">
+          {/* Assessment Card - Full width since modules are hidden */}
+          <AssessmentCard
+            surveyStatus={surveyStatus}
+            onStartSurvey={() => setActiveView('survey')}
+            onStartPostSurvey={() => setActiveView('survey')}
+            hasCompletedModules={displayData.completedModules > 0}
+            courseName={currentCourse?.title}
+          />
 
           {/* Learning Modules - Hidden for learners for now */}
           {false && (
