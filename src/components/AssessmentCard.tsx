@@ -98,7 +98,7 @@ export const AssessmentCard: React.FC<AssessmentCardProps> = ({
             <BookOpen className="h-4 w-4 text-muted-foreground" />
             <div>
               <p className="text-sm font-medium">Survey</p>
-              <p className="text-xs text-muted-foreground">LeadForward Survey</p>
+              <p className="text-xs text-muted-foreground">LEADForward Survey</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
