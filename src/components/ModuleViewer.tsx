@@ -107,14 +107,33 @@ const ModuleViewer = ({ module, onBack, onComplete }: ModuleViewerProps) => {
   };
 
   const handleFileDownload = (file: File) => {
-    const url = URL.createObjectURL(file);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = file.name;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    try {
+      const url = URL.createObjectURL(file);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = file.name;
+      
+      // Force download instead of opening in browser
+      a.setAttribute('target', '_blank');
+      a.setAttribute('rel', 'noopener noreferrer');
+      
+      // Temporarily add to DOM, click, then remove
+      document.body.appendChild(a);
+      a.click();
+      
+      // Clean up immediately
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 100);
+      
+    } catch (error) {
+      console.error('Download failed:', error);
+      // Fallback: open in new tab if download fails
+      const url = URL.createObjectURL(file);
+      window.open(url, '_blank');
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
   };
 
   const renderModuleDocuments = () => {

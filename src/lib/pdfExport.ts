@@ -117,10 +117,31 @@ export const exportToPDF = async (survey: any, filename: string = 'assessment') 
       }
     }
     
-    // Save the PDF
+    // Save the PDF with better download handling
     const pdfFilename = `${filename}-${learnerName.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.pdf`;
     console.log('Saving PDF:', pdfFilename);
-    pdf.save(pdfFilename);
+    
+    try {
+      // Force download instead of opening in browser
+      pdf.save(pdfFilename);
+    } catch (saveError) {
+      console.warn('Direct save failed, trying alternative method:', saveError);
+      // Alternative method for problematic browsers
+      const pdfBlob = pdf.output('blob');
+      const url = URL.createObjectURL(pdfBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = pdfFilename;
+      a.setAttribute('target', '_blank');
+      a.setAttribute('rel', 'noopener noreferrer');
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 100);
+    }
+    
     console.log('PDF export completed successfully');
     
   } catch (error) {
