@@ -7,10 +7,11 @@ import { QuestionRenderer } from './survey/QuestionRenderer';
 import { ParticipantInfoForm, ParticipantInfo } from './survey/ParticipantInfoForm';
 import { SurveyCompletedMessage } from './survey/SurveyCompletedMessage';
 import { useSurveyData } from './survey/useSurveyData';
-import { useSurveyProgress } from './survey/useSurveyProgress';
+import { useSurveyProgressEnhanced } from './survey/useSurveyProgressEnhanced';
 import { useSurveyCompletion } from '@/hooks/useSurveyCompletion';
 import { supabase } from '@/integrations/supabase/client';
 import { dateHelpers } from '@/lib/dateUtils';
+import { SettingsService } from '@/services/settingsService';
 import { useState } from 'react';
 
 interface SurveyFormProps {
@@ -29,6 +30,7 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
     currentSection,
     currentQuestion,
     answers,
+    participantInfo: savedParticipantInfo,
     currentSectionData,
     currentQ,
     isInstructionsSection,
@@ -41,16 +43,22 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
     isSaving,
     lastSaved,
     saveComplete,
+    hasUnsavedChanges,
     handleAnswerChange,
     handleScaleGridChange,
+    handleParticipantInfoChange,
     handleNext,
     handlePrevious,
     saveProgress,
     deleteSavedProgress
-  } = useSurveyProgress(survey);
+  } = useSurveyProgressEnhanced(survey);
+
+  // Use saved participant info if available, otherwise use local state
+  const effectiveParticipantInfo = participantInfo || savedParticipantInfo;
 
   const handleParticipantInfoComplete = (data: ParticipantInfo) => {
     setParticipantInfo(data);
+    handleParticipantInfoChange(data);
   };
 
   const handleManualSave = () => {
@@ -71,7 +79,7 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
         console.log('Survey submitted:', answers);
 
         // Get the participant info from the survey state if available
-        let finalParticipantInfo = participantInfo;
+        let finalParticipantInfo = effectiveParticipantInfo;
         
         // If no participant info from form, try to extract from learnerData
         if (!finalParticipantInfo && learnerData) {
@@ -148,23 +156,29 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
           console.warn('Database save failed, but survey is saved locally:', error);
         }
 
-        // Send completion email using template
+        // Send completion email using template (only if enabled)
         try {
-          const { error: emailError } = await supabase.functions.invoke('send-assessment-summary', {
-            body: {
-              learnerName: finalParticipantInfo?.fullName || learnerData?.name || 'Unknown User',
-              learnerEmail: learnerData?.email || '',
-              summary: submissionData.aiSummary || {},
-              surveyTitle: survey.title,
-              completionDate: dateHelpers.shortDate(new Date()),
-              useTemplate: true // Flag to use template system
-            }
-          });
+          const emailEnabled = await SettingsService.getSurveyEmailEnabled();
+          
+          if (emailEnabled) {
+            const { error: emailError } = await supabase.functions.invoke('send-assessment-summary', {
+              body: {
+                learnerName: finalParticipantInfo?.fullName || learnerData?.name || 'Unknown User',
+                learnerEmail: learnerData?.email || '',
+                summary: submissionData.aiSummary || {},
+                surveyTitle: survey.title,
+                completionDate: dateHelpers.shortDate(new Date()),
+                useTemplate: true // Flag to use template system
+              }
+            });
 
-          if (emailError) {
-            console.error('Failed to send completion email:', emailError);
+            if (emailError) {
+              console.error('Failed to send completion email:', emailError);
+            } else {
+              console.log('Survey completion email sent successfully');
+            }
           } else {
-            console.log('Survey completion email sent successfully');
+            console.log('Survey completion email disabled via settings');
           }
         } catch (emailError) {
           console.error('Email sending failed:', emailError);
@@ -232,7 +246,7 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
   }
 
   // Show participant info form first
-  if (!participantInfo) {
+  if (!effectiveParticipantInfo) {
     return (
       <div className="min-h-screen bg-background">
         <SurveyHeader 
@@ -313,6 +327,7 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
             isSaving={isSaving}
             lastSaved={lastSaved}
             saveComplete={saveComplete}
+            hasUnsavedChanges={hasUnsavedChanges}
             isSubmitting={isSubmitting}
             submissionComplete={submissionComplete}
             learnerName={learnerFullName}

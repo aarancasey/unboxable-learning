@@ -79,4 +79,18 @@ export class SettingsService {
       return false;
     }
   }
+
+  static async getSurveyEmailEnabled(): Promise<boolean> {
+    try {
+      const value = await this.getSetting('survey_completion_email_enabled');
+      return value === null ? true : value === 'true'; // Default to true if not set
+    } catch (error) {
+      console.error('Error getting survey email setting:', error);
+      return true; // Default to enabled on error
+    }
+  }
+
+  static async setSurveyEmailEnabled(enabled: boolean): Promise<boolean> {
+    return this.setSetting('survey_completion_email_enabled', enabled.toString());
+  }
 }

@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight, Save, Clock, Check } from 'lucide-react';
 import { useAuth } from '@/components/auth/AuthProvider';
+import { ProgressIndicator } from './ProgressIndicator';
 
 interface SurveyNavigationProps {
   isFirstItem: boolean;
@@ -13,6 +14,7 @@ interface SurveyNavigationProps {
   isSaving: boolean;
   lastSaved: Date | null;
   saveComplete: boolean;
+  hasUnsavedChanges?: boolean;
   isSubmitting?: boolean;
   submissionComplete?: boolean;
   learnerName?: string;
@@ -29,6 +31,7 @@ export const SurveyNavigation = ({
   isSaving,
   lastSaved,
   saveComplete,
+  hasUnsavedChanges = false,
   isSubmitting = false,
   submissionComplete = false,
   learnerName
@@ -94,26 +97,22 @@ export const SurveyNavigation = ({
             onClick={onSave}
             disabled={!user || isSaving || saveComplete}
             title={!user ? "Please log in to save progress" : ""}
-            className={`flex items-center gap-2 px-6 py-3 transition-all duration-300 ${
-              saveComplete 
-                ? 'border-green-500 bg-green-50 text-green-700 hover:bg-green-50 hover:border-green-500' 
-                : !user
-                ? 'border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed'
-                : 'border-unboxable-orange/20 hover:border-unboxable-orange hover:bg-unboxable-orange/5'
-            }`}
+            className="flex items-center gap-2 px-6 py-3"
           >
-            {saveComplete ? (
-              <>
-                <Check className="w-4 h-4 text-green-600" />
-                Saved ✓
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4" />
-                {!user ? 'Login to Save' : isSaving ? 'Saving...' : 'Save Progress'}
-              </>
-            )}
+            <Save className="w-4 h-4" />
+            {!user ? 'Login to Save' : isSaving ? 'Saving...' : 'Save Progress'}
           </Button>
+          
+          {/* Enhanced progress indicator */}
+          {user && (
+            <ProgressIndicator
+              isSaving={isSaving}
+              lastSaved={lastSaved}
+              saveComplete={saveComplete}
+              hasUnsavedChanges={hasUnsavedChanges}
+              className="hidden sm:flex"
+            />
+          )}
         </div>
 
         <div className="flex gap-3">
