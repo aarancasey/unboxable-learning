@@ -46,6 +46,9 @@ interface EditableAISummaryProps {
 }
 
 export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummaryProps) => {
+  // Debug survey structure
+  console.log('Survey data structure:', survey);
+  
   // Get rubric templates for enhanced assessment
   const rubricTemplates = getRubricTemplates();
 
@@ -256,8 +259,18 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
           <h1 className="text-lg font-bold text-primary mb-1">LEADForward Leadership Self-Assessment</h1>
           <div className="text-sm text-muted-foreground space-y-2 max-w-4xl mx-auto leading-relaxed">
             <p className="text-xs text-muted-foreground mb-4">
-              For: {survey.responses?.participantInfo?.fullName || survey.learner_name || survey.learner || 'Insert Name'}<br/>
-              From: {survey.responses?.participantInfo?.company || survey.company || 'Company'}<br/>
+              For: {(() => {
+                // Try multiple ways to get the full name
+                const fullName = survey.responses?.participantInfo?.fullName || 
+                               survey.participantInfo?.fullName ||
+                               survey.fullName ||
+                               survey.learner_name ||
+                               survey.learner ||
+                               'Insert Name';
+                console.log('Using name for "For" field:', fullName);
+                return fullName;
+              })()}<br/>
+              From: {survey.responses?.participantInfo?.company || survey.participantInfo?.company || survey.company || 'Company'}<br/>
               Assessment Prepared: {new Date().toLocaleDateString()}
             </p>
             
@@ -514,7 +527,17 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
               www.unboxable.co.nz
             </div>
             <div className="text-xs text-muted-foreground">
-              Prepared in Confidence for: {survey.responses?.participantInfo?.fullName || survey.learner_name || survey.learner || 'Name'}
+              Prepared in Confidence for: {(() => {
+                // Try multiple ways to get the full name
+                const fullName = survey.responses?.participantInfo?.fullName || 
+                               survey.participantInfo?.fullName ||
+                               survey.fullName ||
+                               survey.learner_name ||
+                               survey.learner ||
+                               'Name';
+                console.log('Using name for "Prepared for" field:', fullName);
+                return fullName;
+              })()}
             </div>
           </div>
         </div>
