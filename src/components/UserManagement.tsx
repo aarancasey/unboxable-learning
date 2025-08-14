@@ -156,6 +156,20 @@ const UserManagement = () => {
     loadLearners();
   }, []);
 
+  // Force refresh learners data
+  const refreshLearners = async () => {
+    localStorage.clear(); // Clear all localStorage
+    const data = await DataService.getLearners();
+    console.log('Refreshed learners from Supabase:', data);
+    setLearners(data);
+  };
+
+  // Auto-refresh every 5 seconds to ensure data is current
+  useEffect(() => {
+    const interval = setInterval(refreshLearners, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   const filteredUsers = learners.filter(user =>
     user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
