@@ -46,9 +46,32 @@ interface EditableAISummaryProps {
 }
 
 export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummaryProps) => {
-  // Debug survey structure
-  console.log('Survey data structure:', survey);
-  
+  // Helper function to get the learner's full name from various possible locations
+  const getLearnerFullName = () => {
+    // Try to get full name from participant info in different possible structures
+    if (survey.responses?.participantInfo?.fullName) {
+      return survey.responses.participantInfo.fullName;
+    }
+    
+    // If responses is an object with participantInfo
+    if (survey.participantInfo?.fullName) {
+      return survey.participantInfo.fullName;
+    }
+    
+    // If there's a direct fullName field
+    if (survey.fullName) {
+      return survey.fullName;
+    }
+    
+    // For new format, check if responses has the data as nested object
+    if (survey.responses && typeof survey.responses === 'object' && survey.responses.participantInfo) {
+      return survey.responses.participantInfo.fullName;
+    }
+    
+    // Fall back to learner_name or learner, which might only be first name
+    return survey.learner_name || survey.learner || 'Insert Name';
+  };
+
   // Get rubric templates for enhanced assessment
   const rubricTemplates = getRubricTemplates();
 
@@ -259,17 +282,7 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
           <h1 className="text-lg font-bold text-primary mb-1">LEADForward Leadership Self-Assessment</h1>
           <div className="text-sm text-muted-foreground space-y-2 max-w-4xl mx-auto leading-relaxed">
             <p className="text-xs text-muted-foreground mb-4">
-              For: {(() => {
-                // Try multiple ways to get the full name
-                const fullName = survey.responses?.participantInfo?.fullName || 
-                               survey.participantInfo?.fullName ||
-                               survey.fullName ||
-                               survey.learner_name ||
-                               survey.learner ||
-                               'Insert Name';
-                console.log('Using name for "For" field:', fullName);
-                return fullName;
-              })()}<br/>
+              For: {getLearnerFullName()}<br/>
               From: {survey.responses?.participantInfo?.company || survey.participantInfo?.company || survey.company || 'Company'}<br/>
               Assessment Prepared: {new Date().toLocaleDateString()}
             </p>
@@ -527,17 +540,7 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
               www.unboxable.co.nz
             </div>
             <div className="text-xs text-muted-foreground">
-              Prepared in Confidence for: {(() => {
-                // Try multiple ways to get the full name
-                const fullName = survey.responses?.participantInfo?.fullName || 
-                               survey.participantInfo?.fullName ||
-                               survey.fullName ||
-                               survey.learner_name ||
-                               survey.learner ||
-                               'Name';
-                console.log('Using name for "Prepared for" field:', fullName);
-                return fullName;
-              })()}
+              Prepared in Confidence for: {getLearnerFullName()}
             </div>
           </div>
         </div>
