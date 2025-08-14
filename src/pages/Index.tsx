@@ -86,11 +86,21 @@ const AppContent = () => {
   };
 
   const handleLogout = async () => {
-    if (user) {
-      await signOut();
+    console.log('Index: Logout requested...');
+    try {
+      if (user) {
+        await signOut();
+      }
+      // Always clear local state
+      setLearnerData(null);
+      setShowLearnerLogin(false);
+      console.log('Index: Logout completed successfully');
+    } catch (error) {
+      console.error('Error during logout:', error);
+      // Still clear local state even if signOut fails
+      setLearnerData(null);
+      setShowLearnerLogin(false);
     }
-    setLearnerData(null);
-    setShowLearnerLogin(false);
   };
 
   if (isLoading) {

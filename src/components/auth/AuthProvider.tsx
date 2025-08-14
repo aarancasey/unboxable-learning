@@ -56,9 +56,24 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error('Error signing out:', error);
+    try {
+      console.log('AuthProvider: Attempting to sign out...');
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error('Error signing out from Supabase:', error);
+        // Even if there's an error, we should clear local state
+      }
+      
+      // Always clear local state regardless of server response
+      setSession(null);
+      setUser(null);
+      console.log('AuthProvider: Local session cleared');
+    } catch (error) {
+      console.error('Unexpected error during signOut:', error);
+      // Clear local state even on unexpected errors
+      setSession(null);
+      setUser(null);
     }
   };
 
