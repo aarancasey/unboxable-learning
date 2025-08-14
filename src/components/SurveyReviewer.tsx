@@ -6,11 +6,21 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
 import { EditableAISummary } from '@/components/assessment/EditableAISummary';
 import { useToast } from '@/hooks/use-toast';
 import { getQuestionText, getQuestionSection, formatAnswer } from '@/utils/surveyQuestionMapper';
+import { exportSurveyData, ExportOptions } from '@/utils/surveyExportUtils';
 import { 
   FileText, 
+  FileSpreadsheet,
   Clock, 
   CheckCircle, 
   AlertCircle,
@@ -36,6 +46,7 @@ const SurveyReviewer = () => {
   const [sortBy, setSortBy] = useState('newest');
   const [searchTerm, setSearchTerm] = useState('');
   const [storedSurveys, setStoredSurveys] = useState<any[]>([]);
+  const [isExporting, setIsExporting] = useState(false);
   
   const { toast } = useToast();
 
@@ -142,6 +153,27 @@ const SurveyReviewer = () => {
         description: "Failed to reset survey. Please try again.",
         variant: "destructive",
       });
+    }
+  };
+
+  // Handle bulk export
+  const handleExportAll = async (options: ExportOptions) => {
+    setIsExporting(true);
+    try {
+      const result = await exportSurveyData(storedSurveys, options);
+      toast({
+        title: "Export Successful",
+        description: `${result.filename} has been downloaded (${result.format} format)`,
+      });
+    } catch (error) {
+      console.error('Export failed:', error);
+      toast({
+        title: "Export Failed",
+        description: error instanceof Error ? error.message : "Failed to export survey data",
+        variant: "destructive",
+      });
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -449,10 +481,43 @@ const SurveyReviewer = () => {
           </div>
           
           {/* Export Button */}
-          <Button variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            Export All
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" disabled={isExporting}>
+                <Download className="h-4 w-4 mr-2" />
+                {isExporting ? 'Exporting...' : 'Export All'}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel>Export Options</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                onClick={() => handleExportAll({ format: 'excel', includeOnlyCompleted: true })}
+              >
+                <FileSpreadsheet className="h-4 w-4 mr-2" />
+                Excel (Completed Only)
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => handleExportAll({ format: 'csv', includeOnlyCompleted: true })}
+              >
+                <FileText className="h-4 w-4 mr-2" />
+                CSV (Completed Only)
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                onClick={() => handleExportAll({ format: 'excel', includeOnlyCompleted: false })}
+              >
+                <FileSpreadsheet className="h-4 w-4 mr-2" />
+                Excel (All Surveys)
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => handleExportAll({ format: 'csv', includeOnlyCompleted: false })}
+              >
+                <FileText className="h-4 w-4 mr-2" />
+                CSV (All Surveys)
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         
         {/* Filter Buttons */}
