@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import ModuleViewer from './ModuleViewer';
 import SurveyForm from './SurveyForm';
 import LearnerHeader from './LearnerHeader';
-import LearnerWelcomeSection from './LearnerWelcomeSection';
+
 import ModulesSection from './ModulesSection';
 import PasswordChangeModal from './PasswordChangeModal';
 import { useAnalytics } from '@/hooks/useAnalytics';
