@@ -256,8 +256,8 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
           <h1 className="text-lg font-bold text-primary mb-1">LEADForward Leadership Self-Assessment</h1>
           <div className="text-sm text-muted-foreground space-y-2 max-w-4xl mx-auto leading-relaxed">
             <p className="text-xs text-muted-foreground mb-4">
-              For: {survey.learner || survey.learner_name || 'Insert Name'}<br/>
-              From: {survey.company || 'Company'}<br/>
+              For: {survey.responses?.participantInfo?.fullName || survey.learner_name || survey.learner || 'Insert Name'}<br/>
+              From: {survey.responses?.participantInfo?.company || survey.company || 'Company'}<br/>
               Assessment Prepared: {new Date().toLocaleDateString()}
             </p>
             
@@ -514,7 +514,7 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
               www.unboxable.co.nz
             </div>
             <div className="text-xs text-muted-foreground">
-              Prepared in Confidence for: {survey.learner || survey.learner_name || 'Name'}
+              Prepared in Confidence for: {survey.responses?.participantInfo?.fullName || survey.learner_name || survey.learner || 'Name'}
             </div>
           </div>
         </div>
