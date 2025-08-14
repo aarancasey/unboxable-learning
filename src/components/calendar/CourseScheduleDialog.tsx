@@ -30,7 +30,7 @@ export const CourseScheduleDialog = ({ open, onClose, selectedDate, onSchedule }
   useEffect(() => {
     // Load available courses from localStorage
     const savedCourses = JSON.parse(localStorage.getItem('courses') || '[]');
-    console.log('Loading courses for calendar:', savedCourses);
+    
     setAvailableCourses(savedCourses.filter((course: any) => course.status === 'active'));
   }, [open]);
 

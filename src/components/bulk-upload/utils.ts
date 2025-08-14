@@ -63,18 +63,18 @@ export const parseExcel = (file: File): Promise<any[]> => {
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
-        console.log('Starting Excel parse for file:', file.name);
+        
         const data = new Uint8Array(e.target?.result as ArrayBuffer);
         const workbook = XLSX.read(data, { type: 'array' });
-        console.log('Workbook loaded, sheets:', workbook.SheetNames);
+        
         
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
         const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-        console.log('Raw JSON data:', jsonData);
+        
         
         if (jsonData.length === 0) {
-          console.log('No data found in Excel file');
+          
           resolve([]);
           return;
         }
@@ -87,7 +87,7 @@ export const parseExcel = (file: File): Promise<any[]> => {
           cell?.toString().toLowerCase().includes('team')
         );
         
-        console.log('Has proper headers:', hasHeaders);
+        
         
         let startRow = 0;
         let headers: string[] = [];
@@ -100,10 +100,10 @@ export const parseExcel = (file: File): Promise<any[]> => {
           // File has no headers, assume standard order: Name, Email, Team, Role
           headers = ['name', 'email', 'team', 'role'];
           startRow = 0;
-          console.log('No headers detected, assuming order: Name, Email, Team, Role');
+          
         }
         
-        console.log('Using headers:', headers);
+        
         const users = [];
         
         for (let i = startRow; i < jsonData.length; i++) {
@@ -133,12 +133,12 @@ export const parseExcel = (file: File): Promise<any[]> => {
           
           // Only add user if they have at least name and email
           if (user.name && user.email) {
-            console.log('Adding user:', user);
+            
             users.push(user);
           }
         }
         
-        console.log('Final parsed users:', users);
+        
         resolve(users);
       } catch (error) {
         console.error('Error parsing Excel file:', error);

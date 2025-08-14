@@ -58,7 +58,7 @@ const SurveyReviewer = () => {
         const surveys = await DataService.getSurveySubmissions();
         
         // Ensure we're getting ALL surveys including historical ones
-        console.log('Loaded surveys:', surveys);
+        
         setStoredSurveys(surveys || []);
       } catch (error) {
         console.error('Failed to load surveys:', error);

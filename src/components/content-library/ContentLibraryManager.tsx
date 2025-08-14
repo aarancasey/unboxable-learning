@@ -46,7 +46,7 @@ export const ContentLibraryManager: React.FC = () => {
       // Process each document
       for (const item of contentItems) {
         try {
-          console.log(`Processing document: ${item.title}`);
+          
           
           const { error: knowledgeError } = await supabase.functions.invoke('process-document-knowledge', {
             body: {
@@ -60,7 +60,7 @@ export const ContentLibraryManager: React.FC = () => {
             console.error(`Failed to extract knowledge for ${item.title}:`, knowledgeError);
             errorCount++;
           } else {
-            console.log(`Successfully processed: ${item.title}`);
+            
             successCount++;
           }
         } catch (itemError) {

@@ -66,7 +66,7 @@ export const AssessmentRubricsManager: React.FC = () => {
 
   const fetchData = async () => {
     try {
-      console.log('Fetching rubrics data...');
+      
       const [rubricsResponse, categoriesResponse, contentResponse] = await Promise.all([
         supabase
           .from('assessment_rubrics')
@@ -92,9 +92,6 @@ export const AssessmentRubricsManager: React.FC = () => {
           .order('title')
       ]);
 
-      console.log('Rubrics response:', rubricsResponse);
-      console.log('Categories response:', categoriesResponse);
-      console.log('Content response:', contentResponse);
 
       if (rubricsResponse.error) {
         console.error('Rubrics error:', rubricsResponse.error);
@@ -109,7 +106,7 @@ export const AssessmentRubricsManager: React.FC = () => {
         throw contentResponse.error;
       }
 
-      console.log('Setting rubrics data:', rubricsResponse.data);
+      
       setRubrics(rubricsResponse.data || []);
       setCategories(categoriesResponse.data || []);
       setContentItems(contentResponse.data || []);

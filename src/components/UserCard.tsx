@@ -16,10 +16,7 @@ import {
   MoreHorizontal,
   Trash2,
   Send,
-  Edit2,
-  Eye,
-  FileText,
-  RotateCcw
+  Edit2
 } from 'lucide-react';
 import SurveyProgressBadge from './survey/SurveyProgressBadge';
 import { 

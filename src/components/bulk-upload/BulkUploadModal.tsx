@@ -29,10 +29,10 @@ const BulkUploadModal = ({ isOpen, onClose, onBulkImport, existingEmails }: Bulk
   }, []);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('File upload triggered:', event.target.files);
+    
     const selectedFile = event.target.files?.[0];
     if (!selectedFile) {
-      console.log('No file selected');
+      
       return;
     }
     
@@ -59,7 +59,7 @@ const BulkUploadModal = ({ isOpen, onClose, onBulkImport, existingEmails }: Bulk
       return;
     }
     
-    console.log('File being processed:', selectedFile.name, selectedFile.size);
+    
     setFile(selectedFile);
     setIsProcessing(true);
     setProgress(0);
@@ -185,7 +185,7 @@ const BulkUploadModal = ({ isOpen, onClose, onBulkImport, existingEmails }: Bulk
     }));
     
     try {
-      console.log('Starting bulk import with learners:', newLearners);
+      
       await onBulkImport(newLearners);
       handleClose();
     } catch (error) {

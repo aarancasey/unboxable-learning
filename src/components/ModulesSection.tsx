@@ -105,11 +105,11 @@ const ModulesSection = ({ modules, onModuleClick }: ModulesSectionProps) => {
 
   const handleModuleClick = (module: Module) => {
     const isUnlocked = isModuleUnlocked(module);
-    console.log('Module clicked:', module.title, 'unlocked:', isUnlocked);
+    
     if (isUnlocked) {
       onModuleClick(module);
     } else {
-      console.log('Module is locked, click ignored');
+      
     }
   };
 

@@ -71,7 +71,7 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
       try {
         const { DataService } = await import('@/services/dataService');
         const coursesData = await DataService.getCourses();
-        console.log('Loading courses for learner from database:', coursesData);
+        
         
         if (coursesData.length > 0) {
           const activeCourse = coursesData.find((course: any) => course.status === 'active');

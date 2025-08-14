@@ -29,12 +29,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    console.log('AuthProvider: Setting up auth state listener');
+    
     
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        console.log('AuthProvider: Auth state change detected:', { event, session: !!session, userId: session?.user?.id });
+        
         setSession(session);
         setUser(session?.user ?? null);
         setIsLoading(false);
@@ -43,21 +43,21 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('AuthProvider: Initial session check:', { session: !!session, userId: session?.user?.id });
+      
       setSession(session);
       setUser(session?.user ?? null);
       setIsLoading(false);
     });
 
     return () => {
-      console.log('AuthProvider: Cleaning up auth subscription');
+      
       subscription.unsubscribe();
     };
   }, []);
 
   const signOut = async () => {
     try {
-      console.log('AuthProvider: Attempting to sign out...');
+      
       const { error } = await supabase.auth.signOut();
       
       if (error) {
@@ -68,7 +68,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       // Always clear local state regardless of server response
       setSession(null);
       setUser(null);
-      console.log('AuthProvider: Local session cleared');
+      
     } catch (error) {
       console.error('Unexpected error during signOut:', error);
       // Clear local state even on unexpected errors

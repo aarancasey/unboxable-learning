@@ -177,7 +177,7 @@ export const EditableAISummary = ({ survey, onSummaryUpdate }: EditableAISummary
         variant: "destructive",
       });
     } finally {
-      console.log('Setting isExporting to false');
+      
       setIsExporting(false);
     }
   };

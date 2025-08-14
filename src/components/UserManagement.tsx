@@ -55,7 +55,7 @@ const UserManagement = () => {
   };
 
   const handleBulkImport = async (newLearners: any[]) => {
-    console.log('Bulk importing learners via edge function:', newLearners);
+    
     
     try {
       const { data, error } = await supabase.functions.invoke('bulk-upload-learners', {
@@ -71,7 +71,7 @@ const UserManagement = () => {
         throw new Error(data.error || 'Upload failed');
       }
       
-      console.log('Bulk upload successful:', data);
+      
       
       // Refresh the learners list
       await refreshLearners();
@@ -193,13 +193,13 @@ const UserManagement = () => {
   useEffect(() => {
     const loadLearners = async () => {
       try {
-        console.log('Loading learners from Supabase...');
+        
         const data = await DataService.getLearners();
-        console.log('Loaded learners:', data);
+        
         
         // Enhance with survey status
         const learnersWithSurveyStatus = await DataService.getSurveyStatusForLearners(data);
-        console.log('Learners with survey status:', learnersWithSurveyStatus);
+        
         setLearners(learnersWithSurveyStatus);
       } catch (error) {
         console.error('Error loading learners:', error);
@@ -214,7 +214,7 @@ const UserManagement = () => {
   const refreshLearners = async () => {
     try {
       const data = await DataService.getLearners();
-      console.log('Refreshed learners from Supabase:', data);
+      
       
       // Enhance with survey status
       const learnersWithSurveyStatus = await DataService.getSurveyStatusForLearners(data);

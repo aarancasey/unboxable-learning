@@ -64,7 +64,7 @@ const CourseManagement = () => {
       await DataService.addCourse(courseData);
       // Reload courses to get updated data
       await loadCourses();
-      console.log('Course saved to database:', courseData);
+      
     } catch (error) {
       console.error('Error saving course:', error);
     }
@@ -78,7 +78,7 @@ const CourseManagement = () => {
       // Reload courses to reflect changes
       await loadCourses();
       
-      console.log('Course deleted successfully');
+      
     } catch (error) {
       console.error('Error deleting course:', error);
     }

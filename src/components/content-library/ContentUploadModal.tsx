@@ -37,7 +37,7 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
 
   React.useEffect(() => {
     if (isOpen) {
-      console.log('Modal opened, fetching categories...');
+      
       fetchCategories();
     }
   }, [isOpen]);
@@ -45,16 +45,12 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
   const fetchCategories = async () => {
     // Check authentication status
     const { data: { user } } = await supabase.auth.getUser();
-    console.log('Current user:', user);
-    console.log('User is authenticated:', !!user);
     
     const { data, error } = await supabase
       .from('content_categories')
       .select('*')
       .order('name');
     
-    console.log('Categories response:', { data, error });
-    console.log('Categories count:', data?.length || 0);
     
     if (error) {
       console.error('Error fetching categories:', error);
@@ -64,10 +60,10 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
         variant: "destructive"
       });
     } else if (data) {
-      console.log('Setting categories:', data);
+      
       setCategories(data);
     } else {
-      console.log('No categories data received');
+      
     }
   };
 
@@ -149,7 +145,7 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
       
       // Fallback to browser-based analysis
       try {
-        console.log('Starting browser-based AI analysis...');
+        
         const processedText = await AITextProcessor.processDocument(
           formData.extracted_content,
           formData.title || 'Leadership Assessment Document'
@@ -314,7 +310,7 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
       // Extract knowledge from the document content
       if (formData.extracted_content) {
         try {
-          console.log('Processing document for knowledge extraction...');
+          
           const { error: knowledgeError } = await supabase.functions.invoke('process-document-knowledge', {
             body: {
               contentLibraryId: contentData.id,
@@ -326,7 +322,7 @@ export const ContentUploadModal: React.FC<ContentUploadModalProps> = ({ isOpen, 
           if (knowledgeError) {
             console.error('Failed to extract knowledge:', knowledgeError);
           } else {
-            console.log('Knowledge extraction completed successfully');
+            
           }
         } catch (knowledgeError) {
           console.error('Error calling knowledge extraction:', knowledgeError);

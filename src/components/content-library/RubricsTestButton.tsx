@@ -66,7 +66,7 @@ export const RubricsTestButton: React.FC = () => {
       }]);
 
       // Test the edge function directly
-      console.log('🔍 Testing edge function with document:', contentData.title);
+      
       
       setTestResults(prev => [...prev, {
         status: 'success',
@@ -87,7 +87,7 @@ export const RubricsTestButton: React.FC = () => {
       const duration = Date.now() - startTime;
 
       if (analysisError) {
-        console.error('❌ Edge function error:', analysisError);
+        
         setTestResults(prev => [...prev, {
           status: 'error',
           message: `Edge function failed: ${analysisError.message || 'Unknown error'}`,
@@ -100,7 +100,7 @@ export const RubricsTestButton: React.FC = () => {
         return;
       }
 
-      console.log('✅ Edge function result:', analysisResult);
+      
 
       if (analysisResult?.success) {
         setTestResults(prev => [...prev, {
@@ -117,9 +117,9 @@ export const RubricsTestButton: React.FC = () => {
             .in('id', analysisResult.rubrics.map((r: any) => r.id));
 
           if (updateError) {
-            console.error('Failed to link rubrics to document:', updateError);
+            
           } else {
-            console.log('✅ Successfully linked rubrics to document');
+            
           }
         }
 
@@ -136,7 +136,7 @@ export const RubricsTestButton: React.FC = () => {
       }
 
     } catch (error: any) {
-      console.error('❌ Test failed:', error);
+      
       setTestResults(prev => [...prev, {
         status: 'error',
         message: error.message,

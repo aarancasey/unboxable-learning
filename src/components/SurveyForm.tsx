@@ -78,7 +78,7 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
       setIsSubmitting(true);
       try {
         // Survey complete - save final submission and delete progress
-        console.log('Survey submitted:', answers);
+        
 
         // Get the participant info from the survey state if available
         let finalParticipantInfo = effectiveParticipantInfo;
@@ -135,7 +135,7 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
         const existingSurveys = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
         existingSurveys.push(submissionData);
         localStorage.setItem('surveySubmissions', JSON.stringify(existingSurveys));
-        console.log('Survey saved to localStorage successfully');
+        
 
         // Try to save to database using upsert to prevent duplicates
         try {
@@ -152,7 +152,7 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
             });
           
           if (!dbError) {
-            console.log('Survey saved to database successfully');
+            
           }
         } catch (error) {
           console.warn('Database save failed, but survey is saved locally:', error);
@@ -177,10 +177,10 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
             if (emailError) {
               console.error('Failed to send completion email:', emailError);
             } else {
-              console.log('Survey completion email sent successfully');
+              
             }
           } else {
-            console.log('Survey completion email disabled via settings');
+            
           }
         } catch (emailError) {
           console.error('Email sending failed:', emailError);

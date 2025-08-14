@@ -85,7 +85,7 @@ export const useCalendarData = () => {
       // Clear local state
       setScheduledCourses([]);
       
-      console.log('All scheduled courses cleared successfully');
+      
     } catch (error) {
       console.error('Error clearing scheduled courses:', error);
       // Fallback: at least clear localStorage and state
