@@ -41,10 +41,10 @@ export const AssessmentCard: React.FC<AssessmentCardProps> = ({
           status: 'Pending Review',
           statusVariant: 'secondary' as const,
           icon: Clock,
-          action: 'Waiting for Approval',
-          onClick: () => {},
+          action: 'View Submission',
+          onClick: onStartSurvey,
           progress: 50,
-          disabled: true
+          disabled: false
         };
       case 'approved':
         return {
@@ -53,10 +53,10 @@ export const AssessmentCard: React.FC<AssessmentCardProps> = ({
           status: hasCompletedModules ? 'Available' : 'Approved',
           statusVariant: 'default' as const,
           icon: CheckCircle,
-          action: hasCompletedModules ? 'Start Final Assessment' : 'Assessment Complete',
-          onClick: hasCompletedModules ? onStartPostSurvey || (() => {}) : () => {},
+          action: hasCompletedModules ? 'Start Final Assessment' : 'View Submission',
+          onClick: hasCompletedModules ? onStartPostSurvey || (() => {}) : onStartSurvey,
           progress: hasCompletedModules ? 75 : 100,
-          disabled: !hasCompletedModules && surveyStatus === 'approved'
+          disabled: false
         };
     }
   };

@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -1579,12 +1579,12 @@ export type Database = {
       authenticate_learner: {
         Args: { email_input: string; password_input?: string }
         Returns: {
-          id: number
           email: string
+          id: number
           name: string
-          status: string
-          requires_password_change: boolean
           password_valid: boolean
+          requires_password_change: boolean
+          status: string
         }[]
       }
       check_admin_users: {
@@ -1594,7 +1594,7 @@ export type Database = {
         }[]
       }
       create_content_version: {
-        Args: { _page_slug: string; _content: Json; _change_summary?: string }
+        Args: { _change_summary?: string; _content: Json; _page_slug: string }
         Returns: string
       }
       get_current_user_email: {
@@ -1604,10 +1604,10 @@ export type Database = {
       get_learner_for_auth: {
         Args: { email_input: string }
         Returns: {
-          id: number
           email: string
-          status: string
+          id: number
           name: string
+          status: string
         }[]
       }
       has_cms_access: {
@@ -1624,7 +1624,7 @@ export type Database = {
       }
       has_role: {
         Args:
-          | { _user_id: string; _role: Database["public"]["Enums"]["app_role"] }
+          | { _role: Database["public"]["Enums"]["app_role"]; _user_id: string }
           | { role_name: string }
         Returns: boolean
       }

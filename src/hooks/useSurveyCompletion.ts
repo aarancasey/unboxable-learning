@@ -83,11 +83,11 @@ export const useSurveyCompletion = (learnerData?: any): SurveyCompletionResult =
           if (foundSubmission) {
             foundSubmission = {
               id: foundSubmission.id,
-              learner_name: foundSubmission.learnerName || foundSubmission.participantInfo?.fullName,
+              learner_name: (foundSubmission as any).learnerName || (foundSubmission as any).participantInfo?.fullName,
               responses: foundSubmission,
-              status: foundSubmission.status || 'completed',
-              submitted_at: foundSubmission.submittedAt,
-              learner_id: foundSubmission.learnerId
+              status: (foundSubmission as any).status || 'completed',
+              submitted_at: (foundSubmission as any).submittedAt,
+              learner_id: (foundSubmission as any).learnerId
             };
           }
         }
