@@ -210,7 +210,7 @@ const AppContent = () => {
               LEADERSHIP PROGRAM
             </h2>
             <h3 className="text-2xl sm:text-3xl font-black text-unboxable-orange mb-8">
-              DOUGLAS PHARMACEUTICALS
+              DOUGLAS
             </h3>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
               This isn't about reinventing yourself. It's about rethinking how you lead - using your existing strengths with a sharper focus, a wider lens, and a stronger impact.
