@@ -55,25 +55,33 @@ const UserManagement = () => {
   };
 
   const handleBulkImport = async (newLearners: any[]) => {
-    console.log('Bulk importing learners:', newLearners);
+    console.log('Bulk importing learners via edge function:', newLearners);
     
     try {
-      const results = [];
-      for (const learner of newLearners) {
-        console.log('Adding learner to Supabase:', learner);
-        const result = await DataService.addLearner(learner);
-        results.push(result);
+      const { data, error } = await supabase.functions.invoke('bulk-upload-learners', {
+        body: { learners: newLearners }
+      });
+      
+      if (error) {
+        console.error('Edge function error:', error);
+        throw new Error(error.message || 'Failed to upload learners');
       }
+      
+      if (!data.success) {
+        throw new Error(data.error || 'Upload failed');
+      }
+      
+      console.log('Bulk upload successful:', data);
       
       // Refresh the learners list
       await refreshLearners();
       
       toast({
         title: "Bulk import successful",
-        description: `Successfully imported ${results.length} learners.`,
+        description: `Successfully imported ${data.count} learners.`,
       });
       
-      return results;
+      return data.learners;
     } catch (error) {
       console.error('Bulk import failed:', error);
       toast({
