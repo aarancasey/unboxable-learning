@@ -58,37 +58,30 @@ const UserManagement = () => {
     console.log('Bulk importing learners:', newLearners);
     
     try {
-      // Clear localStorage first to prevent any interference
-      localStorage.removeItem('learners');
-      
-      // Add each learner to Supabase with proper error handling
       const results = [];
       for (const learner of newLearners) {
         console.log('Adding learner to Supabase:', learner);
-        try {
-          const result = await DataService.addLearner(learner);
-          results.push(result);
-        } catch (error) {
-          console.error('Failed to add learner:', learner.email, error);
-          throw new Error(`Failed to add learner ${learner.email}: ${error.message}`);
-        }
+        const result = await DataService.addLearner(learner);
+        results.push(result);
       }
       
-      // Refresh the learners list from Supabase
-      const updatedLearners = await DataService.getLearners();
-      setLearners(updatedLearners);
+      // Refresh the learners list
+      await refreshLearners();
       
       toast({
         title: "Bulk import successful",
-        description: `Successfully imported ${results.length} learners to Supabase.`,
+        description: `Successfully imported ${results.length} learners.`,
       });
+      
+      return results;
     } catch (error) {
       console.error('Bulk import failed:', error);
       toast({
-        title: "Bulk import failed",
-        description: error.message || "Failed to save learners to database. Please check permissions.",
+        title: "Bulk import failed", 
+        description: `Error: ${error.message}`,
         variant: "destructive",
       });
+      throw error;
     }
   };
 
@@ -162,16 +155,13 @@ const UserManagement = () => {
     const loadLearners = async () => {
       try {
         console.log('Loading learners from Supabase...');
-        
-        // Clear localStorage on component mount to prevent stale data
-        localStorage.removeItem('learners');
-        localStorage.removeItem('deleted_learners');
-        
         const data = await DataService.getLearners();
         console.log('Loaded learners:', data);
         setLearners(data);
       } catch (error) {
         console.error('Error loading learners:', error);
+        // Set empty array on error instead of crashing
+        setLearners([]);
       }
     };
     loadLearners();
@@ -179,24 +169,14 @@ const UserManagement = () => {
 
   // Force refresh learners data
   const refreshLearners = async () => {
-    localStorage.clear(); // Clear all localStorage
-    const data = await DataService.getLearners();
-    console.log('Refreshed learners from Supabase:', data);
-    setLearners(data);
+    try {
+      const data = await DataService.getLearners();
+      console.log('Refreshed learners from Supabase:', data);
+      setLearners(data);
+    } catch (error) {
+      console.error('Error refreshing learners:', error);
+    }
   };
-
-  // Auto-refresh every 10 seconds to ensure data is current, but handle errors gracefully
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      try {
-        await refreshLearners();
-      } catch (error) {
-        // Silently handle refresh errors to avoid spam
-        console.log('Background refresh failed, will retry next interval');
-      }
-    }, 10000);
-    return () => clearInterval(interval);
-  }, []);
 
   const filteredUsers = learners.filter(user =>
     user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

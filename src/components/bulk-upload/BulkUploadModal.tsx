@@ -160,8 +160,16 @@ const BulkUploadModal = ({ isOpen, onClose, onBulkImport, existingEmails }: Bulk
   const handleImport = async () => {
     const validUsers = parsedUsers.filter(user => user.isValid);
     
-    const newLearners = validUsers.map((user, index) => ({
-      id: Date.now() + index,
+    if (validUsers.length === 0) {
+      toast({
+        title: "No valid users",
+        description: "Please fix the errors in your file before importing.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    const newLearners = validUsers.map(user => ({
       name: user.name,
       email: user.email,
       role: user.role,
@@ -172,15 +180,12 @@ const BulkUploadModal = ({ isOpen, onClose, onBulkImport, existingEmails }: Bulk
     }));
     
     try {
+      console.log('Starting bulk import with learners:', newLearners);
       await onBulkImport(newLearners);
       handleClose();
     } catch (error) {
       console.error('Bulk import failed:', error);
-      toast({
-        title: "Import failed",
-        description: error.message || "Failed to import learners. Please try again.",
-        variant: "destructive"
-      });
+      // Error already handled in parent component
     }
   };
 
