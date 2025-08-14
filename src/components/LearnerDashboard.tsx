@@ -38,10 +38,12 @@ const LearnerDashboard = ({ onLogout, learnerData }: LearnerDashboardProps) => {
         const { DataService } = await import('@/services/dataService');
         const surveySubmissions = await DataService.getSurveySubmissions();
         
-        // Find surveys for this learner (you might need learner identification)
+        // Find surveys for this learner by name and email
         const learnerSurveys = surveySubmissions.filter((submission: any) => 
           submission.learner_name === learnerData?.name || 
-          submission.learner_email === learnerData?.email
+          submission.learner_name?.toLowerCase() === learnerData?.name?.toLowerCase() ||
+          (learnerData?.email && submission.responses?.participantInfo?.email === learnerData.email) ||
+          (learnerData?.email && submission.responses?.email === learnerData.email)
         );
         
         let currentSurveyStatus: 'not_started' | 'completed' | 'approved' = 'not_started';
