@@ -56,10 +56,14 @@ const BulkUploadModal = ({ isOpen, onClose, onBulkImport, existingEmails }: Bulk
       return;
     }
     
+    console.log('File being processed:', selectedFile.name, selectedFile.size);
     setFile(selectedFile);
     setIsProcessing(true);
     setProgress(0);
     setProgressMessage('Initializing...');
+    
+    // Clear the file input value to allow re-uploading the same file
+    event.target.value = '';
     
     try {
       // Terminate existing worker if any

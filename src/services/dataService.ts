@@ -33,29 +33,23 @@ export class DataService {
 
   static async addLearner(learner: any) {
     try {
+      console.log('Adding learner to Supabase:', learner);
       const { data, error } = await supabase
         .from('learners')
         .insert([learner])
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error adding learner:', error);
+        throw error;
+      }
 
-      // Also update localStorage as backup
-      const localLearners = JSON.parse(localStorage.getItem('learners') || '[]');
-      localLearners.push({ ...learner, id: data.id });
-      localStorage.setItem('learners', JSON.stringify(localLearners));
-
+      console.log('Successfully added learner to Supabase:', data);
       return data;
     } catch (error) {
       console.error('Error adding learner:', error);
-      // Fallback to localStorage
-      const localLearners = JSON.parse(localStorage.getItem('learners') || '[]');
-      const newId = localLearners.length > 0 ? Math.max(...localLearners.map((l: any) => l.id)) + 1 : 1;
-      const newLearner = { ...learner, id: newId };
-      localLearners.push(newLearner);
-      localStorage.setItem('learners', JSON.stringify(localLearners));
-      return newLearner;
+      throw error; // Don't fallback to localStorage for bulk uploads
     }
   }
 

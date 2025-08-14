@@ -55,12 +55,20 @@ const UserManagement = () => {
   };
 
   const handleBulkImport = async (newLearners: any[]) => {
+    console.log('Bulk importing learners:', newLearners);
+    
+    // Clear localStorage first to prevent any interference
+    localStorage.removeItem('learners');
+    
     // Add each learner to Supabase
     for (const learner of newLearners) {
+      console.log('Adding learner to Supabase:', learner);
       await DataService.addLearner(learner);
     }
     
-    setLearners(prev => [...prev, ...newLearners]);
+    // Refresh the learners list from Supabase
+    const updatedLearners = await DataService.getLearners();
+    setLearners(updatedLearners);
   };
 
   const handleDeleteLearner = async (learnerId: number) => {
@@ -131,8 +139,19 @@ const UserManagement = () => {
   // Load learners from Supabase on component mount
   useEffect(() => {
     const loadLearners = async () => {
-      const data = await DataService.getLearners();
-      setLearners(data);
+      try {
+        console.log('Loading learners from Supabase...');
+        
+        // Clear localStorage on component mount to prevent stale data
+        localStorage.removeItem('learners');
+        localStorage.removeItem('deleted_learners');
+        
+        const data = await DataService.getLearners();
+        console.log('Loaded learners:', data);
+        setLearners(data);
+      } catch (error) {
+        console.error('Error loading learners:', error);
+      }
     };
     loadLearners();
   }, []);
