@@ -105,7 +105,7 @@ export const AssessmentCard: React.FC<AssessmentCardProps> = ({
             <Clock className="h-4 w-4 text-muted-foreground" />
             <div>
               <p className="text-sm font-medium">Duration</p>
-              <p className="text-xs text-muted-foreground">~45 minutes</p>
+              <p className="text-xs text-muted-foreground">~20 minutes</p>
             </div>
           </div>
         </div>
