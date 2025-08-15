@@ -23,34 +23,18 @@ export const useSurveyData = (): Survey => {
     if (!globalSurveyData) {
       const loadSurvey = async () => {
         try {
+          // ALWAYS load from Supabase first, ignore localStorage completely
           const savedSurvey = await surveyService.getActiveSurveyConfiguration();
           if (savedSurvey) {
             updateGlobalSurveyData(savedSurvey);
           } else {
-            // If no saved survey, check localStorage
-            const localSurvey = localStorage.getItem('surveyData');
-            if (localSurvey) {
-              const parsedSurvey = JSON.parse(localSurvey);
-              updateGlobalSurveyData(parsedSurvey);
-            } else {
-              updateGlobalSurveyData(getDefaultSurveyData());
-            }
+            // Only use default if absolutely nothing in Supabase
+            updateGlobalSurveyData(getDefaultSurveyData());
           }
         } catch (error) {
           console.error('Error loading survey data:', error);
-          // Fallback to localStorage if Supabase fails
-          const localSurvey = localStorage.getItem('surveyData');
-          if (localSurvey) {
-            try {
-              const parsedSurvey = JSON.parse(localSurvey);
-              updateGlobalSurveyData(parsedSurvey);
-            } catch (parseError) {
-              console.error('Failed to parse local survey data:', parseError);
-              updateGlobalSurveyData(getDefaultSurveyData());
-            }
-          } else {
-            updateGlobalSurveyData(getDefaultSurveyData());
-          }
+          // If Supabase fails, use default (not localStorage)
+          updateGlobalSurveyData(getDefaultSurveyData());
         }
       };
 

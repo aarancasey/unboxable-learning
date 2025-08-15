@@ -145,17 +145,16 @@ const SurveyEditor = () => {
       if (success) {
         // Update global survey data so all components get the latest version
         updateGlobalSurveyData(survey);
-        // Also save to localStorage as backup
-        localStorage.setItem('surveyData', JSON.stringify(survey));
-        toast.success('Survey saved successfully to database!');
+        // Do NOT save to localStorage - force Supabase only
+        toast.success('Survey saved to database! Changes are permanent.');
         setHasChanges(false);
       } else {
-        throw new Error('Failed to save to database - check your permissions');
+        toast.error('❌ Failed to save to database - you may not have admin permissions');
+        return; // Don't save locally if Supabase fails
       }
     } catch (error) {
       console.error('Save error:', error);
-      toast.error('Failed to save to database - check your admin permissions');
-      setHasChanges(false);
+      toast.error('❌ Database save failed - check your admin permissions');
     }
   };
 
