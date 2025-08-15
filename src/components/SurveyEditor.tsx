@@ -25,7 +25,7 @@ import {
 import { toast } from 'sonner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useSurveyData } from './survey/useSurveyData';
+import { useSurveyData, updateGlobalSurveyData } from './survey/useSurveyData';
 import type { Survey, SurveySection, Question } from './survey/types';
 
 const SurveyEditor = () => {
@@ -140,23 +140,21 @@ const SurveyEditor = () => {
 
   const saveSurvey = async () => {
     try {
-      console.log('🚀 Attempting to save survey to Supabase:', survey);
       const success = await surveyService.saveSurveyConfiguration(survey);
       
       if (success) {
+        // Update global survey data so all components get the latest version
+        updateGlobalSurveyData(survey);
         // Also save to localStorage as backup
         localStorage.setItem('surveyData', JSON.stringify(survey));
-        console.log('✅ Survey saved successfully to Supabase');
         toast.success('Survey saved successfully to database!');
         setHasChanges(false);
       } else {
-        throw new Error('Failed to save to database');
+        throw new Error('Failed to save to database - check your permissions');
       }
     } catch (error) {
-      console.error('❌ Save error:', error);
-      // Fallback to localStorage only
-      localStorage.setItem('surveyData', JSON.stringify(survey));
-      toast.error('Failed to save to database, saved locally only');
+      console.error('Save error:', error);
+      toast.error('Failed to save to database - check your admin permissions');
       setHasChanges(false);
     }
   };

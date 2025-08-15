@@ -2,48 +2,65 @@ import { Survey } from './types';
 import { useState, useEffect } from 'react';
 import { surveyService } from '@/services/surveyService';
 
+// Create a global state for survey data that can be updated
+let globalSurveyData: Survey | null = null;
+let subscribers: Set<(survey: Survey) => void> = new Set();
+
+// Function to update global survey data and notify all subscribers
+export const updateGlobalSurveyData = (survey: Survey) => {
+  globalSurveyData = survey;
+  subscribers.forEach(callback => callback(survey));
+};
+
 export const useSurveyData = (): Survey => {
-  const [survey, setSurvey] = useState<Survey | null>(null);
+  const [survey, setSurvey] = useState<Survey | null>(globalSurveyData);
 
   useEffect(() => {
-    const loadSurvey = async () => {
-      try {
-        console.log('🔍 Attempting to load survey from Supabase...');
-        const savedSurvey = await surveyService.getActiveSurveyConfiguration();
-        if (savedSurvey) {
-          console.log('✅ Loaded survey from Supabase:', savedSurvey);
-          setSurvey(savedSurvey);
-        } else {
-          console.log('⚠️ No survey found in Supabase, checking localStorage...');
-          // If no saved survey, check localStorage
+    // Add this component to subscribers
+    subscribers.add(setSurvey);
+
+    // Load survey if not already loaded
+    if (!globalSurveyData) {
+      const loadSurvey = async () => {
+        try {
+          const savedSurvey = await surveyService.getActiveSurveyConfiguration();
+          if (savedSurvey) {
+            updateGlobalSurveyData(savedSurvey);
+          } else {
+            // If no saved survey, check localStorage
+            const localSurvey = localStorage.getItem('surveyData');
+            if (localSurvey) {
+              const parsedSurvey = JSON.parse(localSurvey);
+              updateGlobalSurveyData(parsedSurvey);
+            } else {
+              updateGlobalSurveyData(getDefaultSurveyData());
+            }
+          }
+        } catch (error) {
+          console.error('Error loading survey data:', error);
+          // Fallback to localStorage if Supabase fails
           const localSurvey = localStorage.getItem('surveyData');
           if (localSurvey) {
-            console.log('✅ Loaded survey from localStorage');
-            setSurvey(JSON.parse(localSurvey));
+            try {
+              const parsedSurvey = JSON.parse(localSurvey);
+              updateGlobalSurveyData(parsedSurvey);
+            } catch (parseError) {
+              console.error('Failed to parse local survey data:', parseError);
+              updateGlobalSurveyData(getDefaultSurveyData());
+            }
           } else {
-            console.log('📝 Using default survey data');
-            setSurvey(getDefaultSurveyData());
+            updateGlobalSurveyData(getDefaultSurveyData());
           }
         }
-      } catch (error) {
-        console.error('❌ Error loading survey data:', error);
-        // Fallback to localStorage if Supabase fails
-        const localSurvey = localStorage.getItem('surveyData');
-        if (localSurvey) {
-          try {
-            console.log('🔄 Falling back to localStorage');
-            setSurvey(JSON.parse(localSurvey));
-          } catch (parseError) {
-            console.error('Failed to parse local survey data:', parseError);
-            setSurvey(getDefaultSurveyData());
-          }
-        } else {
-          setSurvey(getDefaultSurveyData());
-        }
-      }
-    };
+      };
 
-    loadSurvey();
+      loadSurvey();
+    }
+
+    // Cleanup: remove subscriber when component unmounts
+    return () => {
+      subscribers.delete(setSurvey);
+    };
   }, []);
 
   return survey || getDefaultSurveyData();
