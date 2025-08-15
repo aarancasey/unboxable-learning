@@ -339,33 +339,6 @@ Your facilitator and coach will have oversight into your responses as this will 
             ]
           }
         ]
-      },
-      {
-        title: "Self-Reflection Questions",
-        type: "questions",
-        description: "Take a moment to reflect on your leadership journey and development.",
-        questions: [
-          {
-            id: "reflection_1",
-            type: "text",
-            question: "Based on your responses, what patterns do you notice about your current leadership approach?"
-          },
-          {
-            id: "reflection_2", 
-            type: "text",
-            question: "Which areas of leadership agility feel strongest for you right now?"
-          },
-          {
-            id: "reflection_3",
-            type: "text",
-            question: "Which areas would you most like to develop further?"
-          },
-          {
-            id: "reflection_4",
-            type: "text",
-            question: "What's one insight from this assessment that you want to explore more deeply?"
-          }
-        ]
       }
     ]
   };
