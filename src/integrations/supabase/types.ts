@@ -1354,6 +1354,36 @@ export type Database = {
         }
         Relationships: []
       }
+      survey_configurations: {
+        Row: {
+          configuration: Json
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          survey_type: string
+          updated_at: string
+        }
+        Insert: {
+          configuration: Json
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          survey_type?: string
+          updated_at?: string
+        }
+        Update: {
+          configuration?: Json
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          survey_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       survey_progress: {
         Row: {
           answers: Json

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { surveyService } from '@/services/surveyService';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -139,14 +140,22 @@ const SurveyEditor = () => {
 
   const saveSurvey = async () => {
     try {
-      // Here you would typically save to a database or API
-      // For now, we'll just show a success message
-      localStorage.setItem('surveyData', JSON.stringify(survey));
-      toast.success('Survey saved successfully!');
-      setHasChanges(false);
+      const success = await surveyService.saveSurveyConfiguration(survey);
+      
+      if (success) {
+        // Also save to localStorage as backup
+        localStorage.setItem('surveyData', JSON.stringify(survey));
+        toast.success('Survey saved successfully to database!');
+        setHasChanges(false);
+      } else {
+        throw new Error('Failed to save to database');
+      }
     } catch (error) {
-      toast.error('Failed to save survey');
       console.error('Save error:', error);
+      // Fallback to localStorage only
+      localStorage.setItem('surveyData', JSON.stringify(survey));
+      toast.error('Failed to save to database, saved locally only');
+      setHasChanges(false);
     }
   };
 

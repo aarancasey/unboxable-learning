@@ -1,18 +1,44 @@
 import { Survey } from './types';
+import { useState, useEffect } from 'react';
+import { surveyService } from '@/services/surveyService';
 
 export const useSurveyData = (): Survey => {
-  // Check for saved survey data first
-  const savedSurvey = localStorage.getItem('surveyData');
-  if (savedSurvey) {
-    try {
-      return JSON.parse(savedSurvey);
-    } catch (error) {
-      console.error('Failed to parse saved survey data:', error);
-      // Fall through to default data
-    }
-  }
-  
-  // Return default survey data
+  const [survey, setSurvey] = useState<Survey | null>(null);
+
+  useEffect(() => {
+    const loadSurvey = async () => {
+      try {
+        const savedSurvey = await surveyService.getActiveSurveyConfiguration();
+        if (savedSurvey) {
+          setSurvey(savedSurvey);
+        } else {
+          // If no saved survey, use default
+          setSurvey(getDefaultSurveyData());
+        }
+      } catch (error) {
+        console.error('Error loading survey data:', error);
+        // Fallback to localStorage if Supabase fails
+        const localSurvey = localStorage.getItem('surveyData');
+        if (localSurvey) {
+          try {
+            setSurvey(JSON.parse(localSurvey));
+          } catch (parseError) {
+            console.error('Failed to parse local survey data:', parseError);
+            setSurvey(getDefaultSurveyData());
+          }
+        } else {
+          setSurvey(getDefaultSurveyData());
+        }
+      }
+    };
+
+    loadSurvey();
+  }, []);
+
+  return survey || getDefaultSurveyData();
+};
+
+const getDefaultSurveyData = (): Survey => {
   return {
     title: "Leadership Sentiment, Adaptive and Agile Self-Assessment",
     description: "This self-assessment is designed to help you explore your current leadership sentiment and intent, adaptability and agility. It will give insight into how you currently lead and respond to dynamic conditions, change, make decisions, empower others and lead in complexity.",
