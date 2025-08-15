@@ -1,6 +1,18 @@
 import { Survey } from './types';
 
 export const useSurveyData = (): Survey => {
+  // Check for saved survey data first
+  const savedSurvey = localStorage.getItem('surveyData');
+  if (savedSurvey) {
+    try {
+      return JSON.parse(savedSurvey);
+    } catch (error) {
+      console.error('Failed to parse saved survey data:', error);
+      // Fall through to default data
+    }
+  }
+  
+  // Return default survey data
   return {
     title: "Leadership Sentiment, Adaptive and Agile Self-Assessment",
     description: "This self-assessment is designed to help you explore your current leadership sentiment and intent, adaptability and agility. It will give insight into how you currently lead and respond to dynamic conditions, change, make decisions, empower others and lead in complexity.",
