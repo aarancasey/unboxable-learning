@@ -8,19 +8,30 @@ export const useSurveyData = (): Survey => {
   useEffect(() => {
     const loadSurvey = async () => {
       try {
+        console.log('🔍 Attempting to load survey from Supabase...');
         const savedSurvey = await surveyService.getActiveSurveyConfiguration();
         if (savedSurvey) {
+          console.log('✅ Loaded survey from Supabase:', savedSurvey);
           setSurvey(savedSurvey);
         } else {
-          // If no saved survey, use default
-          setSurvey(getDefaultSurveyData());
+          console.log('⚠️ No survey found in Supabase, checking localStorage...');
+          // If no saved survey, check localStorage
+          const localSurvey = localStorage.getItem('surveyData');
+          if (localSurvey) {
+            console.log('✅ Loaded survey from localStorage');
+            setSurvey(JSON.parse(localSurvey));
+          } else {
+            console.log('📝 Using default survey data');
+            setSurvey(getDefaultSurveyData());
+          }
         }
       } catch (error) {
-        console.error('Error loading survey data:', error);
+        console.error('❌ Error loading survey data:', error);
         // Fallback to localStorage if Supabase fails
         const localSurvey = localStorage.getItem('surveyData');
         if (localSurvey) {
           try {
+            console.log('🔄 Falling back to localStorage');
             setSurvey(JSON.parse(localSurvey));
           } catch (parseError) {
             console.error('Failed to parse local survey data:', parseError);

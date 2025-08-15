@@ -140,18 +140,20 @@ const SurveyEditor = () => {
 
   const saveSurvey = async () => {
     try {
+      console.log('🚀 Attempting to save survey to Supabase:', survey);
       const success = await surveyService.saveSurveyConfiguration(survey);
       
       if (success) {
         // Also save to localStorage as backup
         localStorage.setItem('surveyData', JSON.stringify(survey));
+        console.log('✅ Survey saved successfully to Supabase');
         toast.success('Survey saved successfully to database!');
         setHasChanges(false);
       } else {
         throw new Error('Failed to save to database');
       }
     } catch (error) {
-      console.error('Save error:', error);
+      console.error('❌ Save error:', error);
       // Fallback to localStorage only
       localStorage.setItem('surveyData', JSON.stringify(survey));
       toast.error('Failed to save to database, saved locally only');

@@ -15,6 +15,7 @@ export const surveyService = {
   // Get the active survey configuration
   async getActiveSurveyConfiguration(surveyType: string = 'leadership_assessment'): Promise<Survey | null> {
     try {
+      console.log('🔍 Fetching survey configuration from Supabase...');
       const { data, error } = await supabase
         .from('survey_configurations')
         .select('configuration')
@@ -23,13 +24,16 @@ export const surveyService = {
         .maybeSingle();
 
       if (error) {
-        console.error('Error fetching survey configuration:', error);
+        console.error('❌ Error fetching survey configuration:', error);
         return null;
       }
 
-      return (data?.configuration as unknown as Survey) || null;
+      console.log('📊 Raw Supabase response:', data);
+      const result = (data?.configuration as unknown as Survey) || null;
+      console.log('✅ Parsed survey configuration:', result);
+      return result;
     } catch (error) {
-      console.error('Error fetching survey configuration:', error);
+      console.error('❌ Error fetching survey configuration:', error);
       return null;
     }
   },
@@ -37,30 +41,40 @@ export const surveyService = {
   // Save survey configuration
   async saveSurveyConfiguration(survey: Survey, surveyType: string = 'leadership_assessment'): Promise<boolean> {
     try {
+      console.log('💾 Saving survey configuration to Supabase...', survey);
+      
       // First, deactivate any existing active configurations
-      await supabase
+      const { error: deactivateError } = await supabase
         .from('survey_configurations')
         .update({ is_active: false })
         .eq('survey_type', surveyType)
         .eq('is_active', true);
 
+      if (deactivateError) {
+        console.error('❌ Error deactivating existing configurations:', deactivateError);
+      } else {
+        console.log('✅ Deactivated existing configurations');
+      }
+
       // Insert new configuration
-      const { error } = await supabase
+      const { error, data } = await supabase
         .from('survey_configurations')
         .insert({
           survey_type: surveyType,
           configuration: survey as any,
           is_active: true
-        });
+        })
+        .select();
 
       if (error) {
-        console.error('Error saving survey configuration:', error);
+        console.error('❌ Error saving survey configuration:', error);
         return false;
       }
 
+      console.log('✅ Survey configuration saved successfully:', data);
       return true;
     } catch (error) {
-      console.error('Error saving survey configuration:', error);
+      console.error('❌ Error saving survey configuration:', error);
       return false;
     }
   },
