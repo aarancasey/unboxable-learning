@@ -109,26 +109,33 @@ const LoginForm = ({ role, onLogin }: LoginFormProps) => {
       console.log('Found learner:', learner);
 
       // Check if password validation failed for returning users
-      if (!learner.password_valid && !learner.requires_password_change) {
-        toast({
-          title: "Invalid Password",
-          description: "The password you entered is incorrect",
-          variant: "destructive",
-        });
-        return;
+      if (!learner.password_valid) {
+        // If they need to change password, allow through for password change flow
+        if (learner.requires_password_change) {
+          onLogin(learner, true); // Pass flag indicating password change needed
+          return;
+        } else {
+          // For returning users, password must be valid
+          toast({
+            title: "Invalid Password",
+            description: "The password you entered is incorrect",
+            variant: "destructive",
+          });
+          return;
+        }
       }
 
       // For returning users without password, require password
       if (!learner.requires_password_change && !credentials.password) {
         toast({
-          title: "Password Required",
+          title: "Password Required", 
           description: "Please enter your password",
           variant: "destructive",
         });
         return;
       }
 
-      // If learner requires password change, don't allow dashboard access
+      // If learner requires password change but has valid login, go to password change
       if (learner.requires_password_change) {
         onLogin(learner, true); // Pass flag indicating password change needed
         return;
