@@ -60,12 +60,26 @@ export const exportSurveyData = async (
 };
 
 const processSubmissionsForExport = (submissions: SurveySubmission[], questionMap: any) => {
-  // Collect all unique question IDs from all submissions
-  const allQuestionIds = new Set<string>();
+  // Collect all unique questions from all submissions
+  const allQuestions = new Set<string>();
+  const questionToIdMap = new Map<string, string>();
+  
   submissions.forEach(submission => {
     if (submission.responses) {
-      Object.keys(submission.responses).forEach(questionId => {
-        allQuestionIds.add(questionId);
+      Object.entries(submission.responses).forEach(([key, value]) => {
+        if (key === 'participant_info') return; // Skip participant info in questions
+        
+        // Handle both old format (question text as key) and new format (ID as key)
+        if (typeof value === 'object' && value !== null && 'question' in value) {
+          // Old format: {question: "text", answer: "value"}
+          const questionText = String(value.question);
+          allQuestions.add(questionText);
+          questionToIdMap.set(questionText, key);
+        } else {
+          // New format: question ID as key, answer as value
+          allQuestions.add(key);
+          questionToIdMap.set(key, key);
+        }
       });
     }
   });
@@ -73,7 +87,7 @@ const processSubmissionsForExport = (submissions: SurveySubmission[], questionMa
   // Create headers
   const baseHeaders = [
     'Learner Name',
-    'Submission Date',
+    'Submission Date', 
     'Status',
     'Participant Name',
     'Company',
@@ -81,10 +95,10 @@ const processSubmissionsForExport = (submissions: SurveySubmission[], questionMa
     'Business Area'
   ];
 
-  // Add question headers
-  const questionHeaders = Array.from(allQuestionIds).map(questionId => {
-    const questionText = getQuestionText(questionId);
-    const section = getQuestionSection(questionId);
+  // Add question headers with proper section and question text
+  const questionHeaders = Array.from(allQuestions).map(questionKey => {
+    const questionText = getQuestionText(questionKey);
+    const section = getQuestionSection(questionKey);
     return `${section}: ${questionText}`;
   });
 
@@ -99,20 +113,52 @@ const processSubmissionsForExport = (submissions: SurveySubmission[], questionMa
     row['Submission Date'] = submission.submitted_at ? new Date(submission.submitted_at).toLocaleDateString() : '';
     row['Status'] = submission.status || '';
     
-    // Participant info from responses (if available)
-    const participantInfo = submission.responses?.participant_info || {};
-    row['Participant Name'] = participantInfo.name || '';
-    row['Company'] = participantInfo.company || '';
-    row['Role'] = participantInfo.role || '';
-    row['Business Area'] = participantInfo.businessArea || '';
+    // Extract participant info from various possible locations
+    let participantInfo: any = {};
+    if (submission.responses?.participant_info) {
+      participantInfo = submission.responses.participant_info;
+    } else if (submission.responses?.['Participant Information']) {
+      participantInfo = submission.responses['Participant Information'];
+    } else {
+      // Look for participant info in response format
+      Object.values(submission.responses || {}).forEach((response: any) => {
+        if (typeof response === 'object' && response?.question?.includes('Participant Information')) {
+          participantInfo = response.answer || {};
+        }
+      });
+    }
+
+    row['Participant Name'] = participantInfo?.name || '';
+    row['Company'] = participantInfo?.company || '';
+    row['Role'] = participantInfo?.role || '';
+    row['Business Area'] = participantInfo?.businessArea || '';
 
     // Process answers for each question
-    questionHeaders.forEach((header, index) => {
-      const questionId = Array.from(allQuestionIds)[index];
-      const answer = submission.responses?.[questionId];
+    Array.from(allQuestions).forEach((questionKey, index) => {
+      const header = questionHeaders[index];
+      let answer = null;
+
+      // Try to find the answer in different formats
+      if (submission.responses?.[questionKey]) {
+        const response = submission.responses[questionKey];
+        if (typeof response === 'object' && response !== null && 'answer' in response) {
+          answer = response.answer;
+        } else {
+          answer = response;
+        }
+      } else {
+        // Try to find by question text match
+        Object.entries(submission.responses || {}).forEach(([key, value]) => {
+          if (typeof value === 'object' && value !== null && 'question' in value) {
+            if (value.question === questionKey) {
+              answer = (value as any).answer;
+            }
+          }
+        });
+      }
       
       if (answer !== undefined && answer !== null) {
-        row[header] = formatAnswer(questionId, answer);
+        row[header] = formatAnswer(questionKey, answer);
       } else {
         row[header] = '';
       }
