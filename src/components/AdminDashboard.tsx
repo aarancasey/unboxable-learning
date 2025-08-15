@@ -33,6 +33,7 @@ import { EmailTemplateManager } from './email-management/EmailTemplateManager';
 import { EmailTemplateSettings } from './admin/EmailTemplateSettings';
 import { AssessmentRefactorTool } from './admin/AssessmentRefactorTool';
 import { ContentLibraryManager } from './content-library/ContentLibraryManager';
+import { LocalStorageDataRetrieval } from './admin/LocalStorageDataRetrieval';
 
 import { DataService } from '@/services/dataService';
 import { dateHelpers } from '@/lib/dateUtils';
@@ -438,7 +439,18 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
           </TabsContent>
 
           <TabsContent value="settings">
-            <EmailTemplateSettings />
+            <Tabs defaultValue="email-settings" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="email-settings">Email Settings</TabsTrigger>
+                <TabsTrigger value="data-retrieval">Data Retrieval</TabsTrigger>
+              </TabsList>
+              <TabsContent value="email-settings" className="mt-6">
+                <EmailTemplateSettings />
+              </TabsContent>
+              <TabsContent value="data-retrieval" className="mt-6">
+                <LocalStorageDataRetrieval />
+              </TabsContent>
+            </Tabs>
           </TabsContent>
 
           <TabsContent value="activities">
