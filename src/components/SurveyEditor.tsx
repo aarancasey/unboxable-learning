@@ -65,13 +65,21 @@ const SurveyEditor = () => {
   };
 
   const deleteSection = (sectionIndex: number) => {
-    setSurvey(prev => ({
-      ...prev,
-      sections: prev.sections.filter((_, index) => index !== sectionIndex)
-    }));
-    if (selectedSection >= survey.sections.length - 1) {
-      setSelectedSection(Math.max(0, survey.sections.length - 2));
-    }
+    setSurvey(prev => {
+      const newSections = prev.sections.filter((_, index) => index !== sectionIndex);
+      
+      // Update selected section if needed
+      if (selectedSection >= newSections.length) {
+        setSelectedSection(Math.max(0, newSections.length - 1));
+      } else if (selectedSection > sectionIndex) {
+        setSelectedSection(selectedSection - 1);
+      }
+      
+      return {
+        ...prev,
+        sections: newSections
+      };
+    });
   };
 
   const moveSection = (sectionIndex: number, direction: 'up' | 'down') => {
