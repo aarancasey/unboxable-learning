@@ -137,7 +137,7 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
         localStorage.setItem('surveySubmissions', JSON.stringify(existingSurveys));
         
 
-        // Try to save to database using upsert to prevent duplicates
+        // Try to save to database
         try {
           // Format responses correctly for database
           const formattedResponses = Object.entries(answers).map(([question, answer]) => ({
@@ -145,23 +145,25 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
             answer: Array.isArray(answer) ? answer.join(', ') : answer?.toString() || ''
           }));
 
-          const { error: dbError } = await supabase
+          const { data: dbData, error: dbError } = await supabase
             .from('survey_submissions')
-            .upsert([{
+            .insert([{
               learner_id: learnerData?.id || null,
-              learner_name: finalParticipantInfo?.fullName || 'Unknown User',
+              learner_name: finalParticipantInfo?.fullName || learnerData?.email || 'Unknown User',
               responses: formattedResponses,
               status: 'completed'
-            }], {
-              onConflict: 'learner_name',
-              ignoreDuplicates: false
-            });
+            }])
+            .select()
+            .single();
           
-          if (!dbError) {
-            
+          if (dbError) {
+            console.error('Database save error:', dbError);
+            throw dbError;
           }
+          
+          console.log('Survey successfully saved to database:', dbData);
         } catch (error) {
-          console.warn('Database save failed, but survey is saved locally:', error);
+          console.error('Database save failed, but survey is saved locally:', error);
         }
 
         // Send completion email using template (only if enabled)
