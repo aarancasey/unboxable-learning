@@ -231,7 +231,7 @@ export class DataService {
     }
   }
 
-  // Survey submissions management
+  // Survey submissions management with validation
   static async getSurveySubmissions() {
     try {
       console.log('Attempting to fetch survey submissions from Supabase...');
@@ -241,17 +241,36 @@ export class DataService {
         .order('submitted_at', { ascending: false });
 
       if (error) {
-        console.error('Supabase error when fetching survey submissions:', error);
+        console.error('CRITICAL: Supabase error when fetching survey submissions:', error);
         throw error;
       }
 
-      console.log('Successfully fetched survey submissions:', data);
-      return data || [];
+      if (!data) {
+        console.warn('No survey submissions found in database');
+        return [];
+      }
+
+      console.log(`SUCCESS: Fetched ${data.length} survey submissions from database`);
+      
+      // Validate data integrity
+      const validSubmissions = data.filter(submission => {
+        if (!submission.id || !submission.learner_name || !submission.responses) {
+          console.warn('Invalid submission found:', submission);
+          return false;
+        }
+        return true;
+      });
+
+      if (validSubmissions.length !== data.length) {
+        console.warn(`Data integrity issue: ${data.length - validSubmissions.length} invalid submissions found`);
+      }
+
+      return validSubmissions;
     } catch (error) {
-      console.error('Error getting survey submissions:', error);
+      console.error('CRITICAL: Error getting survey submissions from database:', error);
       // Fallback to localStorage
       const localData = JSON.parse(localStorage.getItem('surveySubmissions') || '[]');
-      console.log('Falling back to localStorage data:', localData);
+      console.log(`Falling back to localStorage: ${localData.length} submissions found`);
       return localData;
     }
   }

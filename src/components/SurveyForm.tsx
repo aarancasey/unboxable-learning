@@ -13,6 +13,7 @@ import { useSurveyCompletion } from '@/hooks/useSurveyCompletion';
 import { supabase } from '@/integrations/supabase/client';
 import { dateHelpers } from '@/lib/dateUtils';
 import { SettingsService } from '@/services/settingsService';
+import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 
 interface SurveyFormProps {
@@ -22,6 +23,7 @@ interface SurveyFormProps {
 }
 
 const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
+  const { toast } = useToast();
   const [participantInfo, setParticipantInfo] = useState<ParticipantInfo | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionComplete, setSubmissionComplete] = useState(false);
@@ -137,13 +139,20 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
         localStorage.setItem('surveySubmissions', JSON.stringify(existingSurveys));
         
 
-        // Try to save to database
+        // Try to save to database with validation
+        let databaseSaveSuccess = false;
         try {
           // Format responses correctly for database
           const formattedResponses = Object.entries(answers).map(([question, answer]) => ({
             question,
             answer: Array.isArray(answer) ? answer.join(', ') : answer?.toString() || ''
           }));
+
+          console.log('Attempting to save survey to database...', {
+            learner_id: learnerData?.id,
+            learner_name: finalParticipantInfo?.fullName || learnerData?.email || 'Unknown User',
+            responses_count: formattedResponses.length
+          });
 
           const { data: dbData, error: dbError } = await supabase
             .from('survey_submissions')
@@ -157,13 +166,59 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
             .single();
           
           if (dbError) {
-            console.error('Database save error:', dbError);
+            console.error('CRITICAL: Database save error:', dbError);
+            toast({
+              title: "Warning: Database Save Failed",
+              description: "Your survey was saved locally but may not appear in admin view. Please contact support.",
+              variant: "destructive",
+            });
             throw dbError;
           }
           
-          console.log('Survey successfully saved to database:', dbData);
+          if (!dbData || !dbData.id) {
+            console.error('CRITICAL: Database returned no data after insert');
+            toast({
+              title: "Warning: Database Save Incomplete",
+              description: "Your survey was saved locally but may not appear in admin view. Please contact support.",
+              variant: "destructive",
+            });
+            throw new Error('Database insert returned no data');
+          }
+          
+          console.log('SUCCESS: Survey saved to database with ID:', dbData.id);
+          databaseSaveSuccess = true;
+          
+          // Verify the save by reading it back
+          const { data: verifyData, error: verifyError } = await supabase
+            .from('survey_submissions')
+            .select('id, learner_name, status')
+            .eq('id', dbData.id)
+            .single();
+            
+          if (verifyError || !verifyData) {
+            console.error('CRITICAL: Failed to verify survey save:', verifyError);
+            databaseSaveSuccess = false;
+          } else {
+            console.log('VERIFIED: Survey exists in database:', verifyData);
+          }
+          
         } catch (error) {
-          console.error('Database save failed, but survey is saved locally:', error);
+          console.error('CRITICAL: Database save failed completely:', error);
+          databaseSaveSuccess = false;
+        }
+
+        // Show appropriate success/warning message
+        if (databaseSaveSuccess) {
+          toast({
+            title: "Survey Submitted Successfully",
+            description: "Your responses have been saved and will appear in the admin portal.",
+          });
+        } else {
+          toast({
+            title: "Survey Saved Locally",
+            description: "Your responses are saved but may not appear in admin view. Please contact support to ensure your submission is processed.",
+            variant: "destructive",
+          });
         }
 
         // Send completion email using template (only if enabled)
