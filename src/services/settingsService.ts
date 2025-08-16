@@ -7,7 +7,7 @@ export class SettingsService {
         .from('settings')
         .select('value')
         .eq('key', key)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data?.value || null;

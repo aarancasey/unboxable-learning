@@ -77,7 +77,7 @@ export const useSurveyStatus = (learnerEmail?: string, learnerName?: string, lea
             .from('survey_progress')
             .select('*')
             .eq('user_id', user.id)
-            .single();
+            .maybeSingle();
 
           if (progressData) {
             setResult({
