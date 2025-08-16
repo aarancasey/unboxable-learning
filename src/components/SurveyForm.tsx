@@ -139,12 +139,18 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
 
         // Try to save to database using upsert to prevent duplicates
         try {
+          // Format responses correctly for database
+          const formattedResponses = Object.entries(answers).map(([question, answer]) => ({
+            question,
+            answer: Array.isArray(answer) ? answer.join(', ') : answer?.toString() || ''
+          }));
+
           const { error: dbError } = await supabase
             .from('survey_submissions')
             .upsert([{
               learner_id: learnerData?.id || null,
               learner_name: finalParticipantInfo?.fullName || 'Unknown User',
-              responses: submissionData as any, // Cast to Json type
+              responses: formattedResponses,
               status: 'completed'
             }], {
               onConflict: 'learner_name',
