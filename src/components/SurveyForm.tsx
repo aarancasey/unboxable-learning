@@ -193,10 +193,13 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
             .from('survey_submissions')
             .select('id, learner_name, status')
             .eq('id', dbData.id)
-            .single();
+            .maybeSingle();
             
-          if (verifyError || !verifyData) {
+          if (verifyError) {
             console.error('CRITICAL: Failed to verify survey save:', verifyError);
+            databaseSaveSuccess = false;
+          } else if (!verifyData) {
+            console.error('CRITICAL: Survey not found after save - ID:', dbData.id);
             databaseSaveSuccess = false;
           } else {
             console.log('VERIFIED: Survey exists in database:', verifyData);
