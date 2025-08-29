@@ -28,6 +28,7 @@ import SurveyEditor from './SurveyEditor';
 import { CalendarView } from './calendar/CalendarView';
 import AnalyticsDashboard from './analytics/AnalyticsDashboard';
 import ActivitiesView from './ActivitiesView';
+import ExternalSurveyManager from './external-surveys/ExternalSurveyManager';
 
 import { EmailTemplateManager } from './email-management/EmailTemplateManager';
 import { EmailTemplateSettings } from './admin/EmailTemplateSettings';
@@ -409,15 +410,19 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
 
           <TabsContent value="surveys">
             <Tabs defaultValue="review" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="review">Review Submissions</TabsTrigger>
                 <TabsTrigger value="edit">Edit Survey</TabsTrigger>
+                <TabsTrigger value="external">External Surveys</TabsTrigger>
               </TabsList>
               <TabsContent value="review" className="mt-6">
                 <SurveyReviewer />
               </TabsContent>
               <TabsContent value="edit" className="mt-6">
                 <SurveyEditor />
+              </TabsContent>
+              <TabsContent value="external" className="mt-6">
+                <ExternalSurveyManager />
               </TabsContent>
             </Tabs>
           </TabsContent>

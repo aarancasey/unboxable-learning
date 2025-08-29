@@ -752,6 +752,63 @@ export type Database = {
         }
         Relationships: []
       }
+      external_survey_uploads: {
+        Row: {
+          content_type: string
+          created_at: string
+          data_mapping: Json | null
+          error_log: Json | null
+          failed_records: number | null
+          file_size: number
+          filename: string
+          id: string
+          original_filename: string
+          processed_records: number | null
+          processing_status: string
+          successful_records: number | null
+          total_records: number | null
+          updated_at: string
+          upload_status: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          content_type?: string
+          created_at?: string
+          data_mapping?: Json | null
+          error_log?: Json | null
+          failed_records?: number | null
+          file_size: number
+          filename: string
+          id?: string
+          original_filename: string
+          processed_records?: number | null
+          processing_status?: string
+          successful_records?: number | null
+          total_records?: number | null
+          updated_at?: string
+          upload_status?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          content_type?: string
+          created_at?: string
+          data_mapping?: Json | null
+          error_log?: Json | null
+          failed_records?: number | null
+          file_size?: number
+          filename?: string
+          id?: string
+          original_filename?: string
+          processed_records?: number | null
+          processing_status?: string
+          successful_records?: number | null
+          total_records?: number | null
+          updated_at?: string
+          upload_status?: string
+          uploaded_by?: string | null
+        }
+        Relationships: []
+      }
       hero_content: {
         Row: {
           background_image_url: string | null
@@ -1285,6 +1342,75 @@ export type Database = {
         }
         Relationships: []
       }
+      rubric_assessments: {
+        Row: {
+          areas_for_improvement: string[] | null
+          assessment_summary: string | null
+          confidence_score: number | null
+          created_at: string
+          criterion_scores: Json
+          id: string
+          max_possible_score: number | null
+          overall_score: number | null
+          percentage_score: number | null
+          processing_metadata: Json | null
+          recommendations: string[] | null
+          rubric_id: string | null
+          strengths: string[] | null
+          survey_submission_id: number | null
+          updated_at: string
+        }
+        Insert: {
+          areas_for_improvement?: string[] | null
+          assessment_summary?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          criterion_scores?: Json
+          id?: string
+          max_possible_score?: number | null
+          overall_score?: number | null
+          percentage_score?: number | null
+          processing_metadata?: Json | null
+          recommendations?: string[] | null
+          rubric_id?: string | null
+          strengths?: string[] | null
+          survey_submission_id?: number | null
+          updated_at?: string
+        }
+        Update: {
+          areas_for_improvement?: string[] | null
+          assessment_summary?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          criterion_scores?: Json
+          id?: string
+          max_possible_score?: number | null
+          overall_score?: number | null
+          percentage_score?: number | null
+          processing_metadata?: Json | null
+          recommendations?: string[] | null
+          rubric_id?: string | null
+          strengths?: string[] | null
+          survey_submission_id?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rubric_assessments_rubric_id_fkey"
+            columns: ["rubric_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_rubrics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rubric_assessments_survey_submission_id_fkey"
+            columns: ["survey_submission_id"]
+            isOneToOne: false
+            referencedRelation: "survey_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       services_content: {
         Row: {
           created_at: string | null
@@ -1422,6 +1548,8 @@ export type Database = {
       }
       survey_submissions: {
         Row: {
+          data_source: string | null
+          external_upload_id: string | null
           id: number
           learner_id: number | null
           learner_name: string
@@ -1430,6 +1558,8 @@ export type Database = {
           submitted_at: string | null
         }
         Insert: {
+          data_source?: string | null
+          external_upload_id?: string | null
           id?: number
           learner_id?: number | null
           learner_name: string
@@ -1438,6 +1568,8 @@ export type Database = {
           submitted_at?: string | null
         }
         Update: {
+          data_source?: string | null
+          external_upload_id?: string | null
           id?: number
           learner_id?: number | null
           learner_name?: string
@@ -1446,6 +1578,13 @@ export type Database = {
           submitted_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "survey_submissions_external_upload_id_fkey"
+            columns: ["external_upload_id"]
+            isOneToOne: false
+            referencedRelation: "external_survey_uploads"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "survey_submissions_learner_id_fkey"
             columns: ["learner_id"]

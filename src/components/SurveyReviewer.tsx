@@ -39,6 +39,7 @@ import {
   Settings
 } from 'lucide-react';
 import { dateHelpers } from '@/lib/dateUtils';
+import RubricAssessmentsCard from './external-surveys/RubricAssessmentsCard';
 
 const SurveyReviewer = () => {
   const [selectedSurvey, setSelectedSurvey] = useState<any>(null);
@@ -381,6 +382,11 @@ const SurveyReviewer = () => {
                 setStoredSurveys(updatedSurveys);
               }}
             />
+
+            {/* Rubric Assessments */}
+            {selectedSurvey.data_source === 'external' && (
+              <RubricAssessmentsCard surveyId={selectedSurvey.id} />
+            )}
 
             {/* Admin Notes */}
             <Card>
