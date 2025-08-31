@@ -241,7 +241,7 @@ const ExternalSurveyUploadModal: React.FC<ExternalSurveyUploadModalProps> = ({
       const mappedData = parsedData.data.map(row => {
         const mapped: any = {};
         Object.entries(columnMapping).forEach(([sourceCol, targetCol]) => {
-          if (targetCol && row[sourceCol]) {
+          if (targetCol && targetCol !== 'none' && row[sourceCol]) {
             mapped[targetCol] = row[sourceCol];
           }
         });
@@ -447,7 +447,7 @@ const ExternalSurveyUploadModal: React.FC<ExternalSurveyUploadModalProps> = ({
                     <div key={header} className="space-y-2">
                       <label className="text-sm font-medium">{header}</label>
                       <Select
-                        value={columnMapping[header] || ''}
+                        value={columnMapping[header] || 'none'}
                         onValueChange={(value) => {
                           setColumnMapping(prev => ({
                             ...prev,
@@ -459,7 +459,7 @@ const ExternalSurveyUploadModal: React.FC<ExternalSurveyUploadModalProps> = ({
                           <SelectValue placeholder="Map to..." />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Don't map</SelectItem>
+                          <SelectItem value="none">Don't map</SelectItem>
                           <SelectItem value="participant_name">Participant Name</SelectItem>
                           <SelectItem value="company">Company</SelectItem>
                           <SelectItem value="role">Role/Position</SelectItem>
