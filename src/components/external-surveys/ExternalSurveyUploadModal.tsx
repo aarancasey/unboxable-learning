@@ -131,14 +131,47 @@ const ExternalSurveyUploadModal: React.FC<ExternalSurveyUploadModalProps> = ({
 
       setParsedData(parsedData);
       
-      // Auto-suggest column mappings
+      // Auto-suggest column mappings with comprehensive survey question mapping
       const autoMapping: Record<string, string> = {};
       const commonMappings = [
+        // Basic participant info
         { patterns: ['name', 'participant', 'full_name', 'fullname'], target: 'participant_name' },
         { patterns: ['company', 'organization', 'org'], target: 'company' },
         { patterns: ['role', 'position', 'title', 'job'], target: 'role' },
         { patterns: ['date', 'submitted', 'timestamp'], target: 'date' },
-        { patterns: ['email', 'e-mail'], target: 'email' }
+        { patterns: ['email', 'e-mail'], target: 'email' },
+        { patterns: ['business_area', 'department', 'dept'], target: 'business_area' },
+        
+        // Leadership Sentiment questions
+        { patterns: ['leadership_style', 'current_style', 'sentiment_1'], target: 'sentiment_1' },
+        { patterns: ['confidence_complexity', 'complexity', 'sentiment_2'], target: 'sentiment_2' },
+        { patterns: ['leadership_mindset', 'mindset', 'sentiment_3'], target: 'sentiment_3' },
+        { patterns: ['challenging', 'challenges', 'sentiment_4'], target: 'sentiment_4' },
+        { patterns: ['exciting', 'energising', 'sentiment_5'], target: 'sentiment_5' },
+        
+        // Purpose questions
+        { patterns: ['matters_most', 'purpose_1'], target: 'purpose_1' },
+        { patterns: ['leadership_style_aspirational', 'purpose_2'], target: 'purpose_2' },
+        { patterns: ['values', 'purpose_3'], target: 'purpose_3' },
+        { patterns: ['legacy', 'impact', 'purpose_4'], target: 'purpose_4' },
+        { patterns: ['purpose_rating', 'purpose_score', 'purpose_5'], target: 'purpose_5' },
+        
+        // Agility questions
+        { patterns: ['decision_making', 'decisions', 'agility_1'], target: 'agility_1' },
+        { patterns: ['complex_problems', 'complexity', 'agility_2'], target: 'agility_2' },
+        { patterns: ['team_dynamics', 'team', 'agility_3'], target: 'agility_3' },
+        { patterns: ['change_leadership', 'change', 'agility_4'], target: 'agility_4' },
+        { patterns: ['learning_experimentation', 'learning', 'agility_5'], target: 'agility_5' },
+        { patterns: ['stakeholder_management', 'stakeholders', 'agility_6'], target: 'agility_6' },
+        
+        // Common leadership competency areas
+        { patterns: ['communication', 'communicate'], target: 'communication_skills' },
+        { patterns: ['emotional_intelligence', 'eq', 'emotions'], target: 'emotional_intelligence' },
+        { patterns: ['strategic_thinking', 'strategy'], target: 'strategic_thinking' },
+        { patterns: ['innovation', 'creative', 'creativity'], target: 'innovation_capability' },
+        { patterns: ['conflict_resolution', 'conflict'], target: 'conflict_management' },
+        { patterns: ['feedback', 'coaching'], target: 'coaching_capability' },
+        { patterns: ['influence', 'persuasion'], target: 'influence_skills' }
       ];
 
       headers.forEach(header => {
@@ -330,15 +363,15 @@ const ExternalSurveyUploadModal: React.FC<ExternalSurveyUploadModalProps> = ({
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent side="right" className="w-full sm:max-w-6xl overflow-hidden flex flex-col p-0">
-        <SheetHeader className="px-6 py-4 border-b">
+      <SheetContent side="right" className="w-full sm:max-w-7xl overflow-hidden flex flex-col p-0">
+        <SheetHeader className="px-6 py-4 border-b shrink-0">
           <SheetTitle className="flex items-center gap-2">
             <Upload className="h-5 w-5" />
             Upload External Survey Data
           </SheetTitle>
         </SheetHeader>
 
-        <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-4">
+        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
           {step === 'upload' && (
             <Card>
               <CardHeader>
@@ -464,13 +497,48 @@ const ExternalSurveyUploadModal: React.FC<ExternalSurveyUploadModalProps> = ({
                           <SelectTrigger className="h-8">
                             <SelectValue placeholder="Map to..." />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="max-h-64 overflow-y-auto">
                             <SelectItem value="none">Don't map</SelectItem>
+                            
+                            {/* Basic Info */}
                             <SelectItem value="participant_name">Participant Name</SelectItem>
                             <SelectItem value="company">Company</SelectItem>
                             <SelectItem value="role">Role/Position</SelectItem>
+                            <SelectItem value="business_area">Business Area</SelectItem>
                             <SelectItem value="date">Date</SelectItem>
                             <SelectItem value="email">Email</SelectItem>
+                            
+                            {/* Leadership Sentiment */}
+                            <SelectItem value="sentiment_1">Current Leadership Style</SelectItem>
+                            <SelectItem value="sentiment_2">Confidence in Leadership Abilities</SelectItem>
+                            <SelectItem value="sentiment_3">Leadership Mindset</SelectItem>
+                            <SelectItem value="sentiment_4">Most Challenging</SelectItem>
+                            <SelectItem value="sentiment_5">Most Exciting/Energising</SelectItem>
+                            
+                            {/* Purpose */}
+                            <SelectItem value="purpose_1">What Matters Most</SelectItem>
+                            <SelectItem value="purpose_2">Aspirational Leadership Style</SelectItem>
+                            <SelectItem value="purpose_3">Core Values</SelectItem>
+                            <SelectItem value="purpose_4">Leadership Legacy</SelectItem>
+                            <SelectItem value="purpose_5">Purpose Rating</SelectItem>
+                            
+                            {/* Agility */}
+                            <SelectItem value="agility_1">Decision Making</SelectItem>
+                            <SelectItem value="agility_2">Complex Problem Solving</SelectItem>
+                            <SelectItem value="agility_3">Team Dynamics</SelectItem>
+                            <SelectItem value="agility_4">Change Leadership</SelectItem>
+                            <SelectItem value="agility_5">Learning & Experimentation</SelectItem>
+                            <SelectItem value="agility_6">Stakeholder Management</SelectItem>
+                            
+                            {/* Leadership Competencies */}
+                            <SelectItem value="communication_skills">Communication Skills</SelectItem>
+                            <SelectItem value="emotional_intelligence">Emotional Intelligence</SelectItem>
+                            <SelectItem value="strategic_thinking">Strategic Thinking</SelectItem>
+                            <SelectItem value="innovation_capability">Innovation Capability</SelectItem>
+                            <SelectItem value="conflict_management">Conflict Management</SelectItem>
+                            <SelectItem value="coaching_capability">Coaching Capability</SelectItem>
+                            <SelectItem value="influence_skills">Influence Skills</SelectItem>
+                            
                             <SelectItem value="custom">Keep as custom field</SelectItem>
                           </SelectContent>
                         </Select>
@@ -488,45 +556,84 @@ const ExternalSurveyUploadModal: React.FC<ExternalSurveyUploadModalProps> = ({
                     {parsedData.data.length} records found
                   </Badge>
                 </CardHeader>
-                <CardContent>
-                  <div className="overflow-auto max-h-48">
-                    <table className="w-full text-xs">
-                      <thead className="sticky top-0 bg-background">
-                        <tr className="border-b">
-                          {parsedData.headers.slice(0, 8).map(header => (
-                            <th key={header} className="text-left p-1.5 font-medium min-w-0">
-                              <div className="truncate" title={header}>{header}</div>
-                            </th>
-                          ))}
-                          {parsedData.headers.length > 8 && (
-                            <th className="text-left p-1.5 font-medium">...</th>
-                          )}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {parsedData.data.slice(0, 5).map((row, index) => (
-                          <tr key={index} className="border-b hover:bg-muted/50">
-                            {parsedData.headers.slice(0, 8).map(header => (
-                              <td key={header} className="p-1.5 min-w-0">
-                                <div className="truncate max-w-24" title={String(row[header] || '')}>
-                                  {String(row[header] || '')}
-                                </div>
-                              </td>
-                            ))}
-                            {parsedData.headers.length > 8 && (
-                              <td className="p-1.5">...</td>
-                            )}
+                <CardContent className="space-y-4">
+                  <div className="text-xs text-muted-foreground">
+                    Preview of your data with current column mappings. Scroll horizontally to see all columns.
+                  </div>
+                  
+                  <div className="border rounded-lg overflow-hidden">
+                    <div className="overflow-x-auto max-h-96">
+                      <table className="w-full text-xs">
+                        <thead className="bg-muted/50 sticky top-0">
+                          <tr>
+                            {parsedData.headers.map(header => {
+                              const mappedTo = columnMapping[header];
+                              return (
+                                <th key={header} className="text-left p-3 font-medium border-r last:border-r-0 min-w-32">
+                                  <div className="space-y-1">
+                                    <div className="font-medium truncate" title={header}>
+                                      {header}
+                                    </div>
+                                    {mappedTo && mappedTo !== 'none' && (
+                                      <Badge variant="secondary" className="text-xs">
+                                        → {mappedTo.replace(/_/g, ' ')}
+                                      </Badge>
+                                    )}
+                                  </div>
+                                </th>
+                              );
+                            })}
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                    {parsedData.data.length > 5 && (
-                      <p className="text-xs text-muted-foreground mt-2 px-1.5">
-                        ... and {parsedData.data.length - 5} more rows
-                      </p>
-                    )}
+                        </thead>
+                        <tbody>
+                          {parsedData.preview.map((row, index) => (
+                            <tr key={index} className="border-b hover:bg-muted/30">
+                              {parsedData.headers.map(header => (
+                                <td key={header} className="p-3 border-r last:border-r-0 min-w-32">
+                                  <div className="max-w-48 truncate" title={row[header]}>
+                                    {row[header] || '-'}
+                                  </div>
+                                </td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  
+                  {parsedData.data.length > 5 && (
+                    <p className="text-xs text-muted-foreground">
+                      Showing first 5 rows of {parsedData.data.length} total records
+                    </p>
+                  )}
+                  
+                  <div className="flex gap-2 pt-2 border-t">
+                    <div className="text-xs text-muted-foreground">
+                      <strong>Mapped fields:</strong> {Object.values(columnMapping).filter(v => v && v !== 'none').length} of {parsedData.headers.length}
+                    </div>
                   </div>
                 </CardContent>
+
+              {/* Processing Action Buttons */}
+              <div className="flex justify-between items-center pt-4 border-t bg-background sticky bottom-0">
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" onClick={() => setStep('upload')}>
+                    Back to Upload
+                  </Button>
+                  <div className="text-xs text-muted-foreground">
+                    {Object.values(columnMapping).filter(v => v && v !== 'none').length} fields mapped
+                  </div>
+                </div>
+                <Button 
+                  onClick={handleProcessSurveys} 
+                  disabled={selectedRubrics.length === 0}
+                  className="font-medium"
+                >
+                  <Brain className="h-4 w-4 mr-2" />
+                  Process with AI Assessment ({selectedRubrics.length} rubric{selectedRubrics.length !== 1 ? 's' : ''})
+                </Button>
+              </div>
               </Card>
             </>
           )}

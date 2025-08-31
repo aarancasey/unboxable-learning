@@ -144,35 +144,73 @@ function mapExternalToInternal(externalData: any) {
 function mapAnswers(externalData: any) {
   const answers: any = {};
   
-  // Map common question patterns to internal format
-  const mappings = [
-    { external: ['leadership_style', 'leadership', 'style'], internal: 'leadership_reflection' },
-    { external: ['purpose', 'why', 'motivation'], internal: 'purpose_rating' },
-    { external: ['strengths', 'strength'], internal: 'strengths' },
-    { external: ['challenges', 'challenge', 'difficulties'], internal: 'challenges' },
-    { external: ['goals', 'goal', 'objectives'], internal: 'goals' },
-    { external: ['team', 'teamwork', 'collaboration'], internal: 'team_dynamics' },
-    { external: ['communication', 'communicate'], internal: 'communication' },
-    { external: ['feedback', 'input'], internal: 'feedback' },
-    { external: ['decision', 'decisions', 'decide'], internal: 'decision_making' },
-    { external: ['conflict', 'conflicts'], internal: 'conflict_resolution' },
-    { external: ['change', 'adaptation', 'adapt'], internal: 'change_management' },
-    { external: ['innovation', 'creative', 'creativity'], internal: 'innovation' }
+  // Direct mapping for survey questions - preserve exact field names from the UI mapping
+  const directMappings = [
+    // Leadership Sentiment
+    'sentiment_1', 'sentiment_2', 'sentiment_3', 'sentiment_4', 'sentiment_5',
+    // Purpose  
+    'purpose_1', 'purpose_2', 'purpose_3', 'purpose_4', 'purpose_5',
+    // Agility
+    'agility_1', 'agility_2', 'agility_3', 'agility_4', 'agility_5', 'agility_6',
+    // Leadership Competencies
+    'communication_skills', 'emotional_intelligence', 'strategic_thinking',
+    'innovation_capability', 'conflict_management', 'coaching_capability', 'influence_skills'
   ];
 
-  // Map each field from external data
+  // Legacy pattern matching for fields that weren't directly mapped
+  const patternMappings = [
+    { patterns: ['leadership_style', 'current_style'], target: 'sentiment_1' },
+    { patterns: ['confidence', 'leadership_confidence'], target: 'sentiment_2' },
+    { patterns: ['mindset', 'leadership_mindset'], target: 'sentiment_3' },
+    { patterns: ['challenging', 'challenges', 'difficult'], target: 'sentiment_4' },
+    { patterns: ['exciting', 'energising', 'motivating'], target: 'sentiment_5' },
+    { patterns: ['matters_most', 'important', 'priority'], target: 'purpose_1' },
+    { patterns: ['aspirational', 'want_to_be', 'future_style'], target: 'purpose_2' },
+    { patterns: ['values', 'core_values'], target: 'purpose_3' },
+    { patterns: ['legacy', 'impact', 'remembered'], target: 'purpose_4' },
+    { patterns: ['purpose_rating', 'purpose_score'], target: 'purpose_5' },
+    { patterns: ['decision_making', 'decisions'], target: 'agility_1' },
+    { patterns: ['complex_problems', 'complexity'], target: 'agility_2' },
+    { patterns: ['team_dynamics', 'team_work'], target: 'agility_3' },
+    { patterns: ['change_leadership', 'leading_change'], target: 'agility_4' },
+    { patterns: ['learning', 'experimentation'], target: 'agility_5' },
+    { patterns: ['stakeholder', 'stakeholders'], target: 'agility_6' },
+    { patterns: ['communication', 'communicate'], target: 'communication_skills' },
+    { patterns: ['emotional_intelligence', 'eq', 'emotions'], target: 'emotional_intelligence' },
+    { patterns: ['strategic', 'strategy'], target: 'strategic_thinking' },
+    { patterns: ['innovation', 'creative', 'creativity'], target: 'innovation_capability' },
+    { patterns: ['conflict', 'conflict_resolution'], target: 'conflict_management' },
+    { patterns: ['coaching', 'feedback', 'development'], target: 'coaching_capability' },
+    { patterns: ['influence', 'persuasion', 'influencing'], target: 'influence_skills' }
+  ];
+
+  // First, directly map any fields that match our survey question IDs
   Object.keys(externalData).forEach(key => {
+    if (directMappings.includes(key)) {
+      answers[key] = externalData[key];
+    }
+  });
+
+  // Then, use pattern matching for other fields
+  Object.keys(externalData).forEach(key => {
+    if (directMappings.includes(key)) return; // Skip already mapped fields
+    
     const lowerKey = key.toLowerCase();
     
-    // Find matching internal question
-    const mapping = mappings.find(m => 
-      m.external.some(ext => lowerKey.includes(ext))
+    // Skip basic participant info fields
+    if (['name', 'company', 'role', 'date', 'participant_name', 'full_name', 'organization', 'position', 'title', 'business_area', 'department', 'email'].includes(lowerKey)) {
+      return;
+    }
+    
+    // Find matching pattern
+    const mapping = patternMappings.find(m => 
+      m.patterns.some(pattern => lowerKey.includes(pattern))
     );
     
-    if (mapping) {
-      answers[mapping.internal] = externalData[key];
-    } else if (!['name', 'company', 'role', 'date', 'participant_name', 'full_name', 'organization', 'position', 'title', 'business_area', 'department'].includes(lowerKey)) {
-      // Include unmapped fields with original key
+    if (mapping && !answers[mapping.target]) { // Don't override direct mappings
+      answers[mapping.target] = externalData[key];
+    } else if (!mapping) {
+      // Include unmapped fields with original key for assessment
       answers[key] = externalData[key];
     }
   });
