@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -17,7 +17,8 @@ import {
   X,
   Download,
   Settings,
-  Brain
+  Brain,
+  Loader2
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
@@ -193,7 +194,7 @@ const ExternalSurveyUploadModal: React.FC<ExternalSurveyUploadModalProps> = ({
     });
   };
 
-  const handleStartProcessing = async () => {
+  const handleProcessSurveys = async () => {
     if (!file || !parsedData || selectedRubrics.length === 0) {
       toast({
         title: "Missing Information",
@@ -315,11 +316,6 @@ const ExternalSurveyUploadModal: React.FC<ExternalSurveyUploadModalProps> = ({
     onClose();
   };
 
-  const handleComplete = () => {
-    handleClose();
-    onUploadComplete();
-  };
-
   const downloadTemplate = () => {
     const templateData = [
       ['participant_name', 'company', 'role', 'date', 'leadership_style', 'strengths', 'challenges', 'goals'],
@@ -333,284 +329,330 @@ const ExternalSurveyUploadModal: React.FC<ExternalSurveyUploadModalProps> = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center space-x-2">
+    <Sheet open={isOpen} onOpenChange={onClose}>
+      <SheetContent side="right" className="w-full sm:max-w-6xl overflow-hidden flex flex-col p-0">
+        <SheetHeader className="px-6 py-4 border-b">
+          <SheetTitle className="flex items-center gap-2">
             <Upload className="h-5 w-5" />
-            <span>Upload External Survey Data</span>
-          </DialogTitle>
-        </DialogHeader>
+            Upload External Survey Data
+          </SheetTitle>
+        </SheetHeader>
 
-        {step === 'upload' && (
-          <div className="space-y-6">
-            <div className="text-center p-8 border-2 border-dashed border-gray-300 rounded-lg">
-              <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium mb-2">Upload Survey Data</h3>
-              <p className="text-gray-600 mb-4">
-                Upload CSV or Excel files containing external survey responses
-              </p>
-              
-              <div className="flex justify-center space-x-4">
-                <Button onClick={() => fileInputRef.current?.click()}>
-                  Select File
-                </Button>
-                <Button variant="outline" onClick={downloadTemplate}>
-                  <Download className="h-4 w-4 mr-2" />
-                  Download Template
-                </Button>
-              </div>
-              
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".csv,.xlsx,.xls"
-                onChange={handleFileSelect}
-                className="hidden"
-              />
-            </div>
-
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <h4 className="font-medium mb-2">Supported Formats:</h4>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li>• CSV files (.csv)</li>
-                <li>• Excel files (.xlsx, .xls)</li>
-                <li>• Maximum file size: 10MB</li>
-                <li>• Must include header row</li>
-              </ul>
-            </div>
-          </div>
-        )}
-
-        {step === 'mapping' && parsedData && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium">Data Mapping & Configuration</h3>
-              <Badge variant="secondary">
-                {parsedData.data.length} records found
-              </Badge>
-            </div>
-
-            {/* Rubric Selection */}
+        <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-4">
+          {step === 'upload' && (
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Brain className="h-5 w-5" />
-                  <span>Select Assessment Rubrics</span>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <FileText className="h-4 w-4" />
+                  <span>Select Survey File</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {rubrics.map(rubric => (
-                    <div key={rubric.id} className="flex items-start space-x-3 p-3 border rounded-lg">
-                      <Checkbox
-                        id={rubric.id}
-                        checked={selectedRubrics.includes(rubric.id!)}
-                        onCheckedChange={(checked) => {
-                          if (checked) {
-                            setSelectedRubrics(prev => [...prev, rubric.id!]);
-                          } else {
-                            setSelectedRubrics(prev => prev.filter(id => id !== rubric.id));
-                          }
-                        }}
-                      />
-                      <div className="flex-1">
-                        <label htmlFor={rubric.id} className="font-medium cursor-pointer">
-                          {rubric.name}
-                        </label>
-                        <p className="text-sm text-gray-600 mt-1">
-                          {rubric.criteria.length} criteria • {rubric.scoring_scale.maxPoints} max points
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                {selectedRubrics.length === 0 && (
-                  <p className="text-yellow-600 text-sm mt-2">
-                    Please select at least one rubric for assessment
+                <div className="text-center p-6 border-2 border-dashed border-muted-foreground/25 rounded-lg">
+                  <FileText className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
+                  <h3 className="text-base font-medium mb-2">Upload Survey Data</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Upload CSV or Excel files containing external survey responses
                   </p>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Column Mapping */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Settings className="h-5 w-5" />
-                  <span>Column Mapping</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {parsedData.headers.map(header => (
-                    <div key={header} className="space-y-2">
-                      <label className="text-sm font-medium">{header}</label>
-                      <Select
-                        value={columnMapping[header] || 'none'}
-                        onValueChange={(value) => {
-                          setColumnMapping(prev => ({
-                            ...prev,
-                            [header]: value
-                          }));
-                        }}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Map to..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">Don't map</SelectItem>
-                          <SelectItem value="participant_name">Participant Name</SelectItem>
-                          <SelectItem value="company">Company</SelectItem>
-                          <SelectItem value="role">Role/Position</SelectItem>
-                          <SelectItem value="date">Date</SelectItem>
-                          <SelectItem value="email">Email</SelectItem>
-                          <SelectItem value="custom">Keep as custom field</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Data Preview */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Data Preview</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b">
-                        {parsedData.headers.map(header => (
-                          <th key={header} className="text-left p-2">
-                            {header}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {parsedData.preview.map((row, index) => (
-                        <tr key={index} className="border-b">
-                          {parsedData.headers.map(header => (
-                            <td key={header} className="p-2 max-w-[200px] truncate">
-                              {row[header]}
-                            </td>
-                          ))}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
-
-            <div className="flex justify-between">
-              <Button variant="outline" onClick={() => setStep('upload')}>
-                Back
-              </Button>
-              <Button 
-                onClick={handleStartProcessing}
-                disabled={selectedRubrics.length === 0}
-              >
-                Start Processing
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {step === 'processing' && (
-          <div className="space-y-6">
-            <div className="text-center">
-              <h3 className="text-lg font-medium mb-4">Processing Survey Data</h3>
-              <Progress value={processing.progress} className="w-full" />
-              <p className="text-sm text-gray-600 mt-2">{processing.message}</p>
-            </div>
-
-            {processing.status === 'error' && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                <div className="flex items-center space-x-2">
-                  <AlertCircle className="h-5 w-5 text-red-500" />
-                  <span className="font-medium text-red-800">Processing Failed</span>
-                </div>
-                <p className="text-red-700 mt-2">{processing.message}</p>
-                <Button 
-                  variant="outline" 
-                  className="mt-4"
-                  onClick={() => setStep('mapping')}
-                >
-                  Try Again
-                </Button>
-              </div>
-            )}
-          </div>
-        )}
-
-        {step === 'complete' && processing.results && (
-          <div className="space-y-6">
-            <div className="text-center">
-              <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
-              <h3 className="text-lg font-medium mb-2">Processing Complete!</h3>
-              <p className="text-gray-600">
-                Your external survey data has been processed and assessed with the selected rubrics.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-blue-600">
-                    {processing.results.processed}
+                  
+                  <div className="flex justify-center space-x-3 mb-4">
+                    <Button size="sm" onClick={() => fileInputRef.current?.click()}>
+                      Select File
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={downloadTemplate}>
+                      <Download className="h-4 w-4 mr-2" />
+                      Download Template
+                    </Button>
                   </div>
-                  <div className="text-sm text-gray-600">Total Processed</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-green-600">
-                    {processing.results.successful}
-                  </div>  
-                  <div className="text-sm text-gray-600">Successful</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-red-600">
-                    {processing.results.failed}
-                  </div>
-                  <div className="text-sm text-gray-600">Failed</div>
-                </CardContent>
-              </Card>
-            </div>
+                  
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".csv,.xlsx,.xls"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                  />
+                </div>
 
-            {processing.results.errors && processing.results.errors.length > 0 && (
+                <div className="bg-muted p-3 rounded-lg mt-4">
+                  <h4 className="text-sm font-medium mb-2">Supported Formats:</h4>
+                  <ul className="text-xs text-muted-foreground space-y-1">
+                    <li>• CSV files (.csv)</li>
+                    <li>• Excel files (.xlsx, .xls)</li>
+                    <li>• Maximum file size: 10MB</li>
+                    <li>• Must include header row</li>
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {step === 'mapping' && parsedData && (
+            <>
+              {/* Assessment Rubrics Selection */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-red-600">Processing Errors</CardTitle>
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <Brain className="h-4 w-4" />
+                    <span>Assessment Rubrics</span>
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="max-h-40 overflow-y-auto">
-                    {processing.results.errors.map((error: any, index: number) => (
-                      <div key={index} className="text-sm p-2 border-b">
-                        <span className="font-medium">Row {error.row}:</span> {error.error}
+                  <div className="text-xs text-muted-foreground mb-3">
+                    Select rubrics to automatically assess the uploaded survey data. The AI will analyze responses against each selected rubric's criteria.
+                  </div>
+                  <div className="grid grid-cols-1 gap-3 max-h-48 overflow-y-auto">
+                    {rubrics.map(rubric => (
+                      <div key={rubric.id} className="flex items-start space-x-3 p-3 border rounded-lg">
+                        <Checkbox
+                          id={rubric.id}
+                          checked={selectedRubrics.includes(rubric.id!)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setSelectedRubrics(prev => [...prev, rubric.id!]);
+                            } else {
+                              setSelectedRubrics(prev => prev.filter(id => id !== rubric.id));
+                            }
+                          }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <label htmlFor={rubric.id} className="text-sm font-medium cursor-pointer">
+                            {rubric.name}
+                          </label>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {rubric.criteria.length} criteria • {rubric.scoring_scale.maxPoints} max points
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {selectedRubrics.length === 0 && (
+                    <p className="text-yellow-600 text-xs mt-2">
+                      Please select at least one rubric for assessment
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Column Mapping */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <Settings className="h-4 w-4" />
+                    <span>Column Mapping</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-xs text-muted-foreground mb-3">
+                    Map your file columns to standard fields. Unmapped columns will be kept as custom fields.
+                  </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 max-h-64 overflow-y-auto">
+                    {parsedData.headers.map(header => (
+                      <div key={header} className="space-y-2">
+                        <label className="text-xs font-medium text-muted-foreground truncate block" title={header}>
+                          {header}
+                        </label>
+                        <Select
+                          value={columnMapping[header] || 'none'}
+                          onValueChange={(value) => {
+                            setColumnMapping(prev => ({
+                              ...prev,
+                              [header]: value
+                            }));
+                          }}
+                        >
+                          <SelectTrigger className="h-8">
+                            <SelectValue placeholder="Map to..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">Don't map</SelectItem>
+                            <SelectItem value="participant_name">Participant Name</SelectItem>
+                            <SelectItem value="company">Company</SelectItem>
+                            <SelectItem value="role">Role/Position</SelectItem>
+                            <SelectItem value="date">Date</SelectItem>
+                            <SelectItem value="email">Email</SelectItem>
+                            <SelectItem value="custom">Keep as custom field</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
                     ))}
                   </div>
                 </CardContent>
               </Card>
-            )}
 
-            <div className="flex justify-center">
-              <Button onClick={handleComplete}>
-                View Results in Survey Management
+              {/* Data Preview */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Data Preview</CardTitle>
+                  <Badge variant="secondary" className="w-fit">
+                    {parsedData.data.length} records found
+                  </Badge>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-auto max-h-48">
+                    <table className="w-full text-xs">
+                      <thead className="sticky top-0 bg-background">
+                        <tr className="border-b">
+                          {parsedData.headers.slice(0, 8).map(header => (
+                            <th key={header} className="text-left p-1.5 font-medium min-w-0">
+                              <div className="truncate" title={header}>{header}</div>
+                            </th>
+                          ))}
+                          {parsedData.headers.length > 8 && (
+                            <th className="text-left p-1.5 font-medium">...</th>
+                          )}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {parsedData.data.slice(0, 5).map((row, index) => (
+                          <tr key={index} className="border-b hover:bg-muted/50">
+                            {parsedData.headers.slice(0, 8).map(header => (
+                              <td key={header} className="p-1.5 min-w-0">
+                                <div className="truncate max-w-24" title={String(row[header] || '')}>
+                                  {String(row[header] || '')}
+                                </div>
+                              </td>
+                            ))}
+                            {parsedData.headers.length > 8 && (
+                              <td className="p-1.5">...</td>
+                            )}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    {parsedData.data.length > 5 && (
+                      <p className="text-xs text-muted-foreground mt-2 px-1.5">
+                        ... and {parsedData.data.length - 5} more rows
+                      </p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          )}
+
+          {step === 'processing' && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Processing Survey Data</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <Progress value={processing.progress} className="w-full" />
+                  <p className="text-sm text-muted-foreground text-center">{processing.message}</p>
+                  
+                  {processing.status === 'error' && (
+                    <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3">
+                      <div className="flex items-center space-x-2">
+                        <AlertCircle className="h-4 w-4 text-destructive" />
+                        <span className="text-sm font-medium text-destructive">Processing Failed</span>
+                      </div>
+                      <p className="text-sm text-destructive/80 mt-1">{processing.message}</p>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="mt-3"
+                        onClick={() => setStep('mapping')}
+                      >
+                        Try Again
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {step === 'complete' && processing.results && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <span>Upload Complete</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Your external survey data has been processed and assessed with the selected rubrics.
+                  </p>
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <div className="text-xs font-medium text-muted-foreground">Records Processed</div>
+                      <div className="text-xl font-bold text-primary">
+                        {processing.results.total_processed || 0}
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="text-xs font-medium text-muted-foreground">Assessments Generated</div>
+                      <div className="text-xl font-bold text-green-600">
+                        {processing.results.assessments_created || 0}
+                      </div>
+                    </div>
+                  </div>
+
+                  {processing.results.errors && processing.results.errors.length > 0 && (
+                    <div className="border border-destructive/20 rounded-lg p-3 bg-destructive/5">
+                      <div className="text-sm font-medium text-destructive mb-2">Processing Errors</div>
+                      <div className="max-h-24 overflow-y-auto space-y-1">
+                        {processing.results.errors.slice(0, 3).map((error: any, index: number) => (
+                          <div key={index} className="text-xs p-1.5 border-b border-destructive/10">
+                            <span className="font-medium">Row {error.row}:</span> {error.error}
+                          </div>
+                        ))}
+                        {processing.results.errors.length > 3 && (
+                          <div className="text-xs text-muted-foreground">
+                            ... and {processing.results.errors.length - 3} more errors
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex justify-between items-center px-6 py-4 border-t bg-background">
+          <div className="flex gap-2">
+            {step === 'upload' && (
+              <Button variant="outline" onClick={onClose} size="sm">
+                Cancel
               </Button>
-            </div>
+            )}
+            {step === 'mapping' && (
+              <Button variant="outline" onClick={() => setStep('upload')} size="sm">
+                Back
+              </Button>
+            )}
+            {step === 'complete' && (
+              <Button variant="outline" onClick={() => { handleClose(); onUploadComplete(); }} size="sm">
+                Close & View Results
+              </Button>
+            )}
           </div>
-        )}
-      </DialogContent>
-    </Dialog>
+          
+          <div className="flex gap-2">
+            {step === 'mapping' && (
+              <Button 
+                onClick={handleProcessSurveys}
+                disabled={selectedRubrics.length === 0}
+                size="sm"
+                className="min-w-28"
+              >
+                Process Data
+              </Button>
+            )}
+          </div>
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 };
 
