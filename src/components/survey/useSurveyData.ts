@@ -153,6 +153,11 @@ Your facilitator and coach will have oversight into your responses as this will 
             id: "sentiment_5",
             type: "text",
             question: "What feels most exciting or energising?"
+          },
+          {
+            id: "sentiment_6",
+            type: "text",
+            question: "What matters most to you as a leader right now?"
           }
         ]
       },
@@ -163,38 +168,33 @@ Your facilitator and coach will have oversight into your responses as this will 
         questions: [
           {
             id: "purpose_1",
-            type: "text",
-            question: "What matters most to you as a leader right now?"
-          },
-          {
-            id: "purpose_2",
             type: "checkbox",
-            question: "What kind of leader do you aspire to be? (Choose up to three)",
+            question: "What kind of leader do you aspire to be? (select up to 3)",
             options: [
               "Strategic and future-focused",
-              "Empowering and people-centred",
+              "Empowering and people-centered",
               "Bold and transformational",
               "Calm and composed under pressure",
               "Curious and adaptive",
-              "Purpose-led and values-driven",
-              "High-performing and results-oriented",
+              "Purpose-led and values driven",
+              "High-performing and results oriented",
               "Trusted and respected across the organisation",
               "Creative and innovative"
             ],
             maxSelections: 3
           },
           {
+            id: "purpose_2",
+            type: "text",
+            question: "What impact do you want your leadership to have - on your team, your department or the organisation?"
+          },
+          {
             id: "purpose_3",
             type: "text",
-            question: "What impact do you want your leadership to have - on your team, your department, or the organisation?"
+            question: "What is one leadership stretch goal you want to work towards over the next 6-12 months?"
           },
           {
             id: "purpose_4",
-            type: "text",
-            question: "What's one leadership stretch goal you want to work toward over the next 6–12 months?"
-          },
-          {
-            id: "purpose_5",
             type: "scale",
             question: "How connected do you feel to a sense of purpose in your current role?",
             scaleLabels: [

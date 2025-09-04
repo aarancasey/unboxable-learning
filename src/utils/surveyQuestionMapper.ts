@@ -71,6 +71,11 @@ const getSurveyData = () => {
             id: "sentiment_5",
             question: "What feels most exciting or energising?",
             type: "text"
+          },
+          {
+            id: "sentiment_6",
+            question: "What matters most to you as a leader right now?",
+            type: "text"
           }
         ]
       },
@@ -79,37 +84,32 @@ const getSurveyData = () => {
         questions: [
           {
             id: "purpose_1",
-            question: "What matters most to you as a leader right now?",
-            type: "text"
-          },
-          {
-            id: "purpose_2",
-            question: "What kind of leader do you aspire to be? (Choose up to three)",
+            question: "What kind of leader do you aspire to be? (select up to 3)",
             type: "checkbox",
             options: [
               "Strategic and future-focused",
-              "Empowering and people-centred",
+              "Empowering and people-centered",
               "Bold and transformational",
               "Calm and composed under pressure",
               "Curious and adaptive",
-              "Purpose-led and values-driven",
-              "High-performing and results-oriented",
+              "Purpose-led and values driven",
+              "High-performing and results oriented",
               "Trusted and respected across the organisation",
               "Creative and innovative"
             ]
           },
           {
+            id: "purpose_2",
+            question: "What impact do you want your leadership to have - on your team, your department or the organisation?",
+            type: "text"
+          },
+          {
             id: "purpose_3",
-            question: "What impact do you want your leadership to have - on your team, your department, or the organisation?",
+            question: "What is one leadership stretch goal you want to work towards over the next 6-12 months?",
             type: "text"
           },
           {
             id: "purpose_4",
-            question: "What's one leadership stretch goal you want to work toward over the next 6–12 months?",
-            type: "text"
-          },
-          {
-            id: "purpose_5",
             question: "How connected do you feel to a sense of purpose in your current role?",
             type: "scale",
             scaleLabels: [
@@ -240,31 +240,6 @@ const getSurveyData = () => {
               "I clarify decision rights so others know when and how to act",
               "I learn from past decisions to improve future thinking"
             ]
-          }
-        ]
-      },
-      {
-        title: "Self-Reflection Questions",
-        questions: [
-          {
-            id: "reflection_1",
-            question: "Based on your responses, what patterns do you notice about your current leadership approach?",
-            type: "text"
-          },
-          {
-            id: "reflection_2", 
-            question: "Which areas of leadership agility feel strongest for you right now?",
-            type: "text"
-          },
-          {
-            id: "reflection_3",
-            question: "Which areas would you most like to develop further?",
-            type: "text"
-          },
-          {
-            id: "reflection_4",
-            question: "What's one insight from this assessment that you want to explore more deeply?",
-            type: "text"
           }
         ]
       }

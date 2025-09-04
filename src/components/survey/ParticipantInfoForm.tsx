@@ -11,19 +11,19 @@ interface ParticipantInfoProps {
 
 export interface ParticipantInfo {
   fullName: string;
-  date: string;
-  company: string;
-  businessArea: string;
+  email: string;
   role: string;
+  department: string;
+  employmentLength: string;
 }
 
 export const ParticipantInfoForm = ({ onComplete, learnerData }: ParticipantInfoProps) => {
   const [formData, setFormData] = useState<ParticipantInfo>({
     fullName: learnerData?.name || '',
-    date: new Date().toISOString().split('T')[0],
-    company: '',
-    businessArea: '',
-    role: ''
+    email: learnerData?.email || '',
+    role: '',
+    department: '',
+    employmentLength: ''
   });
 
   const [errors, setErrors] = useState<Partial<ParticipantInfo>>({});
@@ -39,10 +39,10 @@ export const ParticipantInfoForm = ({ onComplete, learnerData }: ParticipantInfo
     const newErrors: Partial<ParticipantInfo> = {};
     
     if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
-    if (!formData.date) newErrors.date = 'Date is required';
-    if (!formData.company.trim()) newErrors.company = 'Company is required';
-    if (!formData.businessArea.trim()) newErrors.businessArea = 'Business area is required';
+    if (!formData.email.trim()) newErrors.email = 'Email is required';
     if (!formData.role.trim()) newErrors.role = 'Role is required';
+    if (!formData.department.trim()) newErrors.department = 'Department is required';
+    if (!formData.employmentLength.trim()) newErrors.employmentLength = 'Employment length is required';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -66,7 +66,7 @@ export const ParticipantInfoForm = ({ onComplete, learnerData }: ParticipantInfo
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="fullName" className="text-sm font-medium text-unboxable-navy">
-              Full Name *
+              Please enter your full name? *
             </Label>
             <Input
               id="fullName"
@@ -80,52 +80,23 @@ export const ParticipantInfoForm = ({ onComplete, learnerData }: ParticipantInfo
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="date" className="text-sm font-medium text-unboxable-navy">
-              Date *
+            <Label htmlFor="email" className="text-sm font-medium text-unboxable-navy">
+              What is your email address? *
             </Label>
             <Input
-              id="date"
-              type="date"
-              value={formData.date}
-              onChange={(e) => handleChange('date', e.target.value)}
-              className={`h-12 ${errors.date ? 'border-red-500' : ''}`}
+              id="email"
+              type="email"
+              placeholder="Enter your email address"
+              value={formData.email}
+              onChange={(e) => handleChange('email', e.target.value)}
+              className={`h-12 ${errors.email ? 'border-red-500' : ''}`}
             />
-            {errors.date && <p className="text-sm text-red-500">{errors.date}</p>}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="company" className="text-sm font-medium text-unboxable-navy">
-              Company *
-            </Label>
-            <Input
-              id="company"
-              type="text"
-              placeholder="Enter your company name"
-              value={formData.company}
-              onChange={(e) => handleChange('company', e.target.value)}
-              className={`h-12 ${errors.company ? 'border-red-500' : ''}`}
-            />
-            {errors.company && <p className="text-sm text-red-500">{errors.company}</p>}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="businessArea" className="text-sm font-medium text-unboxable-navy">
-              Business Area *
-            </Label>
-            <Input
-              id="businessArea"
-              type="text"
-              placeholder="Enter your business area"
-              value={formData.businessArea}
-              onChange={(e) => handleChange('businessArea', e.target.value)}
-              className={`h-12 ${errors.businessArea ? 'border-red-500' : ''}`}
-            />
-            {errors.businessArea && <p className="text-sm text-red-500">{errors.businessArea}</p>}
+            {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="role" className="text-sm font-medium text-unboxable-navy">
-              Role *
+              What is your role at Douglas? *
             </Label>
             <Input
               id="role"
@@ -136,6 +107,36 @@ export const ParticipantInfoForm = ({ onComplete, learnerData }: ParticipantInfo
               className={`h-12 ${errors.role ? 'border-red-500' : ''}`}
             />
             {errors.role && <p className="text-sm text-red-500">{errors.role}</p>}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="department" className="text-sm font-medium text-unboxable-navy">
+              What department do you work in? *
+            </Label>
+            <Input
+              id="department"
+              type="text"
+              placeholder="Enter your department"
+              value={formData.department}
+              onChange={(e) => handleChange('department', e.target.value)}
+              className={`h-12 ${errors.department ? 'border-red-500' : ''}`}
+            />
+            {errors.department && <p className="text-sm text-red-500">{errors.department}</p>}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="employmentLength" className="text-sm font-medium text-unboxable-navy">
+              How long have you worked at Douglas? *
+            </Label>
+            <Input
+              id="employmentLength"
+              type="text"
+              placeholder="e.g., 2 years, 6 months"
+              value={formData.employmentLength}
+              onChange={(e) => handleChange('employmentLength', e.target.value)}
+              className={`h-12 ${errors.employmentLength ? 'border-red-500' : ''}`}
+            />
+            {errors.employmentLength && <p className="text-sm text-red-500">{errors.employmentLength}</p>}
           </div>
 
           <div className="pt-6">

@@ -91,10 +91,10 @@ const SurveyForm = ({ onBack, onSubmit, learnerData }: SurveyFormProps) => {
             fullName: learnerData.first_name && learnerData.last_name 
               ? `${learnerData.first_name} ${learnerData.last_name}` 
               : learnerData.email || '',
-            date: new Date().toISOString().split('T')[0],
-            company: learnerData.company || '',
-            businessArea: learnerData.team || '',
-            role: learnerData.role || ''
+            email: learnerData.email || '',
+            role: learnerData.role || '',
+            department: learnerData.team || '',
+            employmentLength: ''
           };
         }
 
