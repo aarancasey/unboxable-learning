@@ -1811,6 +1811,10 @@ export type Database = {
         Args: { learner_id_input: number; new_password_input: string }
         Returns: boolean
       }
+      validate_password_strength: {
+        Args: { password_text: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role:
