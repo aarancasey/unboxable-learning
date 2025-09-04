@@ -201,73 +201,6 @@ Learner: ${learnerName}
 Survey Responses:
 ${surveyResponses.map((r: any) => `Q: ${r.question}\nA: ${r.answer}`).join('\n\n')}
 
-Please provide a comprehensive analysis following this EXACT structure from the LEADForward document:
-
-## Leadership Sentiment Snapshot
-This section reflects how you're currently experiencing your leadership role - your mindset, energy, and emotional connection to leading.
-
-### 1. Current Leadership Style
-Based on your selection you see your current leadership style as: [Describe their leadership style based on their responses - 2-3 sentences about their approach]
-
-### 2. Confidence Levels in Key Areas
-Based on your assessment, you see your confidence in the following areas as follows:
-- Strategic Vision & Direction: [score 1.0-5.0]
-- Team Leadership & Motivation: [score 1.0-5.0] 
-- Decision Making Under Pressure: [score 1.0-5.0]
-- Managing Change & Uncertainty: [score 1.0-5.0]
-- Communication & Influence: [score 1.0-5.0]
-- Personal Leadership Presence: [score 1.0-5.0]
-- Building & Maintaining Relationships: [score 1.0-5.0]
-
-From an overall perspective your aggregated average score is: [average of above scores]
-Based on this score, this indicates that: [interpretation based on ranges: 1.0–2.4 = "You're in early stages", 2.5–3.4 = "You're developing your capabilities", 3.5–4.4 = "You have solid foundations", 4.5–5.0 = "You demonstrate strong confidence"]
-
-### 3. Current Leadership Mindset
-You described your current leadership as the following: [extracted from responses]
-
-### 4. Current Leadership Challenges
-You described your current leadership challenge as: [extracted from responses]
-
-### 5. What's Energising You Right Now
-You see yourself as being energised by: [extracted from responses]
-
-## Leadership Intent & Purpose
-This section explores what drives you - your values, aspirations, and the impact you want your leadership to have.
-
-### 1. What Matters Most Right Now
-The following matters to you most right now as a leader: [extracted from responses]
-
-### 2. Leadership Aspirations
-You identified the following attributes that you aspire to be as a leader are: [array of aspirations]
-
-### 3. Desired Impact
-When I think about my leadership, I want to have the following impact: [extracted from responses]
-
-### 4. Leadership Stretch Goal
-As part of this, you have identified the following stretch goal that you would like to work on over the next six to twelve months: [extracted from responses]
-
-### 5. Connection to Purpose
-Purpose is a critical component, and you feel your current connection to purpose is that: [extracted from responses]
-
-## Adaptive & Agile Leadership Snapshot
-Your self-assessed responses across six dimensions of adaptive leadership have been reviewed to highlight your current strengths and development areas.
-
-### 1. Summary Leadership Agility Level
-Based on your scoring you have been assessed as: [Opportunist/Diplomat/Expert/Achiever/Individualist/Strategist/Alchemist]
-This is considered: [description of level]
-
-### 2. Notable Strength
-Based on the responses recorded, your highest rating response was identified as: [specific strength area]
-
-### 3. Potential Development Areas
-Based on the responses recorded, your lowest rating response was identified as: [specific development area]
-
-### Overall Summary
-[Comprehensive 2-3 sentence summary of their leadership profile and readiness for development]
-
-## Assessment Rubric Scores
-Based on the assessment rubrics provided, evaluate the person against each rubric and provide specific scores for each criterion.
-
 Return your analysis as a JSON object with this structure:
 {
   "currentLeadershipStyle": "string",
@@ -313,33 +246,42 @@ Return your analysis as a JSON object with this structure:
 
 Make the analysis personal, specific to their responses, and professionally written following the exact LEADForward document structure.`;
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const HUGGING_FACE_ACCESS_TOKEN = Deno.env.get('HUGGING_FACE_ACCESS_TOKEN');
+    if (!HUGGING_FACE_ACCESS_TOKEN) {
+      throw new Error('Hugging Face API key not configured');
+    }
+
+    const response = await fetch('https://api-inference.huggingface.co/models/meta-llama/Llama-3.1-8B-Instruct', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
+        'Authorization': `Bearer ${HUGGING_FACE_ACCESS_TOKEN}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: 'You are a professional leadership development expert specializing in creating comprehensive leadership assessments following the LEADForward framework. Always respond with valid JSON only.' },
-          { role: 'user', content: prompt }
-        ],
-        temperature: 0.7,
-        max_tokens: 2500,
+        inputs: prompt,
+        parameters: {
+          max_new_tokens: 2500,
+          temperature: 0.7,
+          return_full_text: false
+        }
       }),
     });
 
     if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.status}`);
+      throw new Error(`Hugging Face API error: ${response.status}`);
     }
 
     const data = await response.json();
-    const content = data.choices[0].message.content;
+    const content = data[0]?.generated_text || '';
     
     // Parse the JSON response
     try {
-      return JSON.parse(content);
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error('No JSON found in AI response');
+      }
+      
+      return JSON.parse(jsonMatch[0]);
     } catch (parseError) {
       console.error('Failed to parse AI response as JSON:', content);
       // Return fallback assessment with new structure

@@ -298,7 +298,7 @@ async function processWithRubric(submissionId: number, rubricId: string, mappedR
         confidence_score: assessment.confidenceScore,
         processing_metadata: {
           processedAt: new Date().toISOString(),
-          model: 'gpt-5-2025-08-07',
+          model: 'meta-llama/Llama-3.1-8B-Instruct',
           processingTime: Date.now()
         }
       });
@@ -313,13 +313,12 @@ async function processWithRubric(submissionId: number, rubricId: string, mappedR
 }
 
 async function generateRubricAssessment(surveyResponse: any, rubric: any) {
-  const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-  if (!OPENAI_API_KEY) {
-    throw new Error('OpenAI API key not configured');
+  const HUGGING_FACE_ACCESS_TOKEN = Deno.env.get('HUGGING_FACE_ACCESS_TOKEN');
+  if (!HUGGING_FACE_ACCESS_TOKEN) {
+    throw new Error('Hugging Face API key not configured');
   }
 
-  const prompt = `
-You are an expert assessment evaluator. Analyze the following survey response against the provided rubric and generate a comprehensive assessment.
+  const prompt = `You are an expert assessment evaluator specializing in leadership and professional development assessments. Analyze the following survey response against the provided rubric and generate a comprehensive assessment.
 
 SURVEY RESPONSE:
 Participant: ${surveyResponse.learner_name}
@@ -348,37 +347,36 @@ Please provide a detailed assessment in the following JSON format:
     }
   },
   "summary": "<overall assessment summary>",
-  "strengths": ["<strength 1>", "<strength 2>", ...],
-  "areasForImprovement": ["<area 1>", "<area 2>", ...],
-  "recommendations": ["<recommendation 1>", "<recommendation 2>", ...],
+  "strengths": ["<strength 1>", "<strength 2>"],
+  "areasForImprovement": ["<area 1>", "<area 2>"],
+  "recommendations": ["<recommendation 1>", "<recommendation 2>"],
   "confidenceScore": <0-1 confidence in assessment>
 }
 
-Focus on providing specific, actionable feedback based on the survey responses and rubric criteria.
-`;
+Focus on providing specific, actionable feedback based on the survey responses and rubric criteria. Return only valid JSON.`;
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+  const response = await fetch('https://api-inference.huggingface.co/models/meta-llama/Llama-3.1-8B-Instruct', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${OPENAI_API_KEY}`,
+      'Authorization': `Bearer ${HUGGING_FACE_ACCESS_TOKEN}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'gpt-5-2025-08-07',
-      messages: [
-        { role: 'system', content: 'You are an expert assessment evaluator specializing in leadership and professional development assessments.' },
-        { role: 'user', content: prompt }
-      ],
-      max_completion_tokens: 2000,
+      inputs: prompt,
+      parameters: {
+        max_new_tokens: 2000,
+        temperature: 0.7,
+        return_full_text: false
+      }
     }),
   });
 
   if (!response.ok) {
-    throw new Error(`OpenAI API error: ${response.statusText}`);
+    throw new Error(`Hugging Face API error: ${response.statusText}`);
   }
 
   const data = await response.json();
-  const assessmentText = data.choices[0].message.content;
+  const assessmentText = data[0]?.generated_text || '';
 
   try {
     // Extract JSON from the response
