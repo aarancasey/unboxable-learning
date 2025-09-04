@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useRubrics } from '@/hooks/useRubrics';
+import { autoMapColumns, getSurveyQuestionMappings } from '@/utils/surveyAutoMapping';
 import { 
   Upload, 
   FileText, 
@@ -131,63 +132,18 @@ const ExternalSurveyUploadModal: React.FC<ExternalSurveyUploadModalProps> = ({
 
       setParsedData(parsedData);
       
-      // Auto-suggest column mappings with current survey structure
-      const autoMapping: Record<string, string> = {};
-      const commonMappings = [
-        // Participant info
-        { patterns: ['name', 'participant', 'full_name', 'fullname'], target: 'participant_name' },
-        { patterns: ['company', 'organization', 'org'], target: 'company' },
-        { patterns: ['role', 'position', 'title', 'job'], target: 'role' },
-        { patterns: ['date', 'submitted', 'timestamp'], target: 'date' },
-        { patterns: ['email', 'e-mail', 'email_address'], target: 'email' },
-        { patterns: ['department', 'dept', 'business_area'], target: 'department' },
-        { patterns: ['employment_length', 'years_employed', 'tenure'], target: 'employment_length' },
-        
-        // Leadership Sentiment questions (updated structure)
-        { patterns: ['leadership_style', 'current_style', 'sentiment_1'], target: 'sentiment_1' },
-        { patterns: ['confidence_complexity', 'complexity', 'sentiment_2'], target: 'sentiment_2' },
-        { patterns: ['leadership_mindset', 'mindset', 'sentiment_3'], target: 'sentiment_3' },
-        { patterns: ['challenging', 'challenges', 'sentiment_4'], target: 'sentiment_4' },
-        { patterns: ['exciting', 'energising', 'sentiment_5'], target: 'sentiment_5' },
-        { patterns: ['matters_most', 'what_matters', 'leader_priority', 'sentiment_6'], target: 'sentiment_6' },
-        
-        // Purpose questions (only purpose_5 remains)
-        { patterns: ['purpose_rating', 'purpose_score', 'purpose_5'], target: 'purpose_5' },
-        
-        // Agility questions
-        { patterns: ['decision_making', 'decisions', 'agility_1'], target: 'agility_1' },
-        { patterns: ['complex_problems', 'complexity', 'agility_2'], target: 'agility_2' },
-        { patterns: ['team_dynamics', 'team', 'agility_3'], target: 'agility_3' },
-        { patterns: ['change_leadership', 'change', 'agility_4'], target: 'agility_4' },
-        { patterns: ['learning_experimentation', 'learning', 'agility_5'], target: 'agility_5' },
-        { patterns: ['stakeholder_management', 'stakeholders', 'agility_6'], target: 'agility_6' },
-        
-        // Common leadership competency areas
-        { patterns: ['communication', 'communicate'], target: 'communication_skills' },
-        { patterns: ['emotional_intelligence', 'eq', 'emotions'], target: 'emotional_intelligence' },
-        { patterns: ['strategic_thinking', 'strategy'], target: 'strategic_thinking' },
-        { patterns: ['innovation', 'creative', 'creativity'], target: 'innovation_capability' },
-        { patterns: ['conflict_resolution', 'conflict'], target: 'conflict_management' },
-        { patterns: ['feedback', 'coaching'], target: 'coaching_capability' },
-        { patterns: ['influence', 'persuasion'], target: 'influence_skills' }
-      ];
-
-      headers.forEach(header => {
-        const lowerHeader = header.toLowerCase();
-        const mapping = commonMappings.find(m => 
-          m.patterns.some(pattern => lowerHeader.includes(pattern))
-        );
-        if (mapping) {
-          autoMapping[header] = mapping.target;
-        }
-      });
-
+      // Use intelligent auto-mapping system
+      const autoMapping = autoMapColumns(headers);
       setColumnMapping(autoMapping);
+      
+      const mappedCount = Object.keys(autoMapping).length;
+      const totalColumns = headers.length;
+      
       setStep('mapping');
       
       toast({
         title: "File Parsed Successfully",
-        description: `Found ${parsedData.data.length} records with ${headers.length} columns.`
+        description: `Found ${parsedData.data.length} records with ${headers.length} columns. Auto-mapped ${mappedCount}/${totalColumns} columns.`
       });
 
     } catch (error) {
@@ -474,15 +430,39 @@ const ExternalSurveyUploadModal: React.FC<ExternalSurveyUploadModalProps> = ({
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-xs text-muted-foreground mb-3">
-                    Map your file columns to standard fields. Unmapped columns will be kept as custom fields.
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm text-muted-foreground">
+                        Map your file columns to standard fields. Auto-mapped fields are based on intelligent text matching.
+                      </p>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          const autoMapping = autoMapColumns(parsedData.headers);
+                          setColumnMapping(autoMapping);
+                          const mappedCount = Object.keys(autoMapping).length;
+                          toast({
+                            title: "Re-mapped Columns",
+                            description: `Auto-mapped ${mappedCount}/${parsedData.headers.length} columns using intelligent matching.`
+                          });
+                        }}
+                      >
+                        Re-run Auto-mapping
+                      </Button>
+                    </div>
                   </div>
                   <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 max-h-64 overflow-y-auto">
                     {parsedData.headers.map(header => (
                       <div key={header} className="space-y-2">
-                        <label className="text-xs font-medium text-muted-foreground truncate block" title={header}>
-                          {header}
-                        </label>
+                        <div className="flex items-center justify-between mb-2">
+                          <label className="text-xs font-medium text-muted-foreground truncate" title={header}>
+                            {header}
+                          </label>
+                          {columnMapping[header] && columnMapping[header] !== 'none' && (
+                            <Badge variant="secondary" className="text-xs">Auto-mapped</Badge>
+                          )}
+                        </div>
                         <Select
                           value={columnMapping[header] || 'none'}
                           onValueChange={(value) => {
@@ -610,6 +590,7 @@ const ExternalSurveyUploadModal: React.FC<ExternalSurveyUploadModalProps> = ({
                     </div>
                   </div>
                 </CardContent>
+              </Card>
 
               {/* Processing Action Buttons */}
               <div className="flex justify-between items-center pt-4 border-t bg-background sticky bottom-0">
@@ -630,7 +611,6 @@ const ExternalSurveyUploadModal: React.FC<ExternalSurveyUploadModalProps> = ({
                   Process with AI Assessment ({selectedRubrics.length} rubric{selectedRubrics.length !== 1 ? 's' : ''})
                 </Button>
               </div>
-              </Card>
             </>
           )}
 
