@@ -43,11 +43,24 @@ serve(async (req) => {
         // Map external data to internal survey format
         const mappedResponse = mapExternalToInternal(surveyResponse);
         
+        // Handle duplicate learner names by appending index
+        let learnerName = mappedResponse.learner_name;
+        const { data: existingSubmission } = await supabase
+          .from('survey_submissions')
+          .select('id')
+          .eq('learner_name', learnerName)
+          .eq('external_upload_id', uploadId)
+          .single();
+          
+        if (existingSubmission) {
+          learnerName = `${mappedResponse.learner_name}_${index + 1}`;
+        }
+        
         // Create survey submission
         const { data: submission, error: submissionError } = await supabase
           .from('survey_submissions')
           .insert({
-            learner_name: mappedResponse.learner_name,
+            learner_name: learnerName,
             learner_id: null, // External surveys don't have internal learner IDs
             responses: mappedResponse.responses,
             status: 'pending',
@@ -124,21 +137,58 @@ serve(async (req) => {
 });
 
 function mapExternalToInternal(externalData: any) {
-  // Standard mapping - enhanced for current survey structure
+  // Clean and convert the data properly
+  const cleanedData = cleanExternalData(externalData);
+  
   return {
-    learner_name: externalData.name || externalData.participant_name || externalData.full_name || 'Unknown',
-    submitted_at: externalData.date || externalData.submitted_at || new Date().toISOString(),
+    learner_name: cleanedData.participant_name || cleanedData.name || cleanedData.full_name || 'Unknown',
+    submitted_at: cleanedData.submitted_at || new Date().toISOString(),
     responses: {
       participantInfo: {
-        fullName: externalData.name || externalData.participant_name || externalData.full_name,
-        email: externalData.email || externalData.email_address || '',
-        role: externalData.role || externalData.position || externalData.title || '',
-        department: externalData.department || externalData.business_area || externalData.dept || '',
-        employmentLength: externalData.employment_length || externalData.years_employed || externalData.tenure || ''
+        fullName: cleanedData.participant_name || cleanedData.name || cleanedData.full_name,
+        email: cleanedData.email || cleanedData.email_address || '',
+        role: cleanedData.role || cleanedData.position || cleanedData.title || '',
+        department: cleanedData.department || cleanedData.business_area || cleanedData.dept || '',
+        employmentLength: cleanedData.employment_length || cleanedData.years_employed || cleanedData.tenure || cleanedData['How long have you worked at Douglas?'] || ''
       },
-      answers: mapAnswers(externalData)
+      answers: mapAnswers(cleanedData)
     }
   };
+}
+
+function cleanExternalData(data: any) {
+  const cleaned: any = {};
+  
+  Object.entries(data).forEach(([key, value]) => {
+    if (value === null || value === undefined || value === '') return;
+    
+    // Handle Excel date serial numbers for timestamp fields
+    if (key.toLowerCase().includes('time') || key === 'date') {
+      if (typeof value === 'number' && value > 40000) { // Excel date serial number
+        const excelDate = new Date((value - 25569) * 86400 * 1000);
+        cleaned.submitted_at = excelDate.toISOString();
+      } else if (typeof value === 'string' && !isNaN(Number(value))) {
+        // Skip numeric strings that aren't valid dates
+        return;
+      } else if (typeof value === 'string') {
+        try {
+          cleaned.submitted_at = new Date(value).toISOString();
+        } catch {
+          // Invalid date string, skip
+        }
+      }
+      return;
+    }
+    
+    // Convert numeric strings to numbers for scale questions
+    if (typeof value === 'string' && !isNaN(Number(value)) && Number(value) >= 1 && Number(value) <= 7) {
+      cleaned[key] = Number(value);
+    } else {
+      cleaned[key] = value;
+    }
+  });
+  
+  return cleaned;
 }
 
 function mapAnswers(externalData: any) {

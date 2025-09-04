@@ -421,6 +421,47 @@ const ExternalSurveyUploadModal: React.FC<ExternalSurveyUploadModalProps> = ({
                 </CardContent>
               </Card>
 
+              {/* Data Preview */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <FileText className="h-4 w-4" />
+                    <span>Data Preview</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-xs text-muted-foreground mb-3">
+                    Preview of how your data will be processed. Check for any formatting issues.
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="text-xs border-collapse border border-border w-full">
+                      <thead>
+                        <tr className="bg-muted">
+                          <th className="border border-border p-2 text-left">Name</th>
+                          <th className="border border-border p-2 text-left">Email</th>
+                          <th className="border border-border p-2 text-left">Role</th>
+                          <th className="border border-border p-2 text-left">Department</th>
+                          <th className="border border-border p-2 text-left">Sample Data</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {parsedData.preview.slice(0, 3).map((row, index) => (
+                          <tr key={index}>
+                            <td className="border border-border p-2">{row.participant_name || row.name || 'N/A'}</td>
+                            <td className="border border-border p-2">{row.email || 'N/A'}</td>
+                            <td className="border border-border p-2">{row.role || 'N/A'}</td>
+                            <td className="border border-border p-2">{row.department || 'N/A'}</td>
+                            <td className="border border-border p-2 truncate max-w-32">
+                              {Object.keys(row).slice(0, 3).map(key => `${key}: ${row[key]}`).join(', ')}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* Column Mapping */}
               <Card>
                 <CardHeader>
