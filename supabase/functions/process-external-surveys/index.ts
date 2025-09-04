@@ -124,17 +124,17 @@ serve(async (req) => {
 });
 
 function mapExternalToInternal(externalData: any) {
-  // Standard mapping - can be enhanced based on common external formats
+  // Standard mapping - enhanced for current survey structure
   return {
     learner_name: externalData.name || externalData.participant_name || externalData.full_name || 'Unknown',
     submitted_at: externalData.date || externalData.submitted_at || new Date().toISOString(),
     responses: {
       participantInfo: {
         fullName: externalData.name || externalData.participant_name || externalData.full_name,
-        company: externalData.company || externalData.organization || '',
+        email: externalData.email || externalData.email_address || '',
         role: externalData.role || externalData.position || externalData.title || '',
-        businessArea: externalData.business_area || externalData.department || '',
-        date: externalData.date || new Date().toISOString().split('T')[0]
+        department: externalData.department || externalData.business_area || externalData.dept || '',
+        employmentLength: externalData.employment_length || externalData.years_employed || externalData.tenure || ''
       },
       answers: mapAnswers(externalData)
     }
@@ -144,12 +144,12 @@ function mapExternalToInternal(externalData: any) {
 function mapAnswers(externalData: any) {
   const answers: any = {};
   
-  // Direct mapping for survey questions - preserve exact field names from the UI mapping
+  // Direct mapping for survey questions - updated to match current survey structure
   const directMappings = [
-    // Leadership Sentiment
-    'sentiment_1', 'sentiment_2', 'sentiment_3', 'sentiment_4', 'sentiment_5',
-    // Purpose  
-    'purpose_1', 'purpose_2', 'purpose_3', 'purpose_4', 'purpose_5',
+    // Leadership Sentiment (now includes sentiment_6)
+    'sentiment_1', 'sentiment_2', 'sentiment_3', 'sentiment_4', 'sentiment_5', 'sentiment_6',
+    // Purpose (only purpose_5 remains)
+    'purpose_5',
     // Agility
     'agility_1', 'agility_2', 'agility_3', 'agility_4', 'agility_5', 'agility_6',
     // Leadership Competencies
@@ -164,10 +164,7 @@ function mapAnswers(externalData: any) {
     { patterns: ['mindset', 'leadership_mindset'], target: 'sentiment_3' },
     { patterns: ['challenging', 'challenges', 'difficult'], target: 'sentiment_4' },
     { patterns: ['exciting', 'energising', 'motivating'], target: 'sentiment_5' },
-    { patterns: ['matters_most', 'important', 'priority'], target: 'purpose_1' },
-    { patterns: ['aspirational', 'want_to_be', 'future_style'], target: 'purpose_2' },
-    { patterns: ['values', 'core_values'], target: 'purpose_3' },
-    { patterns: ['legacy', 'impact', 'remembered'], target: 'purpose_4' },
+    { patterns: ['matters_most', 'what_matters', 'important', 'priority', 'leader_priority'], target: 'sentiment_6' },
     { patterns: ['purpose_rating', 'purpose_score'], target: 'purpose_5' },
     { patterns: ['decision_making', 'decisions'], target: 'agility_1' },
     { patterns: ['complex_problems', 'complexity'], target: 'agility_2' },
@@ -198,7 +195,7 @@ function mapAnswers(externalData: any) {
     const lowerKey = key.toLowerCase();
     
     // Skip basic participant info fields
-    if (['name', 'company', 'role', 'date', 'participant_name', 'full_name', 'organization', 'position', 'title', 'business_area', 'department', 'email'].includes(lowerKey)) {
+    if (['name', 'company', 'role', 'date', 'participant_name', 'full_name', 'organization', 'position', 'title', 'business_area', 'department', 'email', 'employment_length', 'years_employed', 'tenure'].includes(lowerKey)) {
       return;
     }
     

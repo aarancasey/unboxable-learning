@@ -131,29 +131,27 @@ const ExternalSurveyUploadModal: React.FC<ExternalSurveyUploadModalProps> = ({
 
       setParsedData(parsedData);
       
-      // Auto-suggest column mappings with comprehensive survey question mapping
+      // Auto-suggest column mappings with current survey structure
       const autoMapping: Record<string, string> = {};
       const commonMappings = [
-        // Basic participant info
+        // Participant info
         { patterns: ['name', 'participant', 'full_name', 'fullname'], target: 'participant_name' },
         { patterns: ['company', 'organization', 'org'], target: 'company' },
         { patterns: ['role', 'position', 'title', 'job'], target: 'role' },
         { patterns: ['date', 'submitted', 'timestamp'], target: 'date' },
-        { patterns: ['email', 'e-mail'], target: 'email' },
-        { patterns: ['business_area', 'department', 'dept'], target: 'business_area' },
+        { patterns: ['email', 'e-mail', 'email_address'], target: 'email' },
+        { patterns: ['department', 'dept', 'business_area'], target: 'department' },
+        { patterns: ['employment_length', 'years_employed', 'tenure'], target: 'employment_length' },
         
-        // Leadership Sentiment questions
+        // Leadership Sentiment questions (updated structure)
         { patterns: ['leadership_style', 'current_style', 'sentiment_1'], target: 'sentiment_1' },
         { patterns: ['confidence_complexity', 'complexity', 'sentiment_2'], target: 'sentiment_2' },
         { patterns: ['leadership_mindset', 'mindset', 'sentiment_3'], target: 'sentiment_3' },
         { patterns: ['challenging', 'challenges', 'sentiment_4'], target: 'sentiment_4' },
         { patterns: ['exciting', 'energising', 'sentiment_5'], target: 'sentiment_5' },
+        { patterns: ['matters_most', 'what_matters', 'leader_priority', 'sentiment_6'], target: 'sentiment_6' },
         
-        // Purpose questions
-        { patterns: ['matters_most', 'purpose_1'], target: 'purpose_1' },
-        { patterns: ['leadership_style_aspirational', 'purpose_2'], target: 'purpose_2' },
-        { patterns: ['values', 'purpose_3'], target: 'purpose_3' },
-        { patterns: ['legacy', 'impact', 'purpose_4'], target: 'purpose_4' },
+        // Purpose questions (only purpose_5 remains)
         { patterns: ['purpose_rating', 'purpose_score', 'purpose_5'], target: 'purpose_5' },
         
         // Agility questions
@@ -504,9 +502,10 @@ const ExternalSurveyUploadModal: React.FC<ExternalSurveyUploadModalProps> = ({
                             <SelectItem value="participant_name">Participant Name</SelectItem>
                             <SelectItem value="company">Company</SelectItem>
                             <SelectItem value="role">Role/Position</SelectItem>
-                            <SelectItem value="business_area">Business Area</SelectItem>
-                            <SelectItem value="date">Date</SelectItem>
                             <SelectItem value="email">Email</SelectItem>
+                            <SelectItem value="department">Department</SelectItem>
+                            <SelectItem value="employment_length">Employment Length</SelectItem>
+                            <SelectItem value="date">Date</SelectItem>
                             
                             {/* Leadership Sentiment */}
                             <SelectItem value="sentiment_1">Current Leadership Style</SelectItem>
@@ -514,12 +513,9 @@ const ExternalSurveyUploadModal: React.FC<ExternalSurveyUploadModalProps> = ({
                             <SelectItem value="sentiment_3">Leadership Mindset</SelectItem>
                             <SelectItem value="sentiment_4">Most Challenging</SelectItem>
                             <SelectItem value="sentiment_5">Most Exciting/Energising</SelectItem>
+                            <SelectItem value="sentiment_6">What Matters Most to You as a Leader</SelectItem>
                             
                             {/* Purpose */}
-                            <SelectItem value="purpose_1">What Matters Most</SelectItem>
-                            <SelectItem value="purpose_2">Aspirational Leadership Style</SelectItem>
-                            <SelectItem value="purpose_3">Core Values</SelectItem>
-                            <SelectItem value="purpose_4">Leadership Legacy</SelectItem>
                             <SelectItem value="purpose_5">Purpose Rating</SelectItem>
                             
                             {/* Agility */}
