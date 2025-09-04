@@ -48,17 +48,31 @@ const SurveyReviewer = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [storedSurveys, setStoredSurveys] = useState<any[]>([]);
   const [isExporting, setIsExporting] = useState(false);
+  const [externalUploadFilter, setExternalUploadFilter] = useState<string | null>(null);
   
   const { toast } = useToast();
+
+  // Check for external upload ID filter from URL params
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const uploadId = params.get('external_upload_id');
+    if (uploadId) {
+      setExternalUploadFilter(uploadId);
+      setFilter('external'); // Auto-set filter to external surveys
+    }
+  }, []);
 
   // Load ALL surveys from Supabase database on component mount
   useEffect(() => {
     const loadAllSurveys = async () => {
       try {
         const { DataService } = await import('@/services/dataService');
-        const surveys = await DataService.getSurveySubmissions();
+        let surveys = await DataService.getSurveySubmissions();
         
-        // Ensure we're getting ALL surveys including historical ones
+        // Filter by external upload ID if specified
+        if (externalUploadFilter) {
+          surveys = surveys.filter((s: any) => s.external_upload_id === externalUploadFilter);
+        }
         
         setStoredSurveys(surveys || []);
       } catch (error) {
@@ -68,7 +82,7 @@ const SurveyReviewer = () => {
     };
     
     loadAllSurveys();
-  }, []);
+  }, [externalUploadFilter]);
 
   const handleApproveSurvey = async (survey: any) => {
     try {
@@ -222,7 +236,11 @@ const SurveyReviewer = () => {
 
   // Apply status filter
   if (filter !== 'all') {
-    processedSurveys = processedSurveys.filter(survey => survey.status === filter);
+    if (filter === 'external') {
+      processedSurveys = processedSurveys.filter(survey => survey.data_source === 'external');
+    } else {
+      processedSurveys = processedSurveys.filter(survey => survey.status === filter);
+    }
   }
 
   // Apply sorting
@@ -569,6 +587,13 @@ const SurveyReviewer = () => {
             onClick={() => setFilter('completed')}
           >
             Completed ({stats.completed})
+          </Button>
+          <Button 
+            variant={filter === 'external' ? 'default' : 'outline'} 
+            size="sm"
+            onClick={() => setFilter('external')}
+          >
+            External ({storedSurveys.filter((s: any) => s.data_source === 'external').length})
           </Button>
         </div>
       </div>

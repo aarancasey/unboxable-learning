@@ -323,16 +323,25 @@ const ExternalSurveyManager: React.FC = () => {
                       {getStatusBadge(upload.processing_status)}
                       
                       <div className="flex space-x-1">
-                        {upload.successful_records > 0 && (
+                        {upload.successful_records > 0 ? (
                           <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => {
-                              // Navigate to survey reviewer filtered by this upload
-                              window.location.hash = '#surveys';
-                            }}
+                            variant="outline" 
+                            size="sm"
+                            className="flex items-center gap-1"
+                            onClick={() => window.location.href = `/survey-reviewer?external_upload_id=${upload.id}`}
                           >
                             <Eye className="h-4 w-4" />
+                            View Results ({upload.successful_records})
+                          </Button>
+                        ) : (
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="flex items-center gap-1"
+                            disabled
+                          >
+                            <Eye className="h-4 w-4" />
+                            No Results
                           </Button>
                         )}
                         

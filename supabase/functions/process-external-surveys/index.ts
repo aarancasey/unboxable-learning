@@ -43,24 +43,32 @@ serve(async (req) => {
         // Map external data to internal survey format
         const mappedResponse = mapExternalToInternal(surveyResponse);
         
-        // Handle duplicate learner names by appending index
-        let learnerName = mappedResponse.learner_name;
-        const { data: existingSubmission } = await supabase
+        // Handle duplicate learner names by appending an index
+        let finalLearnerName = mappedResponse.learner_name;
+        let duplicateIndex = 1;
+        let existingCheck = await supabase
           .from('survey_submissions')
-          .select('id')
-          .eq('learner_name', learnerName)
-          .eq('external_upload_id', uploadId)
-          .single();
-          
-        if (existingSubmission) {
-          learnerName = `${mappedResponse.learner_name}_${index + 1}`;
+          .select('learner_name')
+          .eq('learner_name', finalLearnerName)
+          .maybeSingle();
+        
+        while (existingCheck.data) {
+          finalLearnerName = `${mappedResponse.learner_name} (${duplicateIndex})`;
+          duplicateIndex++;
+          existingCheck = await supabase
+            .from('survey_submissions')
+            .select('learner_name')
+            .eq('learner_name', finalLearnerName)
+            .maybeSingle();
         }
+        
+        mappedResponse.learner_name = finalLearnerName;
         
         // Create survey submission
         const { data: submission, error: submissionError } = await supabase
           .from('survey_submissions')
           .insert({
-            learner_name: learnerName,
+            learner_name: finalLearnerName,
             learner_id: null, // External surveys don't have internal learner IDs
             responses: mappedResponse.responses,
             status: 'pending',
@@ -318,7 +326,14 @@ async function generateRubricAssessment(surveyResponse: any, rubric: any) {
     throw new Error('Hugging Face API key not configured');
   }
 
-  const prompt = `You are an expert assessment evaluator specializing in leadership and professional development assessments. Analyze the following survey response against the provided rubric and generate a comprehensive assessment.
+  const maxRetries = 3;
+  let lastError: any;
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`Generating rubric assessment with Hugging Face (attempt ${attempt}/${maxRetries})...`);
+      
+      const prompt = `You are an expert assessment evaluator specializing in leadership and professional development assessments. Analyze the following survey response against the provided rubric and generate a comprehensive assessment.
 
 SURVEY RESPONSE:
 Participant: ${surveyResponse.learner_name}
@@ -355,52 +370,108 @@ Please provide a detailed assessment in the following JSON format:
 
 Focus on providing specific, actionable feedback based on the survey responses and rubric criteria. Return only valid JSON.`;
 
-  const response = await fetch('https://api-inference.huggingface.co/models/meta-llama/Llama-3.1-8B-Instruct', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${HUGGING_FACE_ACCESS_TOKEN}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      inputs: prompt,
-      parameters: {
-        max_new_tokens: 2000,
-        temperature: 0.7,
-        return_full_text: false
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
+      const response = await fetch('https://api-inference.huggingface.co/models/meta-llama/Llama-3.1-8B-Instruct', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${HUGGING_FACE_ACCESS_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          inputs: prompt,
+          parameters: {
+            max_new_tokens: 2000,
+            temperature: 0.7,
+            return_full_text: false
+          }
+        }),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Hugging Face API error:', response.status, errorText);
+        lastError = new Error(`Hugging Face API error: ${errorText}`);
+        
+        if (response.status === 503 && attempt < maxRetries) {
+          console.log(`Service unavailable, waiting before retry ${attempt + 1}...`);
+          await new Promise(resolve => setTimeout(resolve, 2000 * attempt)); // Exponential backoff
+          continue;
+        }
+        throw lastError;
       }
-    }),
-  });
 
-  if (!response.ok) {
-    throw new Error(`Hugging Face API error: ${response.statusText}`);
-  }
+      const data = await response.json();
+      console.log('Raw Hugging Face response:', data);
+      
+      if (!data || data.length === 0) {
+        throw new Error('Empty response from Hugging Face API');
+      }
+      
+      const assessmentText = data[0]?.generated_text || '';
+      console.log('Generated text:', assessmentText);
 
-  const data = await response.json();
-  const assessmentText = data[0]?.generated_text || '';
-
-  try {
-    // Extract JSON from the response
-    const jsonMatch = assessmentText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('No JSON found in AI response');
+      try {
+        // Extract JSON from the response
+        const jsonMatch = assessmentText.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+          throw new Error('No JSON found in AI response');
+        }
+        
+        const assessment = JSON.parse(jsonMatch[0]);
+        console.log(`Successfully generated assessment (attempt ${attempt})`);
+        return assessment;
+      } catch (parseError) {
+        console.error('Error parsing AI assessment:', parseError);
+        console.log('Raw AI response:', assessmentText);
+        
+        if (attempt < maxRetries) {
+          console.log(`Parse failed, retrying (attempt ${attempt + 1})...`);
+          await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+          continue;
+        }
+        
+        // Fallback assessment after all parsing retries failed
+        return {
+          overallScore: 0,
+          maxPossibleScore: rubric.scoring_scale.maxPoints * rubric.criteria.length,
+          percentageScore: 0,
+          criterionScores: {},
+          summary: 'Assessment could not be completed due to parsing error after multiple attempts',
+          strengths: [],
+          areasForImprovement: ['Assessment needs manual review'],
+          recommendations: ['Please review this assessment manually'],
+          confidenceScore: 0
+        };
+      }
+    } catch (error) {
+      lastError = error;
+      console.error(`Attempt ${attempt} failed:`, error);
+      
+      if (attempt < maxRetries) {
+        console.log(`Retrying in ${2000 * attempt}ms...`);
+        await new Promise(resolve => setTimeout(resolve, 2000 * attempt));
+        continue;
+      }
     }
-    
-    return JSON.parse(jsonMatch[0]);
-  } catch (parseError) {
-    console.error('Error parsing AI assessment:', parseError);
-    console.log('Raw AI response:', assessmentText);
-    
-    // Fallback assessment
-    return {
-      overallScore: 0,
-      maxPossibleScore: rubric.scoring_scale.maxPoints * rubric.criteria.length,
-      percentageScore: 0,
-      criterionScores: {},
-      summary: 'Assessment could not be completed due to parsing error',
-      strengths: [],
-      areasForImprovement: ['Assessment needs manual review'],
-      recommendations: ['Please review this assessment manually'],
-      confidenceScore: 0
-    };
   }
+  
+  console.error('All retry attempts failed. Returning fallback assessment.');
+  
+  // Return fallback assessment after all retries failed
+  return {
+    overallScore: 0,
+    maxPossibleScore: rubric.scoring_scale ? (rubric.scoring_scale.maxPoints * rubric.criteria.length) : 5,
+    percentageScore: 0,
+    criterionScores: {},
+    summary: `Assessment failed after ${maxRetries} attempts. Last error: ${lastError?.message || 'Unknown error'}`,
+    strengths: ['Assessment pending'],
+    areasForImprovement: ['Technical error occurred'],
+    recommendations: ['Retry assessment'],
+    confidenceScore: 0
+  };
 }
